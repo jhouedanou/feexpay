@@ -1,0 +1,6 @@
+/* FeexPay webfonts.
+   SUBSTITUTION NOTE: no font binaries were supplied with the brand assets. The FeexPay
+   wordmark and tagline are set in a geometric grotesque of the Gilroy / Museo Sans family.
+   Figtree is the closest free match (geometric skeleton, double-storey 'a', straight-leg 'R')
+   and is used everywhere here. Swap this file if the real licensed family is available. */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:wght@400;500;700&display=swap");

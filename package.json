@@ -1,0 +1,16 @@
+{
+  "name": "radar-feexpay",
+  "private": true,
+  "packageManager": "pnpm@10.29.2",
+  "scripts": {
+    "extract-matrix": "tsx scripts/extract-matrix.ts",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "xlsx": "^0.18.5",
+    "@types/node": "^22.10.2"
+  }
+}
