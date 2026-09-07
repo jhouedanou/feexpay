@@ -12,7 +12,7 @@ const OUT = 'packages/scoring/src/versions/v2.1'
 
 const wb = XLSX.readFile(SRC)
 const rows = (name: string): unknown[][] =>
-  XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: null }) as unknown[][]
+  XLSX.utils.sheet_to_json(wb.Sheets[name]!, { header: 1, defval: null }) as unknown[][]
 const s = (v: unknown) => (v == null ? '' : String(v).trim())
 const n = (v: unknown) => (v == null || v === '' ? null : Number(v))
 const isCode = (v: unknown) => /^[QR]\d+[A-D]$/.test(s(v))

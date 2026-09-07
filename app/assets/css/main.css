@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  --color-navy-900: #06142b;
+  --color-navy-800: #0a2044;
+  --color-navy-700: #0d2650;
+  --color-navy-600: #112c56;
+  --color-navy-500: #23477e;
+  --color-navy-400: #45689f;
+  --color-navy-300: #7e97bf;
+  --color-navy-200: #b5c5dc;
+  --color-navy-100: #dde5f0;
+  --color-navy-50: #eef3f9;
+  --color-orange-900: #6a2e00;
+  --color-orange-800: #8e3e00;
+  --color-orange-700: #ad4b00;
+  --color-orange-600: #d45d00;
+  --color-orange-500: #e5762a;
+  --color-orange-400: #ef9453;
+  --color-orange-300: #f6b684;
+  --color-orange-200: #fbd6bb;
+  --color-orange-100: #fdebde;
+  --color-orange-50: #fff6f0;
+  --color-gray-900: #12171e;
+  --color-gray-800: #232932;
+  --color-gray-700: #373e4b;
+  --color-gray-600: #4c5665;
+  --color-gray-500: #6c7686;
+  --color-gray-400: #98a3b4;
+  --color-gray-300: #c7ceda;
+  --color-gray-200: #e0e4eb;
+  --color-gray-100: #eef0f4;
+  --color-gray-50: #f6f7f9;
+  --color-green-600: #0f7a48;
+  --color-green-100: #e4f4eb;
+  --color-amber-600: #a66a00;
+  --color-amber-100: #fbf0da;
+  --color-red-600: #b5372a;
+  --color-red-100: #fbe6e3;
+  --color-blue-600: #17549b;
+  --color-blue-100: #e5effb;
+}
+
+:root {
+  --gradient-hero: linear-gradient(180deg, #eef3f9 0%, #ffffff 68%);
+  --gradient-inverse: linear-gradient(135deg, #0d2650 0%, #112c56 55%, #23477e 100%);
+}
+
+html { font-size: 16px; }
+body { @apply bg-white text-gray-900 font-sans antialiased; }

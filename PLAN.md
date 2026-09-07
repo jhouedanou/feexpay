@@ -15,7 +15,7 @@ FeexPay (accompagné par Big Five) veut **Radar by FeexPay** (`radar.feexpay.me`
 
 Résultat gratuit affiché **avant** tout formulaire. Formulaire (P10) débloque rapport en ligne + PDF + email. Côté FeexPay : back-office admin (prospects, fiche commerciale explicable, rapports, comptes, versions). **Aucune recommandation produit automatique.** Moteur déterministe, versionné, serveur-autoritatif.
 
-Repo actuel : vide (aucun code, seulement le pack handoff à la racine). On part de zéro.
+État au 2026-09-05 : Lots 0–2 livrés (workspace, migration SQL, moteur scoring testé, API publique, P01–P09, tests PGlite + e2e). Voir §9 pour le détail coché.
 
 ---
 
@@ -238,12 +238,12 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 ## 9. Lots et ordre d'exécution
 
 **Lot 0 — Socle (jour 1–3)**
-1. `pnpm` workspace, Nuxt 3, TS strict, ESLint, Prettier, Vitest, Playwright ; modules `@nuxtjs/supabase`, `nuxt-og-image`, Tailwind.
-2. `supabase init` + `supabase start` (postgres, auth, storage, inbucket) ; projet Supabase staging/prod région Frankfurt ; `.env.example` documenté (`SUPABASE_URL`, `SUPABASE_KEY` anon, `SUPABASE_SERVICE_KEY` serveur, `DATABASE_URL`).
-3. `packages/db` : schéma Drizzle complet (§4), migrations, triggers immutabilité, RLS deny-all sur tables métier (accès service role seulement), seed admin initial (script one-shot : `inviteUserByEmail` + ligne `admin_user`). Config Auth : signups off, password ≥12 + HIBP, MFA TOTP on.
-4. CI GitHub Actions. Logger structuré (pino) + `correlation_id`. Headers sécurité (HSTS, CSP, noindex middleware).
-5. Copier assets Annexe 02 `assets/` → `app/public/brand/` ; tokens CSS Radar ; Poppins self-hosted ; MDI subset.
-6. `docs/ARCHITECTURE.md` (livrable H.2 n°2, exigé par CDC F.1 « choix consignés dans la documentation d'architecture ») :
+1. ✅ (partiel : ESLint/Prettier/Playwright e2e non installés) `pnpm` workspace, Nuxt 3, TS strict, Vitest ; modules `@nuxtjs/supabase`, `nuxt-og-image`, Tailwind.
+2. ⏳ (Supabase en ligne retenu, pas de CLI local ; env à renseigner) `supabase init` + `supabase start` (postgres, auth, storage, inbucket) ; projet Supabase staging/prod région Frankfurt ; `.env.example` documenté (`SUPABASE_URL`, `SUPABASE_KEY` anon, `SUPABASE_SERVICE_KEY` serveur, `DATABASE_URL`).
+3. ✅ (`supabase/migrations/20260905000000_init.sql` source de vérité + `server/db/schema.ts` miroir Lot 1–3 ; seed admin ⏳) `packages/db` : schéma Drizzle complet (§4), migrations, triggers immutabilité, RLS deny-all sur tables métier (accès service role seulement), seed admin initial (script one-shot : `inviteUserByEmail` + ligne `admin_user`). Config Auth : signups off, password ≥12 + HIBP, MFA TOTP on.
+4. ✅ CI GitHub Actions ; ✅ `correlation_id` ; ⏳ pino, headers sécurité (HSTS/CSP). Headers sécurité (HSTS, CSP, noindex middleware).
+5. ✅ (assets → `public/brand/`, tokens CSS Tailwind 4 ; ⏳ Poppins self-hosted, MDI) Copier assets Annexe 02 `assets/` → `app/public/brand/` ; tokens CSS Radar ; Poppins self-hosted ; MDI subset.
+6. ⏳ `docs/ARCHITECTURE.md` (livrable H.2 n°2, exigé par CDC F.1 « choix consignés dans la documentation d'architecture ») :
    - choix techniques (§2 de ce plan) avec, pour chacun, l'exigence CDC satisfaite (E.1, F.1, G.1, G.3, G.5…) ;
    - schéma de données (§4) + diagramme ER généré depuis Drizzle ;
    - diagramme de déploiement : Nuxt/Nitro (Docker) + worker pg-boss/Playwright, Supabase (Postgres, Auth, Storage) Frankfurt, Resend, GA4/Meta ; trois environnements dev (Supabase local) / staging / prod ;
@@ -253,16 +253,16 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
    Mis à jour à chaque changement de choix technique ; référencé depuis README.
 
 **Lot 2 avant Lot 1 (moteur d'abord, pur, testable)**
-6. `scripts/extract-matrix.ts` → JSON v2.1 + checksum.
-7. `packages/scoring` : dirigeant, rayonnement, cross, insights ; tests §5.5 verts.
-8. Seed `scoring_version 2.1` published + questions/options.
+6. ✅ `scripts/extract-matrix.ts` → JSON v2.1 + checksum.
+7. ✅ `packages/scoring` : dirigeant, rayonnement, cross, insights ; tests §5.5 verts (26 tests).
+8. ✅ Seed `scoring_version 2.1` published + questions/options (`server/db/seed.ts`).
 
 **Lot 1 — Parcours questions**
-9. API sessions/participations/answers ; cookie session ; reprise 7j ; abandon.
-10. P01–P07 + composants AnswerCard, ProgressBar, StepMeta, Skeleton. Responsive 390/834/1440.
+9. ✅ API sessions/participations/answers ; cookie session ; reprise 7j ; ⏳ abandon (cron).
+10. ✅ P01–P07 + AnswerCard, ProgressBar (⏳ StepMeta, Skeleton, file offline, contrôle visuel 390/834/1440 vs maquette).
 
 **Lot 2 suite — Résultats**
-11. `complete` → snapshot + insight_snapshot ; P08/P09 ; DimensionBars, ScoreGauge, WeatherCard ; emblèmes.
+11. ✅ `complete` → snapshot + insight_snapshot ; P08/P09 ; DimensionBars, WeatherCard, emblèmes (⏳ ScoreGauge).
 
 **Lot 3 — Conversion**
 12. `leads` + rapprochement contact + cross_reading ; P10/P11.
