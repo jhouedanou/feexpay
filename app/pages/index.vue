@@ -1,25 +1,36 @@
 <script setup lang="ts">
-// P01 — accueil. Socle Lot 0 : contenu définitif à venir au Lot 1.
 useSeoMeta({
-  title: 'Radar by FeexPay',
-  description:
-    'Deux diagnostics gratuits : profil du dirigeant et rayonnement de votre entreprise.',
+  title: 'Radar by FeexPay — Diagnostic gratuit du dirigeant et de son entreprise',
+  description: 'Découvrez votre profil de dirigeant et le rayonnement de votre entreprise en quelques minutes. Gratuit, sans compte, résultat immédiat.',
+  ogTitle: 'Radar by FeexPay',
+  ogImage: '/brand/hero-archetypes-orbit-1040.png',
 })
-
-const { data: health } = await useFetch('/api/public/health')
 </script>
 
 <template>
-  <section class="mx-auto max-w-3xl px-4 py-16">
-    <h1 class="text-3xl font-semibold">Radar by FeexPay</h1>
-    <p class="mt-4 text-black/70">
-      Socle applicatif en place (Lot&nbsp;0). Les écrans P01–P14 arrivent aux lots suivants.
-    </p>
-    <dl class="mt-8 text-sm">
-      <div class="flex gap-2">
-        <dt class="text-black/50">Moteur de scoring&nbsp;:</dt>
-        <dd>version {{ health?.scoringVersion }} — checksum {{ health?.checksum }}</dd>
+  <section class="px-4 py-10" style="background: var(--gradient-hero)">
+    <div class="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2">
+      <div>
+        <h1 class="text-3xl font-semibold leading-tight text-navy-800 md:text-5xl">Quel dirigeant êtes-vous ? Jusqu'où rayonne votre entreprise ?</h1>
+        <p class="mt-4 text-lg text-gray-700">Deux diagnostics courts, un résultat immédiat.</p>
+        <ul class="mt-6 space-y-2 text-gray-700">
+          <li>✓ Votre archétype de dirigeant parmi 8 figures inspirantes</li>
+          <li>✓ Le score de rayonnement de votre entreprise, avec sa météo</li>
+          <li>✓ 3 à 5 minutes par diagnostic</li>
+          <li>✓ Aucun formulaire avant le résultat</li>
+        </ul>
+        <NuxtLink to="/diagnostic" class="mt-8 inline-flex min-h-12 items-center rounded-xl bg-orange-500 px-6 py-3 text-base font-semibold text-white hover:bg-orange-600">
+          Commencer mon diagnostic
+        </NuxtLink>
       </div>
-    </dl>
+      <img
+        src="/brand/hero-archetypes-orbit-1040.png"
+        alt="Les huit archétypes de dirigeants en orbite"
+        class="mx-auto w-full max-w-md"
+        width="1040"
+        height="1040"
+        fetchpriority="high"
+      />
+    </div>
   </section>
 </template>

@@ -53,7 +53,7 @@ check('Dirigeant BCBADBADDBCADA → Stratège', dir.result.archetype.code === 'S
   dir.result.archetype.code)
 check('projection publique sans pilotage ni affinités',
   !JSON.stringify(dir.result).match(/pilotage|affinit|tieBreak|hypothese/i))
-check('5 barres de dimensions', dir.result.dimensions.length === 5,
+check('8 barres de dimensions', dir.result.dimensions.length === 8,
   dir.result.dimensions.map((d) => `${d.code}=${d.score}`).join(' '))
 
 const ray = await run('rayonnement', 'CCCCCCC')

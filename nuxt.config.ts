@@ -5,6 +5,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-09-08',
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      title: 'Radar by FeexPay',
+      meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+    },
+  },
+
   // PLAN.md §7 : seule P01 est indexable, tout le reste est noindex.
   // En-tête posé directement (pas de module robots pour l'instant).
   routeRules: {
@@ -16,6 +24,8 @@ export default defineNuxtConfig({
   vite: { plugins: [tailwindcss()] },
 
   typescript: { strict: true, typeCheck: false },
+
+  nitro: { experimental: { openAPI: true } },
 
   // Les noms de variables suivent le CDC (SUPABASE_URL…), pas la convention NUXT_* :
   // on les lit donc explicitement. Rien de secret sous `public` — la clé service et

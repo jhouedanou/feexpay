@@ -22,6 +22,8 @@ export default defineEventHandler(async (event) => {
     total: QUESTION_COUNT[p.diagnostic_type],
     answered: Object.keys(answers).length,
     currentIndex: currentIndex(questions, answers),
+    // Alias snake_case : graphie utilisée par les écrans.
+    current_index: currentIndex(questions, answers),
     questions,
     answers,
     correlation_id: event.context.correlationId,

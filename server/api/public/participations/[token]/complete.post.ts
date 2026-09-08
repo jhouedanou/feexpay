@@ -89,6 +89,7 @@ export default defineEventHandler(async (event) => {
     alreadyCompleted: false,
     // Identifiant d'évènement pour le tracking (déduplication client/CAPI, Lot 7).
     eventId: `diag_${p.id}`,
+    event_id: `diag_${p.id}`,
     correlation_id: event.context.correlationId,
   }
 })

@@ -44,6 +44,7 @@ export async function readSnapshot(event: H3Event, participationId: string) {
     status: 'completed' as const,
     result,
     eventId: `diag_${participationId}`,
+    event_id: `diag_${participationId}`,
     correlation_id: event.context.correlationId,
   }
 }
