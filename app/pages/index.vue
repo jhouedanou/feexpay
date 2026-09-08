@@ -88,37 +88,37 @@ const etapes = [
           </p>
         </div>
         <div class="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
-          <NuxtLink to="/diagnostic/dirigeant/introduction" class="card block p-5 hover:border-navy-300 md:p-6 lg:p-7">
-            <span class="inline-flex items-center justify-center text-navy-600 lg:mb-[18px] lg:h-14 lg:w-14 lg:rounded-[14px] lg:bg-orange-50">
+          <NuxtLink to="/diagnostic/dirigeant/introduction" class="card carte-diag group block p-5 md:p-6 lg:p-7">
+            <span class="tuile inline-flex items-center justify-center text-navy-600 lg:mb-[18px] lg:h-14 lg:w-14 lg:rounded-[14px] lg:bg-orange-50">
               <UiIcon name="compass-outline" class="!h-[26px] !w-[26px] md:!h-7 md:!w-7" />
             </span>
-            <p class="mt-2.5 mb-1.5 text-lg leading-[1.3] font-semibold text-navy-600 md:mt-3 md:mb-2 md:text-[19px] lg:mt-0 lg:mb-2.5 lg:text-[21px] lg:leading-[1.28]">Profil du dirigeant</p>
-            <p class="mb-3.5 text-[15px] leading-[1.55] text-gray-600 md:mb-4 lg:mb-[18px] lg:leading-[1.6]">
+            <p class="titre mt-2.5 mb-1.5 text-lg leading-[1.3] font-semibold text-navy-600 md:mt-3 md:mb-2 md:text-[19px] lg:mt-0 lg:mb-2.5 lg:text-[21px] lg:leading-[1.28]">Profil du dirigeant</p>
+            <p class="texte mb-3.5 text-[15px] leading-[1.55] text-gray-600 md:mb-4 lg:mb-[18px] lg:leading-[1.6]">
               Identifiez votre archétype de direction parmi huit profils et ce qu’il implique dans vos décisions<span class="hidden lg:inline"> quotidiennes</span>.
             </p>
             <div class="flex flex-wrap gap-2"><span class="chip">14 questions</span><span class="chip">4 à 6 minutes</span></div>
           </NuxtLink>
-          <NuxtLink to="/diagnostic/rayonnement/introduction" class="card block p-5 hover:border-navy-300 md:p-6 lg:p-7">
-            <span class="inline-flex items-center justify-center text-navy-600 lg:mb-[18px] lg:h-14 lg:w-14 lg:rounded-[14px] lg:bg-orange-50">
+          <NuxtLink to="/diagnostic/rayonnement/introduction" class="card carte-diag group block p-5 md:p-6 lg:p-7">
+            <span class="tuile inline-flex items-center justify-center text-navy-600 lg:mb-[18px] lg:h-14 lg:w-14 lg:rounded-[14px] lg:bg-orange-50">
               <UiIcon name="broadcast" class="!h-[26px] !w-[26px] md:!h-7 md:!w-7" />
             </span>
-            <p class="mt-2.5 mb-1.5 text-lg leading-[1.3] font-semibold text-navy-600 md:mt-3 md:mb-2 md:text-[19px] lg:mt-0 lg:mb-2.5 lg:text-[21px] lg:leading-[1.28]">Rayonnement de l’entreprise</p>
-            <p class="mb-3.5 text-[15px] leading-[1.55] text-gray-600 md:mb-4 lg:mb-[18px] lg:leading-[1.6]">
+            <p class="titre mt-2.5 mb-1.5 text-lg leading-[1.3] font-semibold text-navy-600 md:mt-3 md:mb-2 md:text-[19px] lg:mt-0 lg:mb-2.5 lg:text-[21px] lg:leading-[1.28]">Rayonnement de l’entreprise</p>
+            <p class="texte mb-3.5 text-[15px] leading-[1.55] text-gray-600 md:mb-4 lg:mb-[18px] lg:leading-[1.6]">
               Mesurez ce que votre marché perçoit réellement de votre entreprise, avec un score sur 100<span class="hidden lg:inline"> et un niveau de lecture</span>.
             </p>
             <div class="flex flex-wrap gap-2"><span class="chip">7 questions</span><span class="chip">2 à 4 minutes</span></div>
           </NuxtLink>
           <!-- Carte lecture croisée : desktop seulement. -->
-          <div class="hidden rounded-[14px] border border-navy-600 bg-navy-600 p-7 lg:block">
-            <span class="mb-[18px] inline-flex h-14 w-14 items-center justify-center rounded-[14px] text-orange-300" style="background: rgba(255, 255, 255, 0.12)">
+          <NuxtLink to="/diagnostic" class="card carte-diag group hidden p-7 lg:block">
+            <span class="tuile mb-[18px] inline-flex h-14 w-14 items-center justify-center rounded-[14px] bg-orange-50 text-navy-600">
               <UiIcon name="vector-intersection" :size="28" />
             </span>
-            <p class="mb-2.5 text-[21px] leading-[1.28] font-semibold text-white">Lecture croisée</p>
-            <p class="mb-[18px] text-[15px] leading-[1.6] text-navy-200">
+            <p class="titre mb-2.5 text-[21px] leading-[1.28] font-semibold text-navy-600">Lecture croisée</p>
+            <p class="texte mb-[18px] text-[15px] leading-[1.6] text-gray-600">
               Quand les deux diagnostics sont terminés, la mise en regard du pilotage et du rayonnement fait apparaître la zone à traiter en premier.
             </p>
-            <span class="text-[15px] leading-none font-medium text-orange-300">Débloquée automatiquement →</span>
-          </div>
+            <span class="text-[15px] leading-none font-medium text-orange-600 group-hover:text-orange-300">Débloquée automatiquement →</span>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -133,15 +133,14 @@ const etapes = [
           <li
             v-for="(e, i) in etapes"
             :key="e.titre"
-            class="flex gap-3.5 md:block lg:border-t-2 lg:pt-[22px]"
-            :class="i === 0 ? 'lg:border-orange-600' : 'lg:border-gray-200'"
+            class="etape group flex gap-3.5 md:block lg:border-t-2 lg:border-gray-200 lg:pt-[22px]"
           >
             <span
-              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-navy-50 text-[15px] leading-none font-semibold text-navy-600 md:mb-3.5 md:h-9 md:w-9 md:text-base lg:hidden"
+              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-navy-50 text-[15px] leading-none font-semibold text-navy-600 group-hover:bg-orange-50 group-hover:text-orange-700 md:mb-3.5 md:h-9 md:w-9 md:text-base lg:hidden"
             >
               {{ i + 1 }}
             </span>
-            <span class="mb-3 hidden font-mono text-[13px] leading-none font-semibold lg:block" :class="i === 0 ? 'text-orange-600' : 'text-gray-400'">
+            <span class="mb-3 hidden font-mono text-[13px] leading-none font-semibold text-gray-400 group-hover:text-orange-600 lg:block">
               0{{ i + 1 }}
             </span>
             <div>
@@ -185,3 +184,47 @@ const etapes = [
     </section>
   </div>
 </template>
+
+<style scoped>
+/* Survol des cartes de diagnostic : bleu nuit, tuile translucide, textes clairs. */
+.carte-diag {
+  transition:
+    background-color var(--dur-card) var(--ease-standard),
+    border-color var(--dur-card) var(--ease-standard),
+    color var(--dur-card) var(--ease-standard);
+}
+.carte-diag:hover {
+  background: var(--color-navy-600);
+  border-color: var(--color-navy-600);
+}
+.carte-diag:hover .tuile {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-orange-300);
+}
+.carte-diag:hover .titre {
+  color: #fff;
+}
+.carte-diag:hover .texte {
+  color: var(--color-navy-200);
+}
+.carte-diag:hover .chip {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.carte-diag .tuile,
+.carte-diag .titre,
+.carte-diag .texte,
+.carte-diag .chip {
+  transition:
+    background-color var(--dur-card) var(--ease-standard),
+    color var(--dur-card) var(--ease-standard);
+}
+
+/* Survol des étapes : filet et numéro passent à l'orange. */
+.etape {
+  transition: border-color var(--dur-state) var(--ease-standard);
+}
+.etape:hover {
+  border-color: var(--color-orange-600);
+}
+</style>
