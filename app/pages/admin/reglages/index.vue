@@ -44,7 +44,9 @@ async function enregistrer() {
 
 <template>
   <div>
-    <AdminHeader titre="Réglages" sous-titre="Identifiants de tracking du plan V1.2 · modifiables ici, lus côté serveur" />
+    <AdminHeader titre="Réglages" sous-titre="Identifiants de tracking du plan V1.2 · modifiables ici, lus côté serveur">
+      <NuxtLink to="/admin/reglages/leviers" class="btn btn-outline h-10 gap-2 rounded-[10px] px-3.5 text-sm"><UiIcon name="storefront-outline" :size="18" class="text-gray-500" />Leviers FeexPay</NuxtLink>
+    </AdminHeader>
     <form class="flex items-start gap-5 px-8 pt-7 pb-9" novalidate @submit.prevent="enregistrer">
       <div class="card min-w-0 flex-1 p-7">
         <h3 class="mb-[22px] text-[17px] font-semibold text-navy-600">Mesure d’audience et publicité</h3>

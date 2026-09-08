@@ -282,3 +282,147 @@ export function rapportPdf(r: RapportPublic, baseUrl: string): Buffer {
 const minuscule = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : '')
 const c05 = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
+// --- Fiche prospect (A04 synthèse, A05 entretien) -------------------------------
+
+type FicheData = {
+  contact: { prenom: string; nom: string; email: string; telephone: string | null; entreprise: string | null; secteur: string | null; taille: string | null; pays: string | null }
+  activite: { source: string; premiere: string | Date; derniere: string | Date }
+  priorite: { niveau: string; justification: string }
+  deux: boolean
+  dirigeant: { public: { archetype: { code: string; inspirePar: string }; secondaire: { code: string } | null; dimensions: { nom: string; score: number }[] }; pilotage: { score: number; niveau: string }; version: string } | null
+  rayonnement: { public: { score: number; niveauAffiche: string; meteo: string; dimensions: { nom: string; score: number }[] } } | null
+  croisement: { code: string; lecture: string; interpretation: string; pilotage: number; rayonnement: number } | null
+  constats: { code: string; questionCode: string; gravite: number; difficulte: string; factuel: string; relance: string; dimension: string; diagnostic: string }[]
+  leviers: { levier: { nom: string; description: string }; traite: { code: string }[]; support: { code: string }[] }[]
+}
+
+/**
+ * Fiche prospect imprimable. `synthese` reprend A04 (profils, lecture croisée, difficultés) ;
+ * `entretien` reprend A05 (constats retenus, leviers, angle d'entretien, garde-fous).
+ * Les scores internes y figurent : document réservé à l'équipe, jamais remis au prospect.
+ */
+export function fichePdf(d: FicheData, vue: 'synthese' | 'entretien'): Buffer {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  let y = M
+  const need = (h: number) => {
+    if (y + h > A4.h - M - 8) {
+      doc.addPage()
+      y = M
+    }
+  }
+  const text = (s: string, size: number, color: [number, number, number], opts: { bold?: boolean; lh?: number; width?: number; x?: number } = {}) => {
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal')
+    doc.setFontSize(size)
+    doc.setTextColor(...color)
+    const lines = doc.splitTextToSize(s, opts.width ?? W) as string[]
+    const lh = (opts.lh ?? 1.45) * size * 0.3528
+    need(lines.length * lh)
+    doc.text(lines, opts.x ?? M, y + size * 0.3528 * 0.8)
+    y += lines.length * lh
+  }
+  const eyebrow = (s: string) => {
+    y += 4
+    text(s.toUpperCase(), 8, ORANGE, { bold: true, lh: 1.2 })
+    y += 1.5
+  }
+  const ligne = () => {
+    need(4)
+    doc.setDrawColor(...GRAY_LIGHT)
+    doc.line(M, y + 1, M + W, y + 1)
+    y += 4
+  }
+  const date = (v: string | Date) => new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const c = d.contact
+
+  text('Radar by FeexPay · document interne', 8, GRAY, { bold: true, lh: 1.2 })
+  y += 2
+  text(vue === 'entretien' ? `${c.prenom} ${c.nom} · diagnostic commercial` : `${c.prenom} ${c.nom}`, 20, NAVY, { bold: true, lh: 1.15 })
+  text([c.entreprise, c.secteur, c.taille ? `${c.taille} personnes` : null, c.pays].filter(Boolean).join(' · '), 10, GRAY)
+  text(`${c.email}${c.telephone ? ' · ' + c.telephone : ''} · source ${d.activite.source} · première participation le ${date(d.activite.premiere)}`, 9, GRAY)
+  y += 2
+  text(`Priorité ${d.priorite.niveau.toLowerCase()} · ${d.priorite.justification}`, 9.5, ORANGE_700, { bold: true })
+  ligne()
+
+  if (vue === 'synthese') {
+    if (d.dirigeant) {
+      eyebrow('Profil de dirigeant')
+      text(d.dirigeant.public.archetype.code, 15, NAVY, { bold: true, lh: 1.2 })
+      text(`${d.dirigeant.public.secondaire ? `Profil secondaire : ${d.dirigeant.public.secondaire.code} · ` : ''}inspiré par ${d.dirigeant.public.archetype.inspirePar} · pilotage ${Math.round(d.dirigeant.pilotage.score)} (${d.dirigeant.pilotage.niveau.toLowerCase()}) · moteur ${d.dirigeant.version}`, 9.5, GRAY)
+      for (const dim of [...d.dirigeant.public.dimensions].sort((a, b) => b.score - a.score).slice(0, 3)) text(`${dim.nom} · ${Math.round(dim.score)}`, 9.5, GRAY)
+    }
+    if (d.rayonnement) {
+      eyebrow('Rayonnement')
+      text(`${d.rayonnement.public.score} / 100`, 15, NAVY, { bold: true, lh: 1.2 })
+      text(`${d.rayonnement.public.niveauAffiche} · météo « ${d.rayonnement.public.meteo.toLowerCase()} »`, 9.5, GRAY)
+      for (const dim of d.rayonnement.public.dimensions) text(`${dim.nom} · ${Math.round(dim.score)}`, 9.5, GRAY)
+    }
+    eyebrow('Lecture croisée')
+    if (d.croisement) {
+      text(`${d.croisement.lecture} · règle ${d.croisement.code}`, 11, NAVY, { bold: true })
+      text(d.croisement.interpretation, 9.5, GRAY)
+      text(`Pilotage interne ${d.croisement.pilotage} · rayonnement externe ${d.croisement.rayonnement}`, 9.5, GRAY)
+    } else {
+      text('Indisponible : la lecture croisée exige les deux diagnostics.', 9.5, GRAY)
+    }
+    eyebrow('Difficultés déclarées, par gravité')
+    if (!d.constats.length) text('Aucune difficulté déclarée.', 9.5, GRAY)
+    for (const k of d.constats) {
+      text(`${k.difficulte} (gravité ${k.gravite})`, 10, NAVY, { bold: true })
+      text(`Constat ${k.code} · déclaré à la question ${k.questionCode.replace(/\D/g, '')}${k.diagnostic === 'rayonnement' ? ' du Rayonnement' : ''}`, 8.5, GRAY)
+      y += 1
+    }
+  } else {
+    eyebrow(`Constats retenus · ${d.constats.length}`)
+    if (!d.constats.length) text('Aucune difficulté déclarée.', 9.5, GRAY)
+    for (const k of d.constats) {
+      text(`${k.code} · ${k.difficulte} (gravité ${k.gravite})`, 10, NAVY, { bold: true })
+      text(k.factuel, 9.5, GRAY)
+      text(`Relance : ${k.relance} · ${k.dimension}`, 8.5, GRAY)
+      y += 1
+    }
+    eyebrow('Leviers FeexPay associés')
+    if (!d.leviers.length) text('Aucun levier rattaché aux constats retenus.', 9.5, GRAY)
+    for (const l of d.leviers) {
+      const traite = l.traite.map((t) => t.code)
+      const support = l.support.map((t) => t.code)
+      text(`${l.levier.nom} · ${traite.length ? 'Traite ' + traite.join(' et ') : 'Support de ' + support.join(' et ')}`, 10, NAVY, { bold: true })
+      text(l.levier.description, 9.5, GRAY)
+      y += 1
+    }
+    eyebrow('Angle d’entretien proposé')
+    for (const p of angleEntretien(d)) text(`• ${p}`, 9.5, GRAY)
+    eyebrow('Ce qu’il ne faut pas dire')
+    for (const p of GARDE_FOUS) text(`• ${p}`, 9.5, GRAY)
+  }
+
+  y = A4.h - M
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(7.5)
+  doc.setTextColor(...GRAY)
+  doc.text('Support de préparation d’entretien. Les constats reprennent les déclarations du dirigeant, sans interprétation ajoutée. Les scores internes ne sont jamais cités au prospect.', M, y)
+
+  return Buffer.from(doc.output('arraybuffer'))
+}
+
+export const GARDE_FOUS = [
+  'Aucun jugement sur la gestion de l’entreprise.',
+  'Aucun score interne cité au prospect : les scores restent des outils de priorisation.',
+  'Aucune promesse de résultat chiffré.',
+]
+
+/** Angle d'entretien (A05) : citation d'ouverture puis trois points, dérivés des constats et des leviers. */
+export function angleEntretien(d: Pick<FicheData, 'constats' | 'leviers' | 'dirigeant' | 'contact'>): string[] {
+  const premier = d.constats[0]
+  const leviers = d.leviers.map((l) => l.levier.nom)
+  const pilotageBon = (d.dirigeant?.pilotage.score ?? 0) >= 50
+  const citation = premier
+    ? `« ${pilotageBon ? 'Vous pilotez déjà bien votre activité.' : 'Vous connaissez votre activité mieux que quiconque.'} Ce qui vous coûte aujourd’hui, c’est ${minuscule(premier.difficulte.replace(/\.$/, ''))}. »`
+    : '« Vous avez décrit votre activité avec précision. Regardons ensemble ce qui peut vous faire gagner du temps. »'
+  const points = [
+    premier ? `Partir du constat ${premier.code}, formulé avec ses mots.` : 'Partir des forces déclarées, formulées avec ses mots.',
+    d.leviers[0] ? `Montrer ${d.leviers[0].levier.nom} en usage réel, pas la liste des produits.` : 'Montrer un usage concret, pas la liste des produits.',
+    leviers.length > 1 ? `Proposer ${leviers[0]} comme première étape, ${leviers[1]} ensuite.` : leviers.length === 1 ? `Proposer ${leviers[0]} comme première étape.` : 'Ne proposer aucun produit tant qu’un besoin n’est pas formulé par le prospect.',
+  ]
+  return [citation, ...points]
+}

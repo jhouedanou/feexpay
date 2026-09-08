@@ -65,6 +65,7 @@ pnpm test          # moteur (44) + migration SQL sur PGlite (9), sans base exter
 pnpm test:api      # parcours HTTP : session, réponses, reprise, abandon (26 contrôles)
 pnpm test:results  # calcul, snapshot, idempotence, cas normatifs §5.5 (14 contrôles)
 pnpm test:admin    # invitation, 2FA TOTP, RBAC, gardes admin (22 contrôles, crée des comptes de test)
+pnpm test:metier   # admin métier : dashboard, prospects, fiche, participation, leviers, exports (30 contrôles)
 ```
 
 Les deux derniers exigent un serveur lancé et écrivent dans la base pointée par
@@ -72,7 +73,7 @@ Les deux derniers exigent un serveur lancé et écrivent dans la base pointée p
 
 ## Base de données
 
-Le schéma est appliqué sur le projet Supabase en ligne : 21 tables, RLS activé sans policy sur
+Le schéma est appliqué sur le projet Supabase en ligne : 26 tables, RLS activé sans policy sur
 toutes (deny-all, accès service role uniquement), triggers d'immutabilité sur les snapshots,
 l'historique des réponses et les versions publiées.
 
@@ -86,6 +87,17 @@ une invitation de 7 jours par adresse de la liste du 8 septembre (domaines `feex
 (12 caractères, contrôle HIBP) et la double authentification TOTP (obligatoire Analyste et
 Administrateur) sont appliquées par l'application ; au dashboard Supabase, laisser les
 inscriptions publiques désactivées.
+
+Admin métier (lot 5, cadres A02 à A08) : dashboard sur période glissante comparée à la
+précédente, liste des prospects avec filtres et pagination serveur, fiche prospect en cinq
+onglets (synthèse, diagnostic commercial, participations, rapports et emails, historique),
+détail de participation, états vides et erreurs. Les « Leviers FeexPay associés » de A05
+(maquette qui prime sur le CDC) reposent sur la table `levier_feexpay` / `levier_constat`,
+rattachée à la dimension des constats et modifiable dans Réglages → Leviers FeexPay. Le suivi
+commercial (statut, responsable, notes internes) vit dans `prospect_suivi` / `prospect_note`.
+Chaque export (CSV, PDF de fiche, JSON de réponses) exige `export_allowed` sur le compte et
+laisse une ligne dans `export_job` et `audit_log`. « Renvoyer le rapport » réémet le même
+rapport avec un nouveau jeton, l'ancien lien devenant invalide.
 
 ## Règles
 

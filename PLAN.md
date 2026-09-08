@@ -340,7 +340,7 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 15. Invitations maison 7 j → `generateLink` Supabase ; enrôlement TOTP obligatoire au premier login Analyste/Admin ; codes de récupération ; middleware `aal2` + rôle (`app_metadata`) ; gardes admin (dernier admin, auto-rétrogradation, suspension = `admin.signOut` global) ; `audit_log` ; A01, A09, A10 ; templates invitation/reset/alerte.
 
 **Lot 5 — Admin métier**
-16. A02 dashboard KPI ; A03 liste ; A04/A05/A06 ; cartes Difficulty/Force/Hypothesis/Fact, SeverityTag, KpiCard, EmptyState/EmptyValue.
+16. A02 dashboard KPI ; A03 liste ; A04/A05/A06 ; cartes Difficulty/Force/Hypothesis/Fact, SeverityTag, KpiCard, EmptyState/EmptyValue. Livré le 8 septembre 2026 : migration `20260908140000_admin_metier.sql` (leviers, suivi, notes), utilitaire `server/utils/admin-metier.ts`, dix routes `/api/admin/**`, pages `admin/index`, `admin/prospects/**`, `admin/participations/**`, `admin/reglages/leviers`, test `test/api-metier.mjs`.
 
 **Lot 6 — Ops admin**
 17. A07 rapports + renvoi ; exports async journalisés ; T01 versions + publication contrôlée ; A08 états.

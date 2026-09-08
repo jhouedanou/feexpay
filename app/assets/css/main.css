@@ -414,3 +414,17 @@ button,
   border-color: var(--color-red-600);
   box-shadow: 0 0 0 3px var(--color-red-100);
 }
+
+/* Tableaux admin (lot 5) : pistes minmax(0, …) pour que le contenu long ne déforme pas les colonnes. */
+@utility grille-prospects {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 2.2fr) minmax(0, 0.9fr);
+}
+@utility grille-participations {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1.8fr) minmax(0, 0.6fr);
+}
+@utility grille-fiche-participations {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
+}
+@utility grille-notifications {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.6fr) minmax(0, 2fr);
+}

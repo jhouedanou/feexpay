@@ -16,6 +16,7 @@
     "seed:scoring": "tsx scripts/seed-scoring-version.ts",
     "test:leads": "node test/api-leads.mjs",
     "test:admin": "node test/api-admin.mjs",
+    "test:metier": "node test/api-metier.mjs",
     "seed:admins": "tsx scripts/seed-admins.ts"
   },
   "devDependencies": {

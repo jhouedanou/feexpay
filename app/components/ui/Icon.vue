@@ -6,6 +6,19 @@
  * devient `compass-outline`).
  */
 import {
+  mdiLink,
+  mdiDeleteOutline,
+  mdiPlus,
+  mdiSendOutline,
+  mdiNotePlusOutline,
+  mdiAccountMultiplePlusOutline,
+  mdiFilterVariant,
+  mdiChevronLeft,
+  mdiCloseCircleOutline,
+  mdiCodeJson,
+  mdiFilePdfBox,
+  mdiCashFast,
+  mdiStorefrontOutline,
   mdiAccountOutline,
   mdiAlertCircleOutline,
   mdiAlertOutline,
@@ -137,6 +150,19 @@ const ICONS: Record<string, string> = {
   'open-in-new': mdiOpenInNew,
   'key-outline': mdiKeyOutline,
   'cellphone': mdiCellphone,
+  'storefront-outline': mdiStorefrontOutline,
+  'cash-fast': mdiCashFast,
+  'file-pdf-box': mdiFilePdfBox,
+  'code-json': mdiCodeJson,
+  'close-circle-outline': mdiCloseCircleOutline,
+  'chevron-left': mdiChevronLeft,
+  'filter-variant': mdiFilterVariant,
+  'account-multiple-plus-outline': mdiAccountMultiplePlusOutline,
+  'note-plus-outline': mdiNotePlusOutline,
+  'send-outline': mdiSendOutline,
+  'plus': mdiPlus,
+  'delete-outline': mdiDeleteOutline,
+  'link': mdiLink,
 }
 
 const props = withDefaults(defineProps<{ name: string; size?: number; label?: string }>(), {
