@@ -14,15 +14,15 @@
 | 2 | Supabase local + `.env.example` | **projet en ligne opérationnel** (`lssvoupqvcdlufbegghd`, PostgreSQL 17.6) : `.env` renseigné, connexion Postgres et API REST vérifiées le 2026-09-08. Manque : `supabase start` en local (CLI et Docker absents du poste), séparation staging/prod |
 | 3 | `packages/db` (Drizzle, RLS, seed) | **migration appliquée en ligne** : 21 tables, RLS activé sans policy sur les 21 (deny-all, service role seul), 18 triggers dont immutabilité — testé, `VERSION_LOCKED` remonte bien. Manque : `packages/db` (schéma Drizzle + drizzle-kit), seed admin, config Auth (signups off, HIBP, MFA) |
 | 4 | CI, logger, en-têtes sécurité | partiel — `correlation_id` en place (`server/middleware/correlation.ts`, en-tête `x-correlation-id` + repris dans chaque erreur). Manque : logger pino, HSTS/CSP. **CI GitHub Actions abandonnée** : déploiement via Vercel |
-| 5 | Assets de marque | **fait pour le parcours public** — logos SVG corrigés + PNG, 8 emblèmes d'archétypes (64/256/pleine taille), illustration hero, tokens CSS dans `app/assets/css/main.css`. Manque : Poppins self-hosted, MDI |
+| 5 | Assets de marque | **fait** — logos, 8 emblèmes, hero, tokens CSS, **Poppins self-hosted** (4 graisses woff2, latin + latin-ext, 52 Ko, preload), **icônes MDI** en sous-ensemble SVG (`app/components/ui/Icon.vue`) remplaçant les emoji interdits par le design system. Manque : variantes AVIF/WebP du hero |
 | 6 | `docs/ARCHITECTURE.md` | à faire |
 | 6b | `scripts/extract-matrix.ts` → JSON v2.1 | **fait** — 21 questions, 84 options, 8 archétypes, 16 règles, checksum `4513791…` |
 | 7 | `packages/scoring` + tests §5.5 | **fait** — 44 tests verts (`pnpm --filter @radar/scoring test`) |
 | 8 | Seed `scoring_version 2.1` | **fait** — `scripts/seed-scoring-version.ts` (idempotent, transactionnel) : version 2.1 `published`, 14 + 7 questions, 84 options, checksum `4513791…` identique au moteur (`GET /api/public/health` → `checksumMatch: true`) |
 | 9 | Lot 1 étape 9 — API parcours | **fait** — `server/api/public/{sessions.post,participations.post,participations/[token].get,participations/[token]/answers/[questionCode].put,participations/[token]/abandon.post}.ts` + `server/utils/{db,tokens,errors,session,participation}.ts`. Cookie `radar_sid` httpOnly 7 j glissants, acquisition first-touch, jetons hashés, zod strict. 26 contrôles verts (`pnpm test:api`) |
-| 10 | Lot 1 étape 10 — écrans P01–P07 | **fait** — `app/pages/{index,diagnostic/index,diagnostic/[type]/introduction,diagnostic/[type]/question/[numero],diagnostic/[type]/calcul}.vue` + composants `AnswerCard`, `ProgressBar`, `DimensionBars`, `WeatherCard`, composable `useParticipation`. Vérifié au navigateur à 390 px et en desktop |
+| 10 | Lot 1 étape 10 — écrans P01–P07 | **fait, repris au gabarit de la maquette** — `app/pages/{index,diagnostic/index,diagnostic/[type]/introduction,diagnostic/[type]/question/[numero],diagnostic/[type]/calcul}.vue` + composants `AnswerCard`, `ProgressBar`, `DimensionBars`, `WeatherCard`, composable `useParticipation`, plus `Skeleton` et `StepMeta`. Fondations CSS complètes : échelle typographique responsive, rayons, hauteurs de contrôle (44/52/56), ombres teintées navy, mouvement (140/220/360 ms, `cubic-bezier(.2,0,0,1)`), `:focus-visible` global au halo 3 px orange-300, neutralisation sous `prefers-reduced-motion`. `AnswerCard` porte ses 6 états spécifiés. En-tête 76 px collant, footer 4 colonnes, liste d'étapes en P07. Vérifié au navigateur à 390 px et en desktop |
 | 11 | Lot 2 étape 11 — résultats P08/P09 | **fait** — `complete` (snapshot immuable, idempotent) + `GET /results` + `app/pages/resultat/[type]/[token].vue`. Cas normatifs vérifiés de bout en bout par HTTP : Stratège, 67 Challenger fort, 0, 100 (`pnpm test:results`) |
-| 12+ | Lot 3 et suivants | à faire — **prochaine étape : Lot 3** (formulaire P10, rapport, PDF, email), bloqué par le DNS et par l'hébergement du worker |
+| 12+ | Lot 3 et suivants | à faire — **plus aucun blocage externe** (cf. ci-dessous). Prochaine étape : déploiement Vercel, puis P10/P11, rapport et PDF jsPDF, envoi Resend |
 
 Écart assumé vs §2 : **Nuxt 4.5** au lieu de Nuxt 3 — même API, et sa structure par défaut
 (`app/pages`, `app/components`, `app/layouts`) est exactement l'arborescence cible du §3.
@@ -33,26 +33,35 @@ Prérequis machine : `node` par défaut est en v10 → `nvm use 22` avant tout `
 `supabase` CLI et `docker` **ne sont pas installés** sur ce poste : `supabase start` est
 impossible en l'état. On travaille donc directement sur le projet Supabase en ligne.
 
-**Déploiement : Vercel** (décidé le 2026-09-08, pas de CI GitHub Actions). Deux conséquences
-à traiter avant la première mise en ligne :
+**Déploiement : Vercel** (décidé le 2026-09-08, pas de CI GitHub Actions). Trois choix
+techniques ont été changés le 2026-09-08 pour que l'application tienne entièrement dans des
+fonctions éphémères et ne dépende plus d'aucun élément extérieur :
 
-1. **La connexion directe ne marchera pas sur Vercel — résolu.** `db.<ref>.supabase.co` ne publie
-   aucun enregistrement A, uniquement AAAA : elle est IPv6-only. Elle fonctionne depuis un poste
-   ayant IPv6 (vérifié en local), mais les fonctions Vercel n'ont pas d'egress IPv6.
-   `DATABASE_URL` sur Vercel doit donc pointer le **pooler Supavisor en mode session** :
+1. **Base** — la connexion directe `db.<ref>.supabase.co` est IPv6-only (aucun enregistrement
+   A) et les fonctions Vercel n'ont pas d'egress IPv6. `DATABASE_URL` sur Vercel doit donc
+   pointer le **pooler Supavisor en mode session** :
    `postgresql://postgres.<ref>:<mdp>@aws-0-eu-west-2.pooler.supabase.com:5432/postgres`
    (valeur prête dans `.env` sous `DATABASE_URL_POOLER`, mot de passe percent-encodé).
-   Vérifié le 2026-09-08 : résolution IPv4, connexion OK, données visibles, et **prepared
-   statements acceptés** — le mode session est confirmé. Le port 6543 (mode transaction) reste
-   à proscrire : pas de prepared statements, pg-boss casserait.
-   La connexion directe reste la bonne valeur en local.
+   Vérifié : résolution IPv4, connexion, données visibles, **prepared statements acceptés**.
+   Le port 6543 (mode transaction) reste à proscrire. La connexion directe reste bonne en local.
+   À noter : le pooler est en `eu-west-2` (Londres), pas à Francfort comme l'annonce le §2.
+2. **PDF** — Playwright abandonné. La limite de durée d'une fonction est de **10 s en Hobby**
+   (60 s en Pro) : un démarrage à froid de Chromium en consomme l'essentiel. Remplacé par une
+   génération en JavaScript pur (jsPDF) dans une route Nitro, à la demande, déposée dans
+   Supabase Storage. Compromis assumé : mise en page codée en coordonnées, pas un jumeau pixel
+   du rapport HTML.
+3. **File d'attente** — pg-boss abandonné. Le cron Vercel en Hobby est plafonné à **une
+   exécution par jour**, inutilisable pour du transactionnel. L'envoi Resend se fait dans la
+   requête et la table `notification` sert de journal ; le renvoi manuel depuis l'admin
+   remplace le retry automatique, ce que le CDC prévoit déjà.
 
-   À noter : le pooler est en `eu-west-2` (Londres), alors que le §2 annonce Francfort.
-   Sans effet fonctionnel, mais la documentation d'architecture devra dire la vraie région.
-2. **pg-boss + PDF Playwright sont incompatibles avec des fonctions éphémères.** Le §2 le notait
-   déjà (« exige un runtime Node long-running »). Sur Vercel, le worker de la queue et le rendu
-   PDF devront vivre ailleurs (worker dédié type Railway/Fly/VPS, ou service managé), ou être
-   remplacés. À trancher **avant le Lot 3**, c'est structurant.
+**Email sans accès DNS** : `RESEND_FROM` en variable d'environnement (défaut
+`onboarding@resend.dev`, qui ne délivre qu'à l'adresse du titulaire du compte Resend) et
+`MAIL_ALLOWLIST` optionnelle, qui journalise au lieu d'échouer pour les destinataires hors
+liste. Le jour où un domaine — **n'importe lequel, pas forcément `feexpay.me`** — est vérifié
+dans Resend, on change la variable. Aucun changement de code.
+
+**Conséquence : plus aucune seconde machine, plus aucun accès DNS requis pour livrer.**
 
 Mot de passe `DATABASE_URL` : percent-encodé le 2026-09-08 (`&`→`%26`, `+`→`%2B`, `*`→`%2A`),
 connexion revérifiée. Le mot de passe brut est rappelé en commentaire dans `.env`.
