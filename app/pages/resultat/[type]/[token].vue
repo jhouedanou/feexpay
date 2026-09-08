@@ -1,17 +1,23 @@
 <script setup lang="ts">
-// P08 / P09 — structure et libellés repris de docs/maquette/desktop-1440-P0{8,9}.md.
+// P08 / P09 — restitution. Cadres 390, 834 et 1440 (docs/maquette/frames/*-P08.html, *-P09.html).
+// Aucun champ ici : la saisie de l'adresse a lieu une seule fois, en P10.
+import { METEO_ICONE, slugArchetype, type DiagType } from '~/composables/useParticipation'
+
+definePageMeta({ layout: 'bare' })
+
 const route = useRoute()
-const type = route.params.type as string
+const type = route.params.type as DiagType
 const token = route.params.token as string
 if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCode: 404 })
 
 const { data, error } = await useFetch<any>(`/api/public/results/${token}`)
 if (error.value) throw createError({ statusCode: 404, statusMessage: 'Résultat introuvable ou expiré' })
-
 const r = computed(() => data.value?.result)
-const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
-/** La maquette présente les traits en pastilles séparées. */
+const { etat: autre, charger: chargerAutre } = useAutreDiagnostic(type)
+onMounted(chargerAutre)
+
+/** Traits en pastilles séparées : « Analytique, patient, observateur et anticipateur ». */
 const traits = computed<string[]>(() =>
   String(r.value?.archetype?.traits ?? '')
     .split(/,| et /)
@@ -19,185 +25,237 @@ const traits = computed<string[]>(() =>
     .filter(Boolean)
     .map((t: string) => t.charAt(0).toUpperCase() + t.slice(1)),
 )
+const phrase = (s: string) => (s ? s.replace(/\.?$/, '.') : '')
+const minuscule = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : '')
 
-const toRecord = (dims: any[] = []) =>
-  Object.fromEntries(dims.map((d) => [d.code ?? d.cle, d.score])) as Record<string, number>
+const dimsTriees = computed(() =>
+  [...(r.value?.dimensions ?? [])].sort((a: any, b: any) => b.score - a.score) as { nom: string; score: number }[],
+)
+const dimsTop3 = computed(() => dimsTriees.value.slice(0, 3))
+const dimsRayonnement = computed(() => (r.value?.dimensions ?? []) as { nom: string; score: number }[])
 
-/** P08 : « Dimensions les plus présentes » — les trois premières, pas les huit. */
-const dimsTop3 = computed(() => {
-  const all = [...(r.value?.dimensions ?? [])].sort((a: any, b: any) => b.score - a.score)
-  return toRecord(all.slice(0, 3))
-})
-const dimsToutes = computed(() => toRecord(r.value?.dimensions))
-
-const otherType = type === 'dirigeant' ? 'rayonnement' : 'dirigeant'
+const meteoIcone = computed(() => METEO_ICONE[r.value?.meteo] ?? 'weather-cloudy')
+const autreType: DiagType = type === 'dirigeant' ? 'rayonnement' : 'dirigeant'
+const partager = `/partager/${type}/${token}`
+const recevoir = `/recevoir-mon-analyse/${token}`
 
 useSeoMeta({
-  title:
+  title: () =>
     type === 'dirigeant'
-      ? () => `Votre profil de dirigeant : ${r.value?.archetype?.code ?? ''}`
-      : () => `Rayonnement de votre entreprise : ${r.value?.score ?? ''}/100`,
+      ? `Votre profil de dirigeant : ${r.value?.archetype?.code ?? ''} — Radar by FeexPay`
+      : `Rayonnement de votre entreprise : ${r.value?.score ?? ''} / 100 — Radar by FeexPay`,
 })
 </script>
 
 <template>
-  <section class="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1fr_340px]">
-    <div class="max-w-[760px]">
-      <!-- ------------------------------- P08 ------------------------------- -->
-      <template v-if="type === 'dirigeant'">
-        <p class="type-eyebrow">Votre profil de dirigeant</p>
-        <div class="mt-4 flex items-center gap-5">
-          <img
-            :src="`/brand/emb-${slug(r.archetype.code)}-256.png`"
-            :alt="`Emblème ${r.archetype.code}`"
-            class="h-24 w-24"
-            width="96"
-            height="96"
-          >
-          <div>
-            <h1 class="type-h1">{{ r.archetype.code }}</h1>
-            <p class="mt-1 text-[15px] text-gray-600">Inspiré par {{ r.archetype.inspirePar }}</p>
-          </div>
+  <div class="flex flex-1 flex-col">
+    <!-- Barre supérieure : desktop seulement. -->
+    <header class="hidden border-b border-gray-200 bg-white lg:block">
+      <div class="wrap flex h-[76px] items-center justify-between lg:!px-6">
+        <NuxtLink to="/" aria-label="Radar by FeexPay, accueil"><img src="/brand/logo-feexpay.svg" alt="FeexPay" class="h-6 w-auto" ></NuxtLink>
+        <div class="flex items-center gap-3">
+          <NuxtLink :to="partager" class="btn btn-outline h-11 rounded-[10px] px-4 text-sm">
+            <UiIcon name="share-variant-outline" :size="17" />
+            {{ type === 'dirigeant' ? 'Partager mon profil' : 'Partager mon résultat' }}
+          </NuxtLink>
+          <NuxtLink :to="recevoir" class="btn btn-primary h-11 rounded-[10px] px-[18px] text-sm">Recevoir mon analyse complète</NuxtLink>
         </div>
-
-        <ul class="mt-5 flex flex-wrap gap-2">
-          <li
-            v-for="t in traits"
-            :key="t"
-            class="border border-navy-100 bg-navy-50 px-3 py-1.5 text-[13px] font-medium text-navy-700"
-            style="border-radius: 999px"
-          >
-            {{ t }}
-          </li>
-        </ul>
-
-        <p class="mt-9 type-eyebrow">Dimensions les plus présentes</p>
-        <RadarDimensionBars class="mt-4" :dims="dimsTop3" />
-
-        <h2 class="mt-10 type-h3">Ce que ce profil dit de votre pilotage</h2>
-        <p class="mt-3 text-[17px] leading-[1.6] text-gray-600">{{ r.archetype.traits }}</p>
-
-        <div class="mt-8 space-y-6">
-          <div>
-            <p class="type-eyebrow">Vos forces</p>
-            <p class="mt-2 type-body text-gray-700">{{ r.archetype.forces }}</p>
-          </div>
-          <div>
-            <p class="type-eyebrow">Point de vigilance</p>
-            <p class="mt-2 type-body text-gray-700">{{ r.archetype.risque }}</p>
-          </div>
-        </div>
-
-        <div
-          v-if="r.secondaire"
-          class="mt-9 border border-gray-200 p-5"
-          style="border-radius: var(--radius-card); box-shadow: var(--shadow-sm)"
-        >
-          <p class="type-eyebrow">Profil secondaire</p>
-          <h3 class="mt-2 type-h3">{{ r.secondaire.code }}</h3>
-          <p class="mt-2 text-[15px] leading-[1.6] text-gray-600">
-            {{ r.secondaire.traits }} Elle nuance votre profil principal sans le remplacer.
-          </p>
-        </div>
-
-        <details class="mt-8">
-          <summary class="cursor-pointer text-[15px] font-medium text-navy-600">
-            Voir les huit dimensions
-          </summary>
-          <RadarDimensionBars class="mt-4" :dims="dimsToutes" />
-        </details>
-      </template>
-
-      <!-- ------------------------------- P09 ------------------------------- -->
-      <template v-else>
-        <p class="type-eyebrow">Rayonnement de votre entreprise</p>
-        <div class="mt-4 flex items-end gap-3">
-          <span class="type-figure text-6xl leading-none">{{ r.score }}</span>
-          <span class="pb-2 text-2xl font-semibold text-gray-400">/ 100</span>
-        </div>
-        <p class="mt-4 text-[17px] leading-[1.6] text-gray-600">{{ r.lecture }}</p>
-
-        <h1 class="mt-6 type-h3">{{ r.niveauAffiche }}</h1>
-        <RadarWeatherCard
-          class="mt-4"
-          :meteo="r.meteo"
-          :niveau="r.niveau"
-          :nuance="r.nuance ? 'avec potentiel d’éclaircie' : null"
-        />
-
-        <div class="mt-9">
-          <p class="type-eyebrow">Votre différenciation déclarée</p>
-          <p class="mt-2 type-h3">{{ r.differenciation.valeur }}</p>
-          <p class="mt-2 text-[15px] leading-[1.6] text-gray-500">
-            Prix, proximité, qualité et avantage distinctif sont quatre natures de
-            différenciation, sans hiérarchie entre elles.
-          </p>
-        </div>
-
-        <h2 class="mt-10 type-h2">Vos cinq dimensions</h2>
-        <RadarDimensionBars class="mt-5" :dims="dimsToutes" />
-      </template>
-    </div>
-
-    <!-- Panneau d'action persistant. Aucun champ ici : la saisie a lieu en P10. -->
-    <aside class="lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:self-start">
-      <div
-        class="border border-gray-200 bg-white p-5"
-        style="border-radius: var(--radius-card); box-shadow: var(--shadow-md)"
-      >
-        <h2 class="type-h3">Votre analyse complète</h2>
-        <p class="mt-2 text-[15px] text-gray-600">
-          Disponible en ligne et en PDF.
-        </p>
-        <ul class="mt-4 space-y-2.5">
-          <li
-            v-for="p in [
-              type === 'dirigeant'
-                ? 'Le détail de vos huit dimensions de direction'
-                : 'Le détail de vos cinq dimensions de rayonnement',
-              type === 'dirigeant'
-                ? 'Ce que votre profil implique au quotidien'
-                : 'Ce qui vous porte et ce qui vous freine',
-              'La lecture croisée si vous réalisez les deux diagnostics',
-            ]"
-            :key="p"
-            class="flex items-start gap-2.5 text-[15px] leading-[1.5] text-gray-600"
-          >
-            <UiIcon name="check" :size="18" class="mt-0.5 shrink-0 text-orange-600" />
-            <span>{{ p }}</span>
-          </li>
-        </ul>
-        <NuxtLink
-          :to="`/recevoir-mon-analyse/${token}`"
-          class="mt-6 inline-flex w-full items-center justify-center bg-orange-600 px-5 text-[15px] font-semibold text-white hover:bg-orange-700 active:bg-orange-800"
-          style="min-height: var(--control-h-mobile); border-radius: var(--radius-control)"
-        >
-          Recevoir mon analyse complète
-        </NuxtLink>
       </div>
+    </header>
 
-      <div
-        class="mt-4 border border-navy-100 bg-navy-50 p-5"
-        style="border-radius: var(--radius-card)"
-      >
-        <p class="type-eyebrow">Lecture croisée</p>
-        <h3 class="mt-2 type-h3">Il vous manque un diagnostic</h3>
-        <p class="mt-2 text-[15px] leading-[1.6] text-gray-600">
-          {{
-            otherType === 'rayonnement'
-              ? 'Le diagnostic Rayonnement prend deux à quatre minutes. Réalisé maintenant, il ajoute la mise en regard de votre pilotage et de ce que perçoit votre marché.'
-              : 'Le diagnostic Dirigeant prend quatre à six minutes. Réalisé maintenant, il ajoute la mise en regard de votre pilotage et de ce que perçoit votre marché.'
-          }}
-        </p>
-        <NuxtLink
-          :to="`/diagnostic/${otherType}/introduction`"
-          class="mt-4 inline-flex w-full items-center justify-center gap-1.5 border border-gray-300 bg-white px-5 text-[15px] font-semibold text-navy-600 hover:border-navy-300"
-          style="min-height: var(--control-h); border-radius: var(--radius-control)"
-        >
-          Faire le second diagnostic
-          <UiIcon name="arrow-right" :size="16" />
-        </NuxtLink>
-      </div>
-    </aside>
-  </section>
+    <!-- ============================== P08 ============================== -->
+    <template v-if="type === 'dirigeant'">
+      <section class="bg-navy-600 px-5 pt-8 pb-7 md:px-10 md:pt-11 md:pb-10 lg:px-0 lg:py-14">
+        <div class="wrap flex items-end justify-between gap-8 lg:gap-12 lg:!px-6">
+          <div>
+            <div class="mb-[18px] md:mb-5 lg:mb-6">
+              <span class="inline-flex h-[76px] w-[76px] items-center justify-center rounded-full bg-white md:h-24 md:w-24 lg:h-[120px] lg:w-[120px]">
+                <img :src="`/brand/emb-${slugArchetype(r.archetype.code)}-256.png`" :alt="`Emblème du profil ${r.archetype.code}`" class="block h-[60px] w-[60px] md:h-[76px] md:w-[76px] lg:h-24 lg:w-24" width="96" height="96" >
+              </span>
+            </div>
+            <p class="eyebrow mb-2.5 text-orange-300 md:mb-3 lg:mb-3.5 lg:text-[13px]">Votre profil de dirigeant</p>
+            <h1 class="mb-2 text-[40px] leading-[1.1] font-semibold tracking-[-0.02em] text-white md:text-5xl md:leading-[1.06] lg:mb-2.5 lg:text-[64px] lg:leading-[1.02] lg:tracking-[-0.03em]">{{ r.archetype.code }}</h1>
+            <p class="mb-5 text-sm leading-[1.5] text-navy-200 md:mb-[22px] md:text-[15px] lg:mb-6 lg:text-base">Inspiré par {{ r.archetype.inspirePar }}</p>
+            <ul class="flex flex-wrap gap-2">
+              <li v-for="t in traits" :key="t" class="rounded-full border px-3 py-1.5 text-[13px] leading-[1.3] font-medium text-white lg:px-3.5 lg:py-[7px] lg:text-sm" style="border-color: rgba(255, 255, 255, 0.28)">{{ t }}</li>
+            </ul>
+          </div>
+          <!-- Tablette : actions en contour. -->
+          <div class="hidden shrink-0 gap-2 md:flex lg:hidden">
+            <NuxtLink :to="partager" class="btn btn-ghost h-11 rounded-[10px] px-4 text-sm"><UiIcon name="share-variant-outline" :size="17" />Partager</NuxtLink>
+          </div>
+          <!-- Desktop : dimensions les plus présentes. -->
+          <div class="hidden w-[340px] shrink-0 rounded-[14px] border p-6 lg:block" style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.18)">
+            <p class="eyebrow mb-4 text-orange-300">Dimensions les plus présentes</p>
+            <RadarDimensionBars :dims="dimsTop3" sombre :epaisseur="8" :libelle="14" />
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:bg-gray-50 lg:py-14 lg:pb-16">
+        <div class="wrap lg:flex lg:items-start lg:gap-8 lg:!px-6">
+          <div class="flex flex-col gap-3.5 pt-[26px] pb-2 md:grid md:grid-cols-2 md:gap-5 md:py-8 lg:flex lg:flex-1 lg:gap-5 lg:py-0">
+            <div class="card p-5 md:col-span-2 md:p-6 lg:p-7">
+              <h2 class="mb-2.5 text-xl leading-[1.3] font-semibold text-navy-600 md:text-[22px] lg:mb-3 lg:text-2xl lg:leading-[1.28]">Ce que ce profil dit de votre pilotage</h2>
+              <p class="text-base leading-[1.6] text-gray-700 md:max-w-[640px] md:leading-[1.65] lg:max-w-none lg:text-[17px]" style="text-wrap: pretty">{{ phrase(r.archetype.traits) }}</p>
+            </div>
+            <div class="grid gap-3.5 md:contents lg:grid lg:grid-cols-2 lg:gap-5">
+              <div class="card p-5 md:p-[22px] lg:p-6">
+                <div class="mb-2.5 flex items-center gap-2.5 lg:mb-3"><UiIcon name="arm-flex-outline" :size="20" class="text-green-600" /><p class="eyebrow tracking-[0.06em] text-green-600">Vos forces</p></div>
+                <p class="text-base leading-[1.55] text-gray-700 lg:leading-[1.6]">{{ phrase(r.archetype.forces) }}</p>
+              </div>
+              <div class="card p-5 md:p-[22px] lg:p-6">
+                <div class="mb-2.5 flex items-center gap-2.5 lg:mb-3"><UiIcon name="alert-outline" :size="20" class="text-amber-600" /><p class="eyebrow tracking-[0.06em] text-amber-600">Point de vigilance</p></div>
+                <p class="text-base leading-[1.55] text-gray-700 lg:leading-[1.6]">{{ phrase(r.archetype.risque) }}</p>
+              </div>
+            </div>
+            <div class="card p-5 md:p-[22px] lg:hidden">
+              <p class="eyebrow mb-3 tracking-[0.06em] text-gray-500 md:mb-4">Dimensions les plus présentes</p>
+              <RadarDimensionBars :dims="dimsTop3" :epaisseur="8" :libelle="14" />
+            </div>
+            <div v-if="r.secondaire" class="card bg-gray-50 p-5 md:p-[22px] lg:bg-white lg:p-7">
+              <p class="eyebrow mb-1.5 tracking-[0.06em] text-gray-500 lg:mb-2">Profil secondaire</p>
+              <div class="mb-2 flex items-center gap-3 md:mb-2.5 lg:mb-3 lg:gap-3.5">
+                <img :src="`/brand/emb-${slugArchetype(r.secondaire.code)}-64.png`" :alt="`Emblème du profil ${r.secondaire.code}`" class="h-10 w-10 shrink-0 lg:h-12 lg:w-12" width="48" height="48" >
+                <p class="text-lg leading-[1.3] font-semibold text-navy-600 md:text-[19px] lg:text-[22px] lg:leading-[1.28]">{{ r.secondaire.code }}</p>
+              </div>
+              <p class="text-sm leading-[1.55] text-gray-600 lg:max-w-[640px] lg:text-base lg:leading-[1.65]">
+                Une seconde tendance nette : {{ minuscule(r.secondaire.forces) }}. Elle nuance votre profil principal sans le remplacer.
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-navy-600 p-5 md:col-span-2 md:p-6 lg:flex lg:items-center lg:justify-between lg:gap-8 lg:p-7">
+              <div>
+                <p class="eyebrow mb-2 text-orange-300">{{ autre.termine ? 'Lecture croisée disponible' : 'Lecture croisée' }}</p>
+                <p class="mb-2 text-[19px] leading-[1.3] font-semibold text-white md:text-[22px] md:leading-[1.28]">
+                  {{ autre.termine ? 'Vos deux diagnostics sont terminés' : 'Il vous manque un diagnostic' }}
+                </p>
+                <p class="text-[15px] leading-[1.6] text-navy-200 md:max-w-[640px] lg:max-w-[560px]">
+                  {{
+                    autre.termine
+                      ? 'Mis en regard, ils désignent la zone à traiter en premier ; elle figure dans votre analyse complète.'
+                      : 'Le diagnostic Rayonnement prend deux à quatre minutes. Réalisé maintenant, il ajoute la mise en regard de votre pilotage et de ce que perçoit votre marché.'
+                  }}
+                </p>
+              </div>
+              <NuxtLink v-if="autre.termine" :to="recevoir" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
+            </div>
+          </div>
+
+          <!-- Analyse complète : bande en mobile et tablette, panneau collant en desktop. -->
+          <aside class="mt-[18px] border-t border-gray-200 bg-navy-50 px-5 py-[26px] md:flex md:gap-8 md:px-10 md:py-9 lg:sticky lg:top-6 lg:mt-0 lg:block lg:w-[360px] lg:shrink-0 lg:rounded-[14px] lg:border lg:bg-white lg:p-7" style="box-shadow: var(--shadow-sm)">
+            <div class="md:flex-1">
+              <h2 class="mb-2 text-[22px] leading-[1.3] font-semibold text-navy-600 md:text-2xl md:leading-[1.28] lg:mb-3 lg:text-[22px]">Votre analyse complète</h2>
+              <p class="mb-4 text-[15px] leading-[1.6] text-gray-600 md:max-w-[520px] lg:mb-5">Envoyée par email, disponible en ligne et en PDF.</p>
+              <ul class="mb-5 flex flex-col gap-2 md:mb-0 lg:mb-6 lg:gap-2.5">
+                <li v-for="p in ['Le détail de vos huit dimensions de direction', 'Ce que votre profil implique au quotidien', 'La lecture croisée si vous réalisez aussi le diagnostic Rayonnement']" :key="p" class="flex items-start gap-2.5">
+                  <UiIcon name="check" :size="18" class="shrink-0 text-orange-600" />
+                  <span class="text-[15px] leading-[1.5] text-gray-700">{{ p }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="flex flex-col gap-2.5 md:w-[300px] md:shrink-0 md:justify-center md:gap-2 lg:w-auto">
+              <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">Recevoir mon analyse complète</NuxtLink>
+              <NuxtLink v-if="!autre.termine" :to="`/diagnostic/${autreType}/introduction`" class="btn btn-outline h-[52px] text-base"><UiIcon name="broadcast" :size="18" />Faire le second diagnostic</NuxtLink>
+              <NuxtLink :to="partager" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon profil</NuxtLink>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </template>
+
+    <!-- ============================== P09 ============================== -->
+    <template v-else>
+      <section class="px-5 pt-8 pb-7 md:px-10 md:pt-11 md:pb-10 lg:px-0 lg:pt-16 lg:pb-14" style="background: linear-gradient(180deg, #eef3f9 0%, #ffffff 82%)">
+        <div class="wrap lg:flex lg:items-start lg:gap-14 lg:!px-6">
+          <div class="min-w-0 lg:flex-1">
+            <p class="eyebrow mb-3.5 text-orange-600 lg:mb-[18px] lg:text-[13px]">Rayonnement de votre entreprise</p>
+            <div class="mb-1.5 flex items-end gap-2.5 lg:mb-3.5 lg:gap-3">
+              <span class="text-[64px] leading-none font-bold tracking-[-0.03em] text-navy-600 lg:text-[86px] lg:leading-[0.9] lg:tracking-[-0.04em]">{{ r.score }}</span>
+              <span class="text-xl leading-[1.6] text-gray-500 lg:text-2xl lg:leading-[1.8]">/ 100</span>
+            </div>
+            <div class="mb-[18px] h-2.5 overflow-hidden rounded-full bg-gray-100 lg:mb-7 lg:h-3 lg:max-w-[560px]" role="img" :aria-label="`Score ${r.score} sur 100`">
+              <div class="h-full rounded-full bg-orange-600" :style="{ width: r.score + '%' }" />
+            </div>
+            <p class="hidden text-lg leading-[1.65] text-gray-700 lg:block lg:max-w-[560px]" style="text-wrap: pretty">{{ r.lecture }}</p>
+            <!-- Mobile et tablette : météo dans le hero. -->
+            <div class="card flex items-center gap-3.5 p-4 lg:hidden">
+              <UiIcon :name="meteoIcone" :size="40" class="shrink-0 text-navy-600" />
+              <div>
+                <p class="text-[19px] leading-[1.25] font-semibold text-navy-600">{{ r.niveauAffiche }}</p>
+                <p class="mt-[3px] text-sm leading-[1.4] text-gray-600">Météo : {{ minuscule(r.meteo) }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="card hidden w-[400px] shrink-0 p-7 lg:block" style="box-shadow: var(--shadow-sm)">
+            <div class="mb-[22px] flex items-center gap-[18px] border-b border-gray-100 pb-[22px]">
+              <UiIcon :name="meteoIcone" :size="52" class="shrink-0 text-navy-600" />
+              <div>
+                <p class="text-2xl leading-[1.2] font-semibold tracking-[-0.015em] text-navy-600">{{ r.niveauAffiche }}</p>
+                <p class="mt-1 text-[15px] leading-[1.4] text-gray-600">Météo : {{ minuscule(r.meteo) }}</p>
+              </div>
+            </div>
+            <p class="eyebrow mb-2 tracking-[0.06em] text-gray-500">Votre différenciation déclarée</p>
+            <p class="mb-2 text-[19px] leading-[1.3] font-semibold text-navy-600">{{ r.differenciation.valeur }}</p>
+            <p class="text-sm leading-[1.6] text-gray-600">Prix, proximité, qualité et avantage distinctif sont quatre natures de différenciation, sans hiérarchie entre elles.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lg:border-t lg:border-gray-200 lg:bg-gray-50 lg:py-14 lg:pb-16">
+        <div class="wrap lg:!px-6">
+          <div class="pt-6 pb-2 md:pt-8 lg:py-0">
+            <p class="mb-5 text-base leading-[1.6] text-gray-700 lg:hidden" style="text-wrap: pretty">{{ r.lecture }}</p>
+            <h2 class="mb-7 hidden text-[30px] leading-[1.2] font-semibold tracking-[-0.02em] text-navy-600 lg:block">Vos cinq dimensions</h2>
+            <div class="flex flex-col gap-3.5 md:grid md:grid-cols-2 md:gap-5 lg:mb-5">
+              <div class="card p-5 lg:p-[26px]">
+                <p class="eyebrow mb-3.5 tracking-[0.06em] text-gray-500 lg:hidden">Vos cinq dimensions</p>
+                <RadarDimensionBars :dims="dimsRayonnement" surligne="min" class="lg:hidden" :epaisseur="8" :libelle="14" />
+                <RadarDimensionBars :dims="dimsRayonnement" surligne="min" class="hidden lg:flex" :epaisseur="10" :libelle="16" />
+              </div>
+              <div class="flex flex-col gap-3.5 md:gap-5">
+                <div class="card bg-gray-50 p-5 lg:hidden">
+                  <p class="eyebrow mb-1.5 tracking-[0.06em] text-gray-500">Votre différenciation</p>
+                  <p class="mb-1.5 text-[17px] leading-[1.3] font-semibold text-navy-600">{{ r.differenciation.valeur }}</p>
+                  <p class="text-sm leading-[1.55] text-gray-600">Prix, proximité, qualité et avantage distinctif sont quatre natures de différenciation, sans hiérarchie entre elles.</p>
+                </div>
+                <div class="card hidden p-[26px] lg:block">
+                  <h3 class="mb-3 text-[22px] leading-[1.28] font-semibold text-navy-600">Votre analyse complète</h3>
+                  <p class="mb-5 text-[15px] leading-[1.6] text-gray-600">Envoyée par email, disponible en ligne et en PDF.</p>
+                  <ul class="flex flex-col gap-2.5">
+                    <li v-for="p in ['Le détail de vos cinq dimensions de rayonnement', 'Ce qui vous porte et ce qui vous freine', 'La lecture croisée si vous réalisez aussi le diagnostic Dirigeant']" :key="p" class="flex items-start gap-2.5">
+                      <UiIcon name="check" :size="18" class="shrink-0 text-orange-600" />
+                      <span class="text-[15px] leading-[1.5] text-gray-700">{{ p }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3.5 rounded-[14px] bg-navy-600 p-5 md:mt-5 md:p-6 lg:mt-0 lg:flex lg:items-center lg:justify-between lg:gap-8 lg:p-7">
+              <div>
+                <p class="eyebrow mb-2 text-orange-300">{{ autre.termine ? 'Lecture croisée disponible' : 'Lecture croisée' }}</p>
+                <p class="mb-2 text-[19px] leading-[1.3] font-semibold text-white md:text-[22px] md:leading-[1.28]">
+                  {{ autre.termine ? 'Vos deux diagnostics sont terminés' : 'Il vous manque un diagnostic' }}
+                </p>
+                <p class="text-[15px] leading-[1.6] text-navy-200 lg:max-w-[640px]">
+                  {{
+                    autre.termine
+                      ? 'Mis en regard, ils désignent la zone à traiter en premier ; elle figure dans votre analyse complète.'
+                      : 'Le diagnostic Dirigeant prend quatre à six minutes. Réalisé maintenant, il ajoute la mise en regard de votre pilotage et de ce que perçoit votre marché.'
+                  }}
+                </p>
+              </div>
+              <NuxtLink v-if="autre.termine" :to="recevoir" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
+              <NuxtLink v-else :to="`/diagnostic/${autreType}/introduction`" class="btn btn-white mt-4 hidden h-[52px] shrink-0 px-6 text-[15px] lg:mt-0 lg:inline-flex"><UiIcon name="compass-outline" :size="18" />Faire le second diagnostic</NuxtLink>
+            </div>
+          </div>
+        </div>
+        <div class="mt-[18px] border-t border-gray-200 bg-navy-50 px-5 py-[26px] md:px-10 lg:hidden">
+          <div class="flex flex-col gap-2.5 md:mx-auto md:max-w-[520px]">
+            <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">Recevoir mon analyse complète</NuxtLink>
+            <NuxtLink :to="partager" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon résultat</NuxtLink>
+          </div>
+        </div>
+      </section>
+    </template>
+  </div>
 </template>

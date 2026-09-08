@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { DiagType } from '~/composables/useParticipation'
+// P04 / P06 — question. Cadres 390, 834 et 1440 (docs/maquette/frames/*-P04.html, *-P06.html).
+// Desktop : rail de progression bleu nuit de 320 px à gauche, colonne de réponses de 640 px.
+// Tablette : colonne unique de 600 px. Mobile : barre de progression compacte.
+import { THEMES, type DiagType } from '~/composables/useParticipation'
+
+definePageMeta({ layout: 'bare' })
 
 const route = useRoute()
 const type = route.params.type as DiagType
@@ -12,12 +17,25 @@ const total = computed(() => questions.value.length)
 const q = computed(() => questions.value[numero.value - 1])
 if (!q.value) throw createError({ statusCode: 404 })
 
+const titre = type === 'dirigeant' ? 'Profil du dirigeant' : 'Rayonnement de l’entreprise'
+useSeoMeta({ title: () => `Question ${numero.value} sur ${total.value} — ${titre}` })
+
+const pct = computed(() => Math.round((numero.value / total.value) * 100))
+const themes = THEMES[type]
+const themeCourant = computed(() => themes.find((t) => t.questions.includes(q.value!.code))?.nom ?? '')
+
 const part = useParticipation(type)
 const answers = useState<Record<string, string>>(`answers-${type}`, () => ({}))
 const selected = ref<string | null>(null)
 const dejaRepondue = ref(false)
 const saving = ref(false)
 const error = ref<string | null>(null)
+
+/** État d'un thème du rail : terminé, en cours, à venir. */
+function etatTheme(t: { questions: string[] }) {
+  if (t.questions.includes(q.value!.code)) return 'courant'
+  return t.questions.every((code) => answers.value[code]) ? 'fait' : 'avenir'
+}
 
 onMounted(async () => {
   part.load()
@@ -26,7 +44,7 @@ onMounted(async () => {
     const s = await part.state()
     if (s.status !== 'in_progress') return navigateTo(`/diagnostic/${type}/introduction`)
     answers.value = Object.fromEntries(Object.entries(s.answers).map(([qc, l]) => [qc, `${qc}${l}`]))
-    // Interdit de sauter une question non répondue
+    // Interdit de sauter une question non répondue.
     const first = questions.value.findIndex((qq) => !answers.value[qq.code]) + 1
     if (first > 0 && numero.value > first) return navigateTo(`/diagnostic/${type}/question/${first}`)
     dejaRepondue.value = Boolean(answers.value[q.value!.code])
@@ -36,7 +54,14 @@ onMounted(async () => {
     return navigateTo(`/diagnostic/${type}/introduction`)
   }
 })
-watch(numero, () => (selected.value = answers.value[q.value?.code ?? ''] ?? null))
+watch(numero, () => {
+  selected.value = answers.value[q.value?.code ?? ''] ?? null
+  dejaRepondue.value = Boolean(answers.value[q.value?.code ?? ''])
+})
+
+const precedent = computed(() =>
+  numero.value > 1 ? `/diagnostic/${type}/question/${numero.value - 1}` : `/diagnostic/${type}/introduction`,
+)
 
 async function next() {
   if (!selected.value || saving.value) return
@@ -56,83 +81,104 @@ async function next() {
 </script>
 
 <template>
-  <div class="mx-auto grid max-w-[1200px] gap-10 px-5 py-8 md:px-8 lg:grid-cols-[240px_1fr]">
-    <!-- Rail de progression, desktop seulement (maquette planche 05).
-         La maquette nomme cinq thèmes (« Décision et arbitrage », « Maîtrise financière »…)
-         qui n'existent ni dans questions.json ni dans les dimensions de la matrice V2.1 :
-         ce découpage éditorial est absent du pack livré. On affiche donc la progression
-         réelle plutôt qu'un thème inventé. À demander avec le TDR (PLAN.md §10b, point 6). -->
-    <aside class="hidden lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:block lg:self-start">
-      <p class="type-eyebrow">Diagnostic en cours</p>
-      <h2 class="mt-2 type-h3">
-        {{ type === 'dirigeant' ? 'Profil du dirigeant' : 'Rayonnement de l’entreprise' }}
-      </h2>
-      <p class="mt-5 flex items-baseline gap-2">
-        <span class="type-figure text-4xl leading-none">{{ numero }}</span>
-        <span class="text-[15px] text-gray-500">sur {{ total }}</span>
+  <div class="flex flex-1 flex-col lg:flex-row">
+    <!-- Rail de progression, desktop. -->
+    <aside class="hidden w-80 shrink-0 flex-col bg-navy-600 px-8 py-9 lg:flex">
+      <img src="/brand/logo-feexpay-white.svg" alt="FeexPay" class="mb-11 h-[22px] w-auto self-start" >
+      <p class="eyebrow mb-1.5 text-orange-300">Diagnostic en cours</p>
+      <p class="mb-7 text-[22px] leading-[1.28] font-semibold text-white">{{ titre }}</p>
+      <p class="mb-3 flex items-baseline gap-2">
+        <span class="text-[34px] leading-none font-bold tracking-[-0.02em] text-white">{{ numero }}</span>
+        <span class="text-[15px] leading-none text-navy-200">sur {{ total }}</span>
       </p>
-      <ol class="mt-6 space-y-2">
-        <li
-          v-for="n in total"
-          :key="n"
-          class="h-1.5 rounded-full"
-          :class="n < numero ? 'bg-orange-600' : n === numero ? 'bg-orange-300' : 'bg-gray-100'"
-        />
+      <div class="mb-8 h-1.5 overflow-hidden rounded-full" style="background: rgba(255, 255, 255, 0.18)" role="progressbar" :aria-valuenow="numero" :aria-valuemin="0" :aria-valuemax="total">
+        <div class="h-full rounded-full bg-orange-600" :style="{ width: pct + '%', transition: 'width var(--dur-card) var(--ease-standard)' }" />
+      </div>
+      <ol class="flex flex-col gap-3.5">
+        <li v-for="t in themes" :key="t.nom" class="flex items-center gap-2.5">
+          <UiIcon
+            :name="etatTheme(t) === 'fait' ? 'check-circle' : etatTheme(t) === 'courant' ? 'circle-slice-4' : 'circle-outline'"
+            :size="18"
+            :class="etatTheme(t) === 'fait' ? 'text-orange-300' : etatTheme(t) === 'courant' ? 'text-white' : 'text-navy-400'"
+          />
+          <span
+            class="text-sm leading-[1.4]"
+            :class="etatTheme(t) === 'fait' ? 'text-navy-100' : etatTheme(t) === 'courant' ? 'font-medium text-white' : 'text-navy-300'"
+          >
+            {{ t.nom }}
+          </span>
+        </li>
       </ol>
-      <p class="mt-6 text-[13px] leading-[1.6] text-gray-500">
-        Vos réponses sont enregistrées à chaque écran. Vous pouvez fermer cette page et
-        reprendre plus tard.
-      </p>
+      <div class="mt-auto border-t pt-7" style="border-color: rgba(255, 255, 255, 0.15)">
+        <p class="text-[13px] leading-[1.55] text-navy-300">
+          {{
+            type === 'dirigeant'
+              ? 'Vos réponses sont enregistrées à chaque écran. Vous pouvez fermer cette page et reprendre plus tard.'
+              : 'Répondez d’après ce que vous observez aujourd’hui. Une réponse honnête produit une lecture utile.'
+          }}
+        </p>
+      </div>
     </aside>
 
-  <!-- Colonne plafonnée : 640 px en desktop, 600 px en tablette (maquette planche 04). -->
-  <section class="mx-auto w-full max-w-[600px] lg:mx-0 lg:max-w-[640px]">
-    <RadarProgressBar class="lg:hidden" :current="numero" :total="total" />
-    <RadarStepMeta
-      class="mt-2"
-      :current="numero"
-      :total="total"
-      :enregistre="Boolean(answers[q!.code])"
-    />
+    <div class="flex min-w-0 flex-1 flex-col">
+      <!-- Barre compacte, mobile et tablette. -->
+      <div class="px-5 pt-3.5 md:px-10 md:pt-4 lg:hidden">
+        <div class="mb-3.5 flex items-center gap-3 md:gap-4">
+          <NuxtLink :to="precedent" class="-ml-2.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 md:-ml-3" aria-label="Question précédente">
+            <UiIcon name="arrow-left" :size="22" />
+          </NuxtLink>
+          <span class="hidden text-sm leading-none font-medium text-navy-600 md:inline">{{ titre }}</span>
+          <span class="flex-1 text-[13px] leading-none font-medium text-gray-500 md:hidden">Question {{ numero }} sur {{ total }}</span>
+          <span class="text-[13px] leading-none font-medium text-gray-500 md:hidden">{{ pct }} %</span>
+          <span class="ml-auto hidden text-sm leading-none text-gray-500 md:inline">Question {{ numero }} sur {{ total }} · {{ pct }} %</span>
+        </div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-gray-100" role="progressbar" :aria-valuenow="numero" :aria-valuemin="0" :aria-valuemax="total" :aria-label="`Progression : question ${numero} sur ${total}`">
+          <div class="h-full rounded-full bg-orange-600" :style="{ width: pct + '%', transition: 'width var(--dur-card) var(--ease-standard)' }" />
+        </div>
+      </div>
 
-    <h1 class="mt-6 type-h2">{{ q!.texte }}</h1>
+      <!-- Barre desktop. -->
+      <div class="hidden items-center justify-between border-b border-gray-200 px-10 py-[22px] lg:flex">
+        <NuxtLink :to="precedent" class="inline-flex items-center gap-2.5 text-[15px] leading-none font-medium text-navy-600 hover:underline">
+          <UiIcon name="arrow-left" :size="20" />
+          Question précédente
+        </NuxtLink>
+        <span v-if="answers[q!.code]" class="text-sm leading-none text-gray-500">Enregistré · il y a quelques secondes</span>
+      </div>
 
-    <div class="mt-6 space-y-3">
-      <RadarAnswerCard
-        v-for="o in q!.options"
-        :key="o.code"
-        :lettre="o.lettre"
-        :texte="o.texte"
-        :selected="selected === o.code"
-        :enregistree="answers[q!.code] === o.code"
-        :modification="dejaRepondue && selected === o.code && answers[q!.code] !== o.code"
-        @click="selected = o.code"
-      />
+      <div class="flex flex-1 justify-center px-5 pt-7 pb-5 md:px-10 md:pt-12 md:pb-8 lg:pt-16 lg:pb-10">
+        <div class="w-full md:max-w-[600px] lg:max-w-[640px]">
+          <p class="eyebrow mb-4 hidden text-orange-600 lg:block">{{ themeCourant }}</p>
+          <h1
+            class="mb-6 text-[26px] leading-[1.28] font-semibold tracking-[-0.01em] text-navy-600 md:mb-7 md:text-[30px] md:leading-[1.25] md:tracking-[-0.015em] lg:mb-8 lg:text-[34px] lg:leading-[1.24] lg:tracking-[-0.018em]"
+            style="text-wrap: pretty"
+          >
+            {{ q!.texte }}
+          </h1>
+          <div class="flex flex-col gap-3">
+            <RadarAnswerCard
+              v-for="o in q!.options"
+              :key="o.code"
+              :texte="o.texte"
+              :selected="selected === o.code"
+              :enregistree="answers[q!.code] === o.code"
+              :modification="dejaRepondue && selected === o.code && answers[q!.code] !== o.code"
+              @click="selected = o.code"
+            />
+          </div>
+          <p v-if="error" class="mt-4 text-sm text-red-600" role="alert">{{ error }}</p>
+        </div>
+      </div>
+
+      <div class="flex justify-center border-t border-gray-200 px-5 pt-4 pb-6 md:px-10 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8">
+        <div class="flex w-full items-center gap-3 md:max-w-[600px] lg:max-w-[640px]">
+          <NuxtLink :to="precedent" class="btn btn-outline h-[52px] w-24 shrink-0 text-[15px] md:w-[120px] lg:w-[130px]">Précédent</NuxtLink>
+          <button type="button" :disabled="!selected || saving" class="btn btn-primary h-[52px] flex-1 text-base" @click="next">
+            {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
+            <UiIcon name="arrow-right" :size="18" />
+          </button>
+        </div>
+      </div>
     </div>
-
-    <p v-if="error" class="mt-4 type-small text-red-600">{{ error }}</p>
-
-    <div class="mt-8 flex items-center justify-between gap-3">
-      <NuxtLink
-        v-if="numero > 1"
-        :to="`/diagnostic/${type}/question/${numero - 1}`"
-        class="inline-flex items-center gap-1.5 px-4 type-small font-medium text-gray-600 hover:text-navy-700"
-        style="min-height: var(--control-h)"
-      >
-        <UiIcon name="arrow-left" :size="18" />
-        Question précédente
-      </NuxtLink>
-      <span v-else />
-      <button
-        type="button"
-        :disabled="!selected || saving"
-        class="inline-flex flex-1 items-center justify-center bg-orange-600 px-7 font-semibold text-white hover:bg-orange-700 active:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
-        style="min-height: var(--control-h-mobile); border-radius: var(--radius-control)"
-        @click="next"
-      >
-        {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
-      </button>
-    </div>
-    </section>
   </div>
 </template>

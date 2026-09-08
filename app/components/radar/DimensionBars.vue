@@ -1,47 +1,73 @@
 <script setup lang="ts">
 /**
- * Barres horizontales. La maquette est explicite : « aucun graphique radar »
- * malgré le nom du produit. « Le bleu nuit porte les séries ; l'orange met en
- * évidence la dimension la plus pondérée. »
+ * Barres horizontales de dimensions. « Aucun graphique radar » malgré le nom du produit.
+ * Une dimension est mise en avant en orange : la plus haute (profil du dirigeant, P08)
+ * ou la plus basse (rayonnement, P09 — la zone à travailler). Sur fond bleu nuit, les
+ * autres barres passent en bleu 200 et les valeurs en blanc.
  */
-const LABELS: Record<string, string> = {
-  VIS: 'Vision',
-  STR: 'Stratégie',
-  EXE: 'Exécution',
-  ORG: 'Organisation',
-  INF: 'Influence',
-  AUD: 'Audace',
-  ADA: 'Adaptabilité',
-  TRA: 'Transformation',
-  notoriete: 'Notoriété',
-  lectureConcurrentielle: 'Lecture concurrentielle',
-  differenciation: 'Différenciation',
-  digital: 'Digital',
-  empreinte: 'Empreinte',
-}
+const props = withDefaults(
+  defineProps<{
+    dims: { nom: string; score: number }[]
+    surligne?: 'max' | 'min'
+    sombre?: boolean
+    /** Épaisseur de la piste en px. */
+    epaisseur?: number
+    /** Taille du libellé en px. */
+    libelle?: number
+  }>(),
+  { surligne: 'max', sombre: false, epaisseur: 8, libelle: 14 },
+)
 
-const props = defineProps<{ dims: Record<string, number> }>()
-
-/** La valeur la plus haute est mise en avant en orange. */
-const maxKey = computed(() => {
-  const entries = Object.entries(props.dims)
-  if (!entries.length) return null
-  return entries.reduce((a, b) => (b[1] > a[1] ? b : a))[0]
+const cible = computed(() => {
+  if (!props.dims.length) return -1
+  let i = 0
+  props.dims.forEach((d, k) => {
+    const better = props.surligne === 'max' ? d.score > props.dims[i]!.score : d.score < props.dims[i]!.score
+    if (better) i = k
+  })
+  return i
 })
 </script>
 
 <template>
-  <ul class="space-y-3">
-    <li v-for="(v, k) in dims" :key="k">
-      <div class="mb-1 flex justify-between type-small">
-        <span class="text-gray-700">{{ LABELS[k] ?? k }}</span>
-        <span class="font-semibold text-navy-700">{{ Math.round(v) }}</span>
+  <ul class="flex flex-col" :style="{ gap: epaisseur >= 10 ? '18px' : '13px' }">
+    <li v-for="(d, i) in dims" :key="d.nom">
+      <div class="mb-1.5 flex items-center justify-between leading-[1.2]">
+        <span
+          :style="{ fontSize: libelle + 'px' }"
+          :class="
+            i === cible
+              ? sombre ? 'font-medium text-white' : 'font-medium text-navy-600'
+              : sombre ? 'text-navy-100' : 'text-gray-700'
+          "
+        >
+          {{ d.nom }}
+        </span>
+        <span
+          class="font-mono"
+          :style="{ fontSize: libelle - 1 + 'px' }"
+          :class="
+            i === cible
+              ? sombre ? 'font-semibold text-orange-300' : 'font-semibold text-orange-600'
+              : sombre ? 'font-medium text-white' : 'font-medium text-navy-600'
+          "
+        >
+          {{ Math.round(d.score) }}
+        </span>
       </div>
-      <div class="h-2 rounded-full bg-gray-100">
+      <div
+        class="overflow-hidden rounded-full"
+        :style="{ height: epaisseur + 'px', background: sombre ? 'rgba(255,255,255,.16)' : '#EEF0F4' }"
+        role="img"
+        :aria-label="`${d.nom} : ${Math.round(d.score)} sur 100`"
+      >
         <div
           class="h-full rounded-full"
-          :class="k === maxKey ? 'bg-orange-600' : 'bg-navy-500'"
-          :style="{ width: Math.round(v) + '%' }"
+          :style="{
+            width: Math.max(0, Math.min(100, d.score)) + '%',
+            background: i === cible ? '#D45D00' : sombre ? '#B5C5DC' : '#23477E',
+            transition: 'width var(--dur-card) var(--ease-standard)',
+          }"
         />
       </div>
     </li>

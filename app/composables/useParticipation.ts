@@ -67,3 +67,90 @@ export function useParticipation(type: DiagType) {
 
 export const useQuestions = (type: DiagType) =>
   useFetch<{ version: string; questions: PublicQuestion[] }>(`/api/public/questions/${type}`, { key: `questions-${type}` })
+
+export interface AutreDiagnostic {
+  type: DiagType
+  token: string | null
+  /** Parcours terminé, résultat consultable. */
+  termine: boolean
+  /** Résultat public, chargé seulement s'il est terminé. */
+  resultat: Record<string, any> | null
+  charge: boolean
+}
+
+/**
+ * État de l'autre diagnostic de la session (P05, P08, P09, P10, P11) : un jeton en
+ * localStorage, et si le parcours est terminé, son résultat public. Client seulement.
+ */
+export function useAutreDiagnostic(type: DiagType) {
+  const autre: DiagType = type === 'dirigeant' ? 'rayonnement' : 'dirigeant'
+  const etat = useState<AutreDiagnostic>(`autre-diag-${autre}`, () => ({
+    type: autre,
+    token: null,
+    termine: false,
+    resultat: null,
+    charge: false,
+  }))
+  const part = useParticipation(autre)
+
+  const charger = async () => {
+    if (!import.meta.client) return
+    part.load()
+    etat.value.token = part.token.value
+    if (!part.token.value) {
+      etat.value.charge = true
+      return
+    }
+    try {
+      const s = await part.state()
+      etat.value.termine = s.status === 'completed'
+      if (etat.value.termine) {
+        const r = await $fetch<{ result: Record<string, any> }>(
+          `/api/public/results/${part.token.value}`,
+        )
+        etat.value.resultat = r.result
+      }
+    } catch {
+      etat.value.termine = false
+      etat.value.resultat = null
+    } finally {
+      etat.value.charge = true
+    }
+  }
+
+  return { etat, charger }
+}
+
+/** Thèmes du rail de progression (maquette P04/P06), par question. */
+export const THEMES: Record<DiagType, { nom: string; questions: string[] }[]> = {
+  dirigeant: [
+    { nom: 'Décision et arbitrage', questions: ['Q1', 'Q2', 'Q3'] },
+    { nom: 'Organisation', questions: ['Q4'] },
+    { nom: 'Maîtrise financière', questions: ['Q5', 'Q6', 'Q7', 'Q8', 'Q9'] },
+    { nom: 'Relation client', questions: ['Q10', 'Q11', 'Q12'] },
+    { nom: 'Vision et croissance', questions: ['Q13', 'Q14'] },
+  ],
+  rayonnement: [
+    { nom: 'Notoriété locale', questions: ['R1'] },
+    { nom: 'Différenciation', questions: ['R2', 'R4'] },
+    { nom: 'Recommandation', questions: ['R3'] },
+    { nom: 'Présence numérique', questions: ['R5'] },
+    { nom: 'Canaux de vente', questions: ['R6'] },
+    { nom: 'Empreinte territoriale', questions: ['R7'] },
+  ],
+}
+
+export const METEO_ICONE: Record<string, string> = {
+  Soleil: 'weather-sunny',
+  Éclaircies: 'weather-partly-cloudy',
+  Nuageux: 'weather-cloudy',
+  Pluie: 'weather-rainy',
+  Tempête: 'weather-lightning-rainy',
+}
+
+/** Nom de fichier de l'emblème d'un archétype : « Stratège » → « stratege ». */
+export const slugArchetype = (code: string) =>
+  code
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()

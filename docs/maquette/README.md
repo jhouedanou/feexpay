@@ -3,6 +3,11 @@
 Généré par `node scripts/extract-maquette.mjs` depuis
 `MarketingBS/Annexe_02_…/Radar by FeexPay - Maquette V1.dc.html`.
 
+Le dossier `frames/` contient, en plus, chaque cadre d’écran en page HTML autonome
+(markup complet : icônes, fonds, puces), généré par `node scripts/extract-maquette-frames.mjs`
+et servi depuis la racine du projet pour le contrôle visuel. C’est la référence à ouvrir
+à côté de l’application : l’extraction texte ci-dessous ne suffit pas pour la fidélité.
+
 Les textes sont repris **sans modification**. Les commentaires HTML en fin de ligne
 portent la spécification de police du bloc d’origine (graisse, taille, interligne, couleur),
 qui donne la hiérarchie à respecter.

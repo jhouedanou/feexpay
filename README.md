@@ -18,11 +18,17 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
   44 tests de contrôle. `public.ts` produit les projections d'affichage : le pilotage, les
   affinités, le tie-break et les hypothèses ne sortent jamais du serveur.
 - `scripts/extract-matrix.ts` — xlsx → `packages/scoring/src/versions/v2.1/*.json` + checksum.
+- `scripts/extract-maquette-frames.mjs` — maquette annexe 02 → `docs/maquette/frames/*.html`, un
+  cadre par écran et par largeur (390, 834, 1440), à ouvrir à côté de l’application pour le
+  contrôle visuel : `python3 -m http.server 8765` à la racine puis
+  `/docs/maquette/frames/index.html`.
 - `scripts/seed-scoring-version.ts` — seed idempotent de la version publiée en base.
 - `supabase/migrations/` — schéma SQL, **source de vérité**.
 - `server/api/public/` — sessions, participations, réponses, complétion, résultats, questions.
 - `server/utils/` — accès base, jetons, session, erreurs, projections.
-- `app/` — écrans P01–P09, composants `radar/*` et `ui/*`, composable `useParticipation`.
+- `app/` — écrans P01–P11 et P13/P14, composants `radar/*` et `ui/*`, composable
+  `useParticipation`. Deux layouts : `default` (navigation et pied de page, P01 et pages cadres)
+  et `bare` (parcours, chaque page pose sa barre supérieure `RadarTopBar`).
 - `test/` — migration SQL sur PGlite (vitest) + smoke tests HTTP (scripts Node).
 
 ## Démarrer
@@ -74,5 +80,7 @@ Config Auth à faire au dashboard avant le Lot 4 : inscriptions publiques OFF, m
 - Aucune recommandation produit : le tag « Produit FeexPay » n'est pas extrait de la matrice.
 - `noindex` partout sauf `/`.
 - Interface : les valeurs de la maquette (annexe 02) priment sur le design system générique
-  qu'elle embarque. Poppins est self-hosted, les icônes sont un sous-ensemble MDI en SVG — le
-  design system interdit explicitement les emoji.
+  qu'elle embarque. Poppins est self-hosted, les icônes viennent de `@mdi/js` (SVG inline, seuls les
+  glyphes nommés dans `UiIcon` entrent dans le bundle) — le design system interdit
+  explicitement les emoji. Trois compositions par écran, relevées sur les cadres 390, 834 et
+  1440 : les textes eux-mêmes varient par largeur.
