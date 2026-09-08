@@ -36,14 +36,19 @@ impossible en l'état. On travaille donc directement sur le projet Supabase en l
 **Déploiement : Vercel** (décidé le 2026-09-08, pas de CI GitHub Actions). Deux conséquences
 à traiter avant la première mise en ligne :
 
-1. **La connexion directe ne marchera pas sur Vercel.** `db.<ref>.supabase.co` ne publie aucun
-   enregistrement A, uniquement AAAA : elle est IPv6-only. Elle fonctionne depuis un poste
+1. **La connexion directe ne marchera pas sur Vercel — résolu.** `db.<ref>.supabase.co` ne publie
+   aucun enregistrement A, uniquement AAAA : elle est IPv6-only. Elle fonctionne depuis un poste
    ayant IPv6 (vérifié en local), mais les fonctions Vercel n'ont pas d'egress IPv6.
-   Il faut donc, pour l'environnement Vercel, un `DATABASE_URL` pointant le **pooler Supavisor
-   en mode session** (port 5432, user `postgres.<ref>` — chaîne exacte à copier depuis
-   Dashboard → Connect). Le mode transaction (6543) est à proscrire : il ne supporte pas les
-   prepared statements dont pg-boss a besoin. Le pooler résout bien en IPv4 (vérifié).
-   Alternative : add-on IPv4 payant. La connexion directe reste bonne en local.
+   `DATABASE_URL` sur Vercel doit donc pointer le **pooler Supavisor en mode session** :
+   `postgresql://postgres.<ref>:<mdp>@aws-0-eu-west-2.pooler.supabase.com:5432/postgres`
+   (valeur prête dans `.env` sous `DATABASE_URL_POOLER`, mot de passe percent-encodé).
+   Vérifié le 2026-09-08 : résolution IPv4, connexion OK, données visibles, et **prepared
+   statements acceptés** — le mode session est confirmé. Le port 6543 (mode transaction) reste
+   à proscrire : pas de prepared statements, pg-boss casserait.
+   La connexion directe reste la bonne valeur en local.
+
+   À noter : le pooler est en `eu-west-2` (Londres), alors que le §2 annonce Francfort.
+   Sans effet fonctionnel, mais la documentation d'architecture devra dire la vraie région.
 2. **pg-boss + PDF Playwright sont incompatibles avec des fonctions éphémères.** Le §2 le notait
    déjà (« exige un runtime Node long-running »). Sur Vercel, le worker de la queue et le rendu
    PDF devront vivre ailleurs (worker dédié type Railway/Fly/VPS, ou service managé), ou être
