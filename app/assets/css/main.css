@@ -1,7 +1,98 @@
 @import 'tailwindcss';
 
+/* ---------------------------------------------------------------------------
+   Poppins — self-hosted (PLAN.md §9 étape 5 : « Poppins self-hosted », pas de CDN).
+   Sous-ensembles latin et latin-ext seulement : le devanagari livré par Google
+   n'est d'aucun usage ici. 52 Ko pour les 4 graisses de la maquette (400/500/600/700).
+   --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/poppins-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/poppins-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins-600-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins-700-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------------------------------------------------------------------------
+   Tokens. Couleurs : transposition exacte des `--fx-*` de la maquette normative
+   (Annexe 02, bloc <style> de tête, qui surcharge le design system générique).
+   --------------------------------------------------------------------------- */
 @theme {
   --font-sans: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+
   --color-navy-900: #06142b;
   --color-navy-800: #0a2044;
   --color-navy-700: #0d2650;
@@ -40,12 +131,154 @@
   --color-red-100: #fbe6e3;
   --color-blue-600: #17549b;
   --color-blue-100: #e5effb;
+
+  /* Rayons — alias du design system. La maquette emploie surtout 12 px (cartes de
+     réponse), 14 px (cartes), 10 px (contrôles) et 999 px (puces). */
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-answer: 12px;
+  --radius-modal: 20px;
+
+  /* Ombres — toujours teintées navy #112C56, jamais noires. */
+  --shadow-xs: 0 1px 2px rgba(17, 44, 86, 0.06);
+  --shadow-sm: 0 2px 6px rgba(17, 44, 86, 0.07);
+  --shadow-md: 0 4px 12px rgba(17, 44, 86, 0.09);
+  --shadow-lg: 0 14px 32px rgba(17, 44, 86, 0.14);
+  --shadow-frame: 0 6px 20px rgba(17, 44, 86, 0.1);
+
+  /* Mouvement — valeurs de la planche Foundations. */
+  --dur-state: 140ms;
+  --dur-card: 220ms;
+  --dur-panel: 360ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
   --gradient-hero: linear-gradient(180deg, #eef3f9 0%, #ffffff 68%);
   --gradient-inverse: linear-gradient(135deg, #0d2650 0%, #112c56 55%, #23477e 100%);
+
+  /* Halo de focus : orange 300, 3 px. « Jamais un contour de navigateur. » */
+  --ring-focus: 0 0 0 3px #f6b684;
+
+  /* Hauteurs de contrôle relevées sur la maquette. */
+  --control-h: 44px; /* bouton desktop, bouton icône rond */
+  --control-h-mobile: 52px; /* CTA pleine largeur, au-delà du minimum tactile de 48 px */
+  --field-h: 56px;
+  --header-h: 76px;
 }
 
-html { font-size: 16px; }
-body { @apply bg-white text-gray-900 font-sans antialiased; }
+html {
+  font-size: 16px;
+}
+
+body {
+  @apply bg-white text-gray-700 font-sans antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+   Échelle typographique de la maquette (planche Foundations). Deux valeurs par
+   style : la composition change de palier, elle n'est pas mise à l'échelle.
+   Graisses : Regular 400 pour la lecture, Medium 500 et SemiBold 600 pour les
+   titres, Bold 700 réservé aux chiffres de résultat.
+   --------------------------------------------------------------------------- */
+@utility type-display {
+  font-size: 34px;
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-navy-800);
+}
+@utility type-h1 {
+  font-size: 30px;
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-navy-800);
+}
+@utility type-h2 {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-navy-800);
+}
+@utility type-h3 {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--color-navy-800);
+}
+@utility type-body {
+  font-size: 16px;
+  line-height: 1.6;
+}
+@utility type-small {
+  font-size: 14px;
+  line-height: 1.45;
+}
+@utility type-caption {
+  font-size: 12px;
+  line-height: 1.35;
+}
+@utility type-eyebrow {
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-orange-600);
+}
+/* Chiffres de résultat : seul emploi du Bold 700. */
+@utility type-figure {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-navy-800);
+}
+
+@media (min-width: 1024px) {
+  .type-display {
+    font-size: 52px;
+  }
+  .type-h1 {
+    font-size: 44px;
+  }
+  .type-h2 {
+    font-size: 32px;
+  }
+  .type-h3 {
+    font-size: 24px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Focus visible, appliqué globalement — la maquette le prescrit sur tous les
+   éléments interactifs, pas seulement sur les cartes de réponse.
+   --------------------------------------------------------------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--radius-control);
+}
+
+/* Transitions par défaut, aux durées de la maquette. */
+a,
+button,
+[role='button'] {
+  transition:
+    background-color var(--dur-state) var(--ease-standard),
+    border-color var(--dur-state) var(--ease-standard),
+    color var(--dur-state) var(--ease-standard),
+    box-shadow var(--dur-state) var(--ease-standard);
+}
+
+/* « Toutes les durées tombent à zéro avec prefers-reduced-motion. » */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

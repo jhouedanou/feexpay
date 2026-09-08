@@ -12,10 +12,18 @@ const r = computed(() => data.value?.result)
 
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
-/** DimensionBars attend un Record<code, score> ; la projection donne un tableau. */
-const dims = computed<Record<string, number>>(() =>
-  Object.fromEntries((r.value?.dimensions ?? []).map((d: any) => [d.code ?? d.cle, d.score])),
-)
+const toRecord = (dims: any[] = []) =>
+  Object.fromEntries(dims.map((d) => [d.code ?? d.cle, d.score])) as Record<string, number>
+
+/**
+ * P08 montre « les dimensions les plus présentes » — les trois premières, pas les huit
+ * (maquette planches 03 et 05). P09 affiche bien ses cinq dimensions.
+ */
+const dimsTop3 = computed(() => {
+  const all = [...(r.value?.dimensions ?? [])].sort((a: any, b: any) => b.score - a.score)
+  return toRecord(all.slice(0, 3))
+})
+const dimsToutes = computed(() => toRecord(r.value?.dimensions))
 
 const otherType = type === 'dirigeant' ? 'rayonnement' : 'dirigeant'
 
@@ -28,82 +36,115 @@ useSeoMeta({
 </script>
 
 <template>
-  <section class="mx-auto max-w-2xl px-4 py-10">
-    <template v-if="type === 'dirigeant'">
-      <p class="text-xs uppercase tracking-wide text-orange-600">Votre profil de dirigeant</p>
-      <div class="mt-3 flex items-center gap-4">
-        <img
-          :src="`/brand/emb-${slug(r.archetype.code)}-256.png`"
-          :alt="`Emblème ${r.archetype.code}`"
-          class="h-24 w-24"
-          width="96"
-          height="96"
+  <section class="mx-auto grid max-w-[1200px] gap-10 px-5 py-12 md:px-8 lg:grid-cols-[1fr_320px]">
+    <div class="max-w-[760px]">
+      <template v-if="type === 'dirigeant'">
+        <p class="type-eyebrow">Votre profil de dirigeant</p>
+        <div class="mt-4 flex items-center gap-5">
+          <img
+            :src="`/brand/emb-${slug(r.archetype.code)}-256.png`"
+            :alt="`Emblème ${r.archetype.code}`"
+            class="h-24 w-24"
+            width="96"
+            height="96"
+          >
+          <div>
+            <h1 class="type-h1">{{ r.archetype.code }}</h1>
+            <p class="mt-1 type-small text-gray-600">Inspiré par {{ r.archetype.inspirePar }}</p>
+          </div>
+        </div>
+
+        <dl class="mt-8 space-y-5">
+          <div>
+            <dt class="type-small font-semibold text-navy-700">
+              Ce que ce profil dit de votre façon de diriger
+            </dt>
+            <dd class="mt-1 type-body text-gray-700">{{ r.archetype.traits }}</dd>
+          </div>
+          <div>
+            <dt class="type-small font-semibold text-navy-700">Vos forces</dt>
+            <dd class="mt-1 type-body text-gray-700">{{ r.archetype.forces }}</dd>
+          </div>
+          <div>
+            <dt class="type-small font-semibold text-navy-700">Point de vigilance</dt>
+            <dd class="mt-1 type-body text-gray-700">{{ r.archetype.risque }}</dd>
+          </div>
+        </dl>
+
+        <p
+          v-if="r.secondaire"
+          class="mt-6 border border-navy-100 bg-navy-50 p-4 type-small text-navy-700"
+          style="border-radius: var(--radius-control)"
         >
-        <div>
-          <h1 class="text-3xl font-semibold text-navy-800">{{ r.archetype.code }}</h1>
-          <p class="text-sm text-gray-600">Inspiré par {{ r.archetype.inspirePar }}</p>
-        </div>
-      </div>
-      <dl class="mt-6 space-y-4">
-        <div>
-          <dt class="text-sm font-semibold text-navy-700">Traits dominants</dt>
-          <dd class="text-gray-700">{{ r.archetype.traits }}</dd>
-        </div>
-        <div>
-          <dt class="text-sm font-semibold text-navy-700">Forces</dt>
-          <dd class="text-gray-700">{{ r.archetype.forces }}</dd>
-        </div>
-        <div>
-          <dt class="text-sm font-semibold text-navy-700">Point de vigilance</dt>
-          <dd class="text-gray-700">{{ r.archetype.risque }}</dd>
-        </div>
-      </dl>
-      <p v-if="r.secondaire" class="mt-6 rounded-lg bg-navy-50 p-3 text-sm text-navy-700">
-        Profil secondaire : <strong>{{ r.secondaire.code }}</strong>
-        (inspiré par {{ r.secondaire.inspirePar }})
-      </p>
-      <h2 class="mt-8 text-lg font-semibold text-navy-800">Vos 8 dimensions</h2>
-      <RadarDimensionBars class="mt-4" :dims="dims" />
-    </template>
+          Profil secondaire : <strong>{{ r.secondaire.code }}</strong>
+          (inspiré par {{ r.secondaire.inspirePar }})
+        </p>
 
-    <template v-else>
-      <p class="text-xs uppercase tracking-wide text-orange-600">Rayonnement de votre entreprise</p>
-      <div class="mt-3 flex items-end gap-3">
-        <span class="text-6xl font-semibold text-navy-800">{{ r.score }}</span>
-        <span class="pb-2 text-gray-500">/ 100</span>
-      </div>
-      <p class="text-lg font-medium text-navy-700">{{ r.niveauAffiche }}</p>
-      <RadarWeatherCard
-        class="mt-4"
-        :meteo="r.meteo"
-        :niveau="r.niveau"
-        :nuance="r.nuance ? 'avec potentiel d\'éclaircie' : null"
-      />
-      <p class="mt-4 text-gray-700">{{ r.lecture }}</p>
-      <h2 class="mt-8 text-lg font-semibold text-navy-800">Vos 5 dimensions</h2>
-      <RadarDimensionBars class="mt-4" :dims="dims" />
-      <p class="mt-6 text-sm text-gray-600">
-        Différenciation déclarée : <strong>{{ r.differenciation.valeur }}</strong>
-      </p>
-    </template>
+        <h2 class="mt-10 type-h3">Vos dimensions les plus présentes</h2>
+        <RadarDimensionBars class="mt-4" :dims="dimsTop3" />
 
-    <div class="mt-10 space-y-3 rounded-2xl border border-orange-200 bg-orange-50 p-5">
-      <p class="font-semibold text-navy-800">Recevez votre analyse complète</p>
-      <p class="text-sm text-gray-700">
-        Rapport en ligne et PDF, avec la lecture détaillée de votre résultat.
-      </p>
-      <NuxtLink
-        :to="`/recevoir-mon-analyse/${token}`"
-        class="inline-flex min-h-12 items-center rounded-xl bg-orange-500 px-6 font-semibold text-white"
-      >
-        Recevoir mon analyse
-      </NuxtLink>
+        <details class="mt-4">
+          <summary class="cursor-pointer type-small font-medium text-navy-600">
+            Voir les huit dimensions
+          </summary>
+          <RadarDimensionBars class="mt-4" :dims="dimsToutes" />
+        </details>
+      </template>
+
+      <template v-else>
+        <p class="type-eyebrow">Rayonnement de votre entreprise</p>
+        <div class="mt-4 flex items-end gap-3">
+          <span class="type-figure text-6xl leading-none">{{ r.score }}</span>
+          <span class="pb-1.5 type-body text-gray-500">/ 100</span>
+        </div>
+        <h1 class="mt-2 type-h3">{{ r.niveauAffiche }}</h1>
+
+        <RadarWeatherCard
+          class="mt-5"
+          :meteo="r.meteo"
+          :niveau="r.niveau"
+          :nuance="r.nuance ? 'avec potentiel d’éclaircie' : null"
+        />
+
+        <p class="mt-5 type-body text-gray-700">{{ r.lecture }}</p>
+
+        <h2 class="mt-10 type-h3">Vos cinq dimensions</h2>
+        <RadarDimensionBars class="mt-4" :dims="dimsToutes" />
+
+        <p class="mt-6 type-small text-gray-600">
+          Différenciation déclarée : <strong>{{ r.differenciation.valeur }}</strong>
+        </p>
+      </template>
     </div>
-    <NuxtLink
-      :to="`/diagnostic/${otherType}/introduction`"
-      class="mt-6 inline-block text-sm font-medium text-navy-600 underline"
-    >
-      Faire le diagnostic {{ otherType === 'dirigeant' ? 'du dirigeant' : "de l'entreprise" }} →
-    </NuxtLink>
+
+    <!-- Panneau d'action : persistant au défilement en desktop (maquette planche 05).
+         Aucun champ n'est demandé ici — la saisie a lieu une seule fois, en P10. -->
+    <aside class="lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:self-start">
+      <div
+        class="border border-orange-200 bg-orange-50 p-5"
+        style="border-radius: var(--radius-card)"
+      >
+        <p class="font-semibold text-navy-800">Recevez votre analyse complète</p>
+        <p class="mt-1.5 type-small text-gray-700">
+          Rapport en ligne et PDF, avec la lecture détaillée de votre résultat.
+        </p>
+        <NuxtLink
+          :to="`/recevoir-mon-analyse/${token}`"
+          class="mt-4 inline-flex w-full items-center justify-center bg-orange-600 px-6 font-semibold text-white hover:bg-orange-700 active:bg-orange-800"
+          style="min-height: var(--control-h-mobile); border-radius: var(--radius-control)"
+        >
+          Recevoir mon analyse
+        </NuxtLink>
+      </div>
+
+      <NuxtLink
+        :to="`/diagnostic/${otherType}/introduction`"
+        class="mt-4 inline-flex w-full items-center justify-center gap-1.5 border border-gray-300 px-6 type-small font-semibold text-navy-700 hover:border-navy-300"
+        style="min-height: var(--control-h); border-radius: var(--radius-control)"
+      >
+        Faire le diagnostic {{ otherType === 'dirigeant' ? 'du dirigeant' : 'de l’entreprise' }}
+        <UiIcon name="arrow-right" :size="16" />
+      </NuxtLink>
+    </aside>
   </section>
 </template>

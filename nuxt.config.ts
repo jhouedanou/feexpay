@@ -10,7 +10,24 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'fr' },
       title: 'Radar by FeexPay',
       meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+      link: [
+        // Le kit prescrit le symbole FeexPay comme favicon.
+        { rel: 'icon', href: '/brand/logo-mark-2026.png', type: 'image/png' },
+        // Seule la graisse du corps de texte est préchargée : les titres arrivent
+        // en même temps que le CSS, un preload par graisse coûterait plus qu'il ne rapporte.
+        {
+          rel: 'preload',
+          as: 'font',
+          type: 'font/woff2',
+          href: '/fonts/poppins-400-latin.woff2',
+          crossorigin: 'anonymous',
+        },
+      ],
     },
+    // Durées de la maquette (planche Foundations) : apparition de carte 220 ms,
+    // courbe cubic-bezier(.2,0,0,1). Neutralisé par la règle prefers-reduced-motion.
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: false,
   },
 
   // PLAN.md §7 : seule P01 est indexable, tout le reste est noindex.

@@ -15,6 +15,7 @@ if (!q.value) throw createError({ statusCode: 404 })
 const part = useParticipation(type)
 const answers = useState<Record<string, string>>(`answers-${type}`, () => ({}))
 const selected = ref<string | null>(null)
+const dejaRepondue = ref(false)
 const saving = ref(false)
 const error = ref<string | null>(null)
 
@@ -28,6 +29,7 @@ onMounted(async () => {
     // Interdit de sauter une question non répondue
     const first = questions.value.findIndex((qq) => !answers.value[qq.code]) + 1
     if (first > 0 && numero.value > first) return navigateTo(`/diagnostic/${type}/question/${first}`)
+    dejaRepondue.value = Boolean(answers.value[q.value!.code])
     selected.value = answers.value[q.value!.code] ?? null
   } catch {
     part.save(null)
@@ -54,9 +56,18 @@ async function next() {
 </script>
 
 <template>
-  <section class="mx-auto max-w-[640px] px-4 py-8">
+  <!-- Colonne plafonnée : 640 px en desktop, 600 px en tablette (maquette planche 04). -->
+  <section class="mx-auto max-w-[600px] px-5 py-8 lg:max-w-[640px]">
     <RadarProgressBar :current="numero" :total="total" />
-    <h1 class="mt-6 text-xl font-semibold leading-snug text-navy-800 md:text-2xl">{{ q!.texte }}</h1>
+    <RadarStepMeta
+      class="mt-2"
+      :current="numero"
+      :total="total"
+      :enregistre="Boolean(answers[q!.code])"
+    />
+
+    <h1 class="mt-6 type-h2">{{ q!.texte }}</h1>
+
     <div class="mt-6 space-y-3">
       <RadarAnswerCard
         v-for="o in q!.options"
@@ -64,14 +75,32 @@ async function next() {
         :lettre="o.lettre"
         :texte="o.texte"
         :selected="selected === o.code"
+        :enregistree="answers[q!.code] === o.code"
+        :modification="dejaRepondue && selected === o.code && answers[q!.code] !== o.code"
         @click="selected = o.code"
       />
     </div>
-    <p v-if="error" class="mt-4 text-sm text-red-600">{{ error }}</p>
-    <div class="mt-8 flex items-center justify-between">
-      <NuxtLink v-if="numero > 1" :to="`/diagnostic/${type}/question/${numero - 1}`" class="min-h-12 px-4 py-3 text-sm font-medium text-gray-600">← Retour</NuxtLink>
+
+    <p v-if="error" class="mt-4 type-small text-red-600">{{ error }}</p>
+
+    <div class="mt-8 flex items-center justify-between gap-3">
+      <NuxtLink
+        v-if="numero > 1"
+        :to="`/diagnostic/${type}/question/${numero - 1}`"
+        class="inline-flex items-center gap-1.5 px-4 type-small font-medium text-gray-600 hover:text-navy-700"
+        style="min-height: var(--control-h)"
+      >
+        <UiIcon name="arrow-left" :size="18" />
+        Question précédente
+      </NuxtLink>
       <span v-else />
-      <button type="button" :disabled="!selected || saving" class="min-h-12 rounded-xl bg-orange-500 px-6 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40" @click="next">
+      <button
+        type="button"
+        :disabled="!selected || saving"
+        class="inline-flex flex-1 items-center justify-center bg-orange-600 px-7 font-semibold text-white hover:bg-orange-700 active:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+        style="min-height: var(--control-h-mobile); border-radius: var(--radius-control)"
+        @click="next"
+      >
         {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
       </button>
     </div>
