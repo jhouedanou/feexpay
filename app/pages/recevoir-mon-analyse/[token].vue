@@ -80,7 +80,7 @@ async function envoyer() {
   envoi.value = true
   erreur.value = null
   try {
-    const res = await $fetch<{ reportToken: string }>('/api/public/leads', {
+    const res = await $fetch<{ reportToken: string; email: { sent: boolean; to: string } }>('/api/public/leads', {
       method: 'POST',
       headers: { 'Idempotency-Key': idempotencyKey.value },
       body: {
@@ -99,7 +99,7 @@ async function envoyer() {
     try {
       localStorage.setItem(
         `radar:rapport:${res.reportToken}`,
-        JSON.stringify({ type: type.value, token, email: form.email.trim(), rapport: rapportNom.value }),
+        JSON.stringify({ type: type.value, token, email: form.email.trim(), rapport: rapportNom.value, envoye: res.email?.sent === true }),
       )
     } catch {}
     await navigateTo(`/confirmation/${res.reportToken}`)

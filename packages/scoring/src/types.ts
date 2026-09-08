@@ -355,6 +355,8 @@ export interface PublicDirigeantResult {
   archetype: PublicArchetype
   secondaire: PublicArchetype | null
   dimensions: { code: Dimension; nom: string; definition: string; score: number }[]
+  /** Niveau de pilotage et sa lecture (maquette P08 « ce que ce profil dit de votre pilotage », P12). */
+  pilotage: { score: number; niveau: string; lecture: string }
 }
 
 export interface PublicRayonnementResult {
@@ -369,4 +371,7 @@ export interface PublicRayonnementResult {
   nuance: boolean
   dimensions: { cle: RayonnementDimension['cle']; nom: string; score: number }[]
   differenciation: { tag: string; valeur: string }
+  /** Maquette P09 : « ce qui vous porte » (force déclarée) et « ce qui vous freine ». */
+  porte: string | null
+  freine: string | null
 }

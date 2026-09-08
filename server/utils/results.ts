@@ -37,7 +37,7 @@ export async function readSnapshot(event: H3Event, participationId: string) {
   const result =
     meta.type === 'dirigeant'
       ? toPublicDirigeant(scoreDirigeant(answers, meta.version))
-      : toPublicRayonnement(scoreRayonnement(answers, meta.version))
+      : toPublicRayonnement(scoreRayonnement(answers, meta.version), answers)
 
   return {
     type: meta.type,

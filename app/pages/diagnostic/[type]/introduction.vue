@@ -10,10 +10,8 @@ const type = route.params.type as DiagType
 if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCode: 404 })
 
 const PROFILS = ['Stratège', 'Bâtisseur', 'Gestionnaire', 'Fédérateur', 'Conquérant', 'Résilient', 'Visionnaire', 'Réformateur']
-// La maquette nomme ici « Maîtrise financière, Relation client, Délégation ». La matrice
-// V2.1 prime pour les contenus normatifs (notice des maquettes §6) : on reprend ses
-// dimensions, celles-là mêmes qu'affiche la page de résultat.
-const DIMENSIONS = ['Vision', 'Stratégie', 'Exécution', 'Organisation', 'Influence', 'Audace', 'Adaptabilité', 'Transformation']
+// Libellés de la maquette (décision client : la maquette prime sur ce point).
+const DIMENSIONS = ['Stratégie', 'Organisation', 'Maîtrise financière', 'Adaptabilité', 'Relation client', 'Délégation', 'Vision', 'Exécution']
 const NIVEAUX = [
   ['80+', 'Dominant'],
   ['65–79', 'Challenger fort'],

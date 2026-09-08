@@ -51,8 +51,10 @@ await call('POST', '/api/public/sessions', {})
 const dir = await run('dirigeant', 'BCBADBADDBCADA')
 check('Dirigeant BCBADBADDBCADA → Stratège', dir.result.archetype.code === 'Stratège',
   dir.result.archetype.code)
-check('projection publique sans pilotage ni affinités',
-  !JSON.stringify(dir.result).match(/pilotage|affinit|tieBreak|hypothese/i))
+check('projection publique sans affinités, tie-break ni hypothèses',
+  !JSON.stringify(dir.result).match(/affinit|tieBreak|hypothese/i))
+check('niveau de pilotage exposé (maquette P08/P12)',
+  typeof dir.result.pilotage?.lecture === 'string' && dir.result.pilotage.lecture.length > 0)
 check('8 barres de dimensions', dir.result.dimensions.length === 8,
   dir.result.dimensions.map((d) => `${d.code}=${d.score}`).join(' '))
 

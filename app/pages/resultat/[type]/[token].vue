@@ -97,7 +97,7 @@ useSeoMeta({
           <div class="flex flex-col gap-3.5 pt-[26px] pb-2 md:grid md:grid-cols-2 md:gap-5 md:py-8 lg:flex lg:flex-1 lg:gap-5 lg:py-0">
             <div class="card p-5 md:col-span-2 md:p-6 lg:p-7">
               <h2 class="mb-2.5 text-xl leading-[1.3] font-semibold text-navy-600 md:text-[22px] lg:mb-3 lg:text-2xl lg:leading-[1.28]">Ce que ce profil dit de votre pilotage</h2>
-              <p class="text-base leading-[1.6] text-gray-700 md:max-w-[640px] md:leading-[1.65] lg:max-w-none lg:text-[17px]" style="text-wrap: pretty">{{ phrase(r.archetype.traits) }}</p>
+              <p class="text-base leading-[1.6] text-gray-700 md:max-w-[640px] md:leading-[1.65] lg:max-w-none lg:text-[17px]" style="text-wrap: pretty">{{ r.pilotage.niveau }} : {{ minuscule(r.pilotage.lecture) }} {{ phrase(r.archetype.traits) }}</p>
             </div>
             <div class="grid gap-3.5 md:contents lg:grid lg:grid-cols-2 lg:gap-5">
               <div class="card p-5 md:p-[22px] lg:p-6">
@@ -218,15 +218,13 @@ useSeoMeta({
                   <p class="mb-1.5 text-[17px] leading-[1.3] font-semibold text-navy-600">{{ r.differenciation.valeur }}</p>
                   <p class="text-sm leading-[1.55] text-gray-600">Prix, proximité, qualité et avantage distinctif sont quatre natures de différenciation, sans hiérarchie entre elles.</p>
                 </div>
-                <div class="card hidden p-[26px] lg:block">
-                  <h3 class="mb-3 text-[22px] leading-[1.28] font-semibold text-navy-600">Votre analyse complète</h3>
-                  <p class="mb-5 text-[15px] leading-[1.6] text-gray-600">Envoyée par email, disponible en ligne et en PDF.</p>
-                  <ul class="flex flex-col gap-2.5">
-                    <li v-for="p in ['Le détail de vos cinq dimensions de rayonnement', 'Ce qui vous porte et ce qui vous freine', 'La lecture croisée si vous réalisez aussi le diagnostic Dirigeant']" :key="p" class="flex items-start gap-2.5">
-                      <UiIcon name="check" :size="18" class="shrink-0 text-orange-600" />
-                      <span class="text-[15px] leading-[1.5] text-gray-700">{{ p }}</span>
-                    </li>
-                  </ul>
+                <div v-if="r.porte" class="card hidden p-[26px] lg:block">
+                  <div class="mb-3 flex items-center gap-2.5"><UiIcon name="arm-flex-outline" :size="20" class="text-green-600" /><p class="eyebrow tracking-[0.06em] text-green-600">Ce qui vous porte</p></div>
+                  <p class="text-base leading-[1.6] text-gray-700">{{ r.porte }}</p>
+                </div>
+                <div v-if="r.freine" class="card hidden border-orange-200 p-[26px] lg:block">
+                  <div class="mb-3 flex items-center gap-2.5"><UiIcon name="alert-outline" :size="20" class="text-orange-700" /><p class="eyebrow tracking-[0.06em] text-orange-700">Ce qui vous freine</p></div>
+                  <p class="text-base leading-[1.6] text-gray-700">{{ r.freine }}</p>
                 </div>
               </div>
             </div>

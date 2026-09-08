@@ -52,6 +52,8 @@ export default defineNuxtConfig({
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? '',
     databaseUrl: process.env.DATABASE_URL ?? '',
     resendApiKey: process.env.RESEND_API_KEY ?? '',
+    // Sans accès DNS : onboarding@resend.dev ne délivre qu'au titulaire du compte Resend.
+    resendFrom: process.env.RESEND_FROM ?? 'Radar by FeexPay <onboarding@resend.dev>',
     public: {
       appBaseUrl: process.env.APP_BASE_URL ?? 'http://localhost:3000',
       supabaseUrl: process.env.SUPABASE_URL ?? '',

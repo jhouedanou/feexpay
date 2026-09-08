@@ -5,6 +5,8 @@ import {
   scoreRayonnement,
   type Answers,
 } from '@radar/scoring'
+import { envoyerRapport } from '../../utils/email'
+import { reportByToken } from '../../utils/report'
 
 /**
  * POST /api/public/leads — P10. Rapproche un contact, ouvre un rapport et calcule la
@@ -192,10 +194,22 @@ export default defineEventHandler(async (event) => {
     return { contactId, reportId: report.rows[0]!.id, token: reportToken, croisement }
   })
 
+  // Envoi du rapport : PDF joint, lien vers P12. Un échec d'envoi ne bloque pas la
+  // remise du rapport en ligne, il est journalisé dans `notification`.
+  let email: { sent: boolean; to: string; error?: string } = { sent: false, to: emailNorm }
+  if (!out.rejoue) {
+    try {
+      const rapport = await reportByToken(event, out.token)
+      email = await envoyerRapport(rapport, out.token, out.reportId)
+    } catch (e) {
+      email = { sent: false, to: emailNorm, error: e instanceof Error ? e.message : String(e) }
+    }
+  }
+
   setResponseStatus(event, 201)
   return {
     reportToken: out.token,
-    // Le rapport et son envoi arrivent aux étapes suivantes du Lot 3.
+    email: { sent: email.sent, to: email.to },
     croisement: out.croisement,
     correlation_id: event.context.correlationId,
   }

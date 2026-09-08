@@ -7,7 +7,7 @@ formulaire**. Plan complet et décisions : [PLAN.md](PLAN.md). Sources normative
 ## Stack
 
 Nuxt 4 (monolithe : public + API Nitro) · Supabase Postgres · `pg` en accès direct serveur ·
-Tailwind 4 · Vitest · Resend et génération PDF en JavaScript pur (Lot 3, à venir).
+Tailwind 4 · Vitest · Resend (email, PDF en pièce jointe) · jsPDF (PDF en JavaScript pur).
 
 Aucun navigateur sans interface, aucune file d'attente, aucun second serveur : tout tient dans
 des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dépendance externe.
@@ -24,9 +24,12 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
   `/docs/maquette/frames/index.html`.
 - `scripts/seed-scoring-version.ts` — seed idempotent de la version publiée en base.
 - `supabase/migrations/` — schéma SQL, **source de vérité**.
-- `server/api/public/` — sessions, participations, réponses, complétion, résultats, questions.
-- `server/utils/` — accès base, jetons, session, erreurs, projections.
-- `app/` — écrans P01–P11 et P13/P14, composants `radar/*` et `ui/*`, composable
+- `server/api/public/` — sessions, participations, réponses, complétion, résultats, questions,
+  leads (P10 : contact, rapport, lecture croisée, envoi de l'email avec le PDF joint),
+  rapports (`reports/{token}` pour P12, `reports/{token}/pdf` généré à la demande avec jsPDF).
+- `server/utils/` — accès base, jetons, session, erreurs, projections, rapport (`report.ts`),
+  PDF (`pdf.ts`, jsPDF, Helvetica), email (`email.ts`, Resend, ligne `notification` par envoi).
+- `app/` — écrans P01–P14 (P12 : `/rapport/{token}`), composants `radar/*` et `ui/*`, composable
   `useParticipation`. Deux layouts : `default` (navigation et pied de page, P01 et pages cadres)
   et `bare` (parcours, chaque page pose sa barre supérieure `RadarTopBar`).
 - `test/` — migration SQL sur PGlite (vitest) + smoke tests HTTP (scripts Node).
@@ -75,8 +78,13 @@ Config Auth à faire au dashboard avant le Lot 4 : inscriptions publiques OFF, m
 
 - Jetons publics : 32 octets aléatoires en base64url, stockés en sha256, jamais journalisés.
   Une participation n'est accessible qu'avec le cookie de session correspondant.
-- Aucune donnée interne côté client : pilotage, affinités, constats et tie-break restent
-  serveur. Vérifié par test sur la réponse de l'API.
+- Aucune donnée interne côté client : affinités, tie-break, hypothèses et constats de la fiche
+  commerciale restent serveur (vérifié par test sur la réponse de l'API). Décision client du
+  8 septembre 2026 : la maquette prime, donc le niveau de pilotage et sa lecture (P08, P12),
+  la force et la difficulté déclarées (P09) sont publics.
+- Email : sans domaine vérifié chez Resend, `onboarding@resend.dev` ne délivre qu'à l'adresse du
+  titulaire du compte. Chaque tentative laisse une ligne `notification` (accepted ou failed avec
+  l'erreur) ; le rapport et le PDF restent accessibles par le lien quoi qu'il arrive.
 - Aucune recommandation produit : le tag « Produit FeexPay » n'est pas extrait de la matrice.
 - `noindex` partout sauf `/`.
 - Interface : les valeurs de la maquette (annexe 02) priment sur le design system générique
