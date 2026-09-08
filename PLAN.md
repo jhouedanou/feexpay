@@ -226,7 +226,7 @@ CC (≥60,≥60) Cohérence consolidée · PS (≥60,<60) Potentiel sous-exploit
 - Infos déclarées : Q11 canal, Q13 condition d'adoption, Q14 progrès prioritaire, R3 différenciation.
 - Règles combinées RC01–RC16 : OR intra-groupe, AND inter-groupes (voir annexe §11), **max 6**, tri gravité desc puis id. Hypothèse au conditionnel + relance obligatoire.
 - Preuves : exhaustif (code, question, option, version, date).
-- **Interdit** : tout champ `product_*`, `recommended_offer`, mapping constat→produit. Le tag « Produit FeexPay » de Q14 de la matrice n'est **pas** exposé (ni admin ni public).
+- Décision client du 8 septembre 2026 : la maquette prime sur le CDC. Les « Leviers FeexPay associés » de A05 (rattachement constat → produit) seront implémentés en admin (Lot 5), avec une table de correspondance éditable. Côté public, aucune recommandation produit.
 
 ### 5.5 Tests obligatoires (`controls.test.ts`)
 | Cas | Dirigeant | Rayonnement | Attendu |

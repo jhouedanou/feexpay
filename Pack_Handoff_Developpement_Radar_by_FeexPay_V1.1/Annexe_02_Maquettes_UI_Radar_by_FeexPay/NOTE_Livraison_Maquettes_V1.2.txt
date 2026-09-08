@@ -1,0 +1,10 @@
+NOTE DE LIVRAISON — MAQUETTES V1.2
+
+- Utiliser exclusivement les deux fichiers HTML V1.2 de ce dossier.
+- Conserver toutes les dépendances locales jointes.
+- Desktop et mobile sont documentés.
+- Bandeau cookies : bas de page, compact, non bloquant, deux actions initiales.
+- Personnalisation : cookies nécessaires toujours actifs ; analytics et publicité réglables ; poursuite avec les seuls cookies nécessaires possible.
+- Consentement au diagnostic obligatoire et consentement commercial facultatif présents dans le formulaire.
+- Les contenus juridiques visibles servent de gabarit jusqu’à l’insertion de l’Annexe 05 validée.
+

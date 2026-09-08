@@ -1,0 +1,10 @@
+DERNIER FICHIER À INSÉRER AVANT L’ENVOI FINAL
+
+Après validation écrite des textes par FeexPay, déposer à la racine du pack le document DOCX sous le nom exact :
+
+Annexe_05_Textes_juridiques_Radar_by_FeexPay_V1.0_Valides.docx
+
+Le document doit contenir la politique de confidentialité et les mentions légales dans leur version validée.
+
+Une fois le DOCX inséré, supprimer cette note. Ne modifier aucun autre nom de fichier.
+

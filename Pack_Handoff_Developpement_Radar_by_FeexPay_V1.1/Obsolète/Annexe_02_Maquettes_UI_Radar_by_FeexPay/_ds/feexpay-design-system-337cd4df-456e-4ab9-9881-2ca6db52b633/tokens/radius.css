@@ -1,0 +1,5 @@
+:root{
+/* The mark is built from hard-edged rectangles; product UI softens to a friendly, not-pill radius. */
+--radius-none:0px;--radius-xs:4px;--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-2xl:28px;--radius-pill:999px;--radius-circle:50%;
+--radius-control:10px;--radius-card:14px;--radius-modal:20px;--radius-media:20px;--radius-chip:999px;
+}

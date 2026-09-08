@@ -1,0 +1,33 @@
+RADAR BY FEEXPAY — DÉCISIONS ET PRÉREQUIS
+Version 1.2 — 8 septembre 2026
+
+
+1. DÉCISIONS ACTÉES
+
+- Mise en ligne cible : vendredi 25 septembre 2026.
+- Volumétrie de référence : 1 000 participations par mois.
+- Hébergement et services récurrents : pris en charge par Big Five.
+- Scoring : règle de départage programmable et simulateur corrigés dans la matrice V2.2.
+- Cookies : bandeau compact en bas, non bloquant, avec deux boutons au premier niveau : « Tout accepter » et « Personnaliser ».
+- Cookies nécessaires uniquement : option disponible dans le panneau « Personnaliser ».
+- Formulaire : consentement au traitement nécessaire au diagnostic obligatoire ; consentement commercial facultatif.
+- Recette : Cossi CODJIA pilote les vérifications fonctionnelles et remonte les anomalies ; Jean-Luc HOUÉDANOU effectue les corrections et le débogage.
+
+
+2. TRACKING
+
+- Identifiant GA4 : G-N2BEKD7NM3.
+- Identifiant Meta Pixel / jeu de données : 2579023315884016.
+- Meta CAPI : intégration serveur documentée dans le plan de tracking V1.2.
+- Jeton CAPI : à insérer par Cossi CODJIA avant l’envoi du pack.
+- Test Event Code : à utiliser uniquement pendant la recette Meta.
+- Google Tag Manager : hors architecture retenue et retiré du plan de tracking.
+
+
+3. DÉPENDANCES EXTERNES RESTANTES
+
+- DNS et domaine d’envoi : demande déjà transmise à FeexPay ; interlocuteur et délégation attendus.
+- Textes juridiques : validation écrite de FeexPay attendue avant insertion de l’Annexe 05.
+
+Ces dépendances n’empêchent pas l’exploitation du pack pour le développement. Elles doivent être levées avant la recette sur le domaine cible et la mise en production.
+

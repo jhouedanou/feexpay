@@ -14,7 +14,9 @@
     "typecheck": "pnpm -r typecheck",
     "typecheck:app": "nuxt typecheck",
     "seed:scoring": "tsx scripts/seed-scoring-version.ts",
-    "test:leads": "node test/api-leads.mjs"
+    "test:leads": "node test/api-leads.mjs",
+    "test:admin": "node test/api-admin.mjs",
+    "seed:admins": "tsx scripts/seed-admins.ts"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
@@ -29,9 +31,11 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "@radar/scoring": "workspace:*",
+    "@supabase/supabase-js": "^2.116.0",
     "@tailwindcss/vite": "^4.3.3",
     "jspdf": "^4.2.1",
     "nuxt": "^4.5.2",
+    "otpauth": "^9.5.2",
     "pg": "^8.23.0",
     "resend": "^6.26.0",
     "tailwindcss": "^4.3.3",

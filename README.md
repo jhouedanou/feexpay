@@ -29,6 +29,11 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
   rapports (`reports/{token}` pour P12, `reports/{token}/pdf` généré à la demande avec jsPDF).
 - `server/utils/` — accès base, jetons, session, erreurs, projections, rapport (`report.ts`),
   PDF (`pdf.ts`, jsPDF, Helvetica), email (`email.ts`, Resend, ligne `notification` par envoi).
+- `app/admin/**` (pages), `app/layouts/admin.vue`, `app/middleware/admin.ts`, `app/composables/useAdmin.ts` —
+  espace interne : A01 connexion et double authentification, acceptation d'invitation, A09, A10,
+  réglages (identifiants de tracking). `server/api/admin/**` et `server/utils/{admin-auth,invitations,
+  supabase,settings}.ts` : Supabase Auth côté serveur (clé service), cookie httpOnly `radar_admin`,
+  RBAC vérifié par handler, `audit_log` alimenté.
 - `app/` — écrans P01–P14 (P12 : `/rapport/{token}`), composants `radar/*` et `ui/*`, composable
   `useParticipation`. Deux layouts : `default` (navigation et pied de page, P01 et pages cadres)
   et `bare` (parcours, chaque page pose sa barre supérieure `RadarTopBar`).
@@ -56,6 +61,7 @@ transaction) : il ne supporte pas les prepared statements.
 pnpm test          # moteur (44) + migration SQL sur PGlite (9), sans base externe
 pnpm test:api      # parcours HTTP : session, réponses, reprise, abandon (26 contrôles)
 pnpm test:results  # calcul, snapshot, idempotence, cas normatifs §5.5 (14 contrôles)
+pnpm test:admin    # invitation, 2FA TOTP, RBAC, gardes admin (22 contrôles, crée des comptes de test)
 ```
 
 Les deux derniers exigent un serveur lancé et écrivent dans la base pointée par
@@ -71,8 +77,12 @@ l'historique des réponses et les versions publiées.
 pnpm seed:scoring   # version 2.1 published + 21 questions + 84 options (idempotent)
 ```
 
-Config Auth à faire au dashboard avant le Lot 4 : inscriptions publiques OFF, mot de passe
-≥ 12 + HIBP, MFA TOTP ON.
+Comptes admin : `pnpm seed:admins` crée l'administrateur principal (`amedeel@feexpay.me`) et
+une invitation de 7 jours par adresse de la liste du 8 septembre (domaines `feexpay.me` et
+`bigfiveabidjan.com`), puis imprime les liens à transmettre. La politique de mot de passe
+(12 caractères, contrôle HIBP) et la double authentification TOTP (obligatoire Analyste et
+Administrateur) sont appliquées par l'application ; au dashboard Supabase, laisser les
+inscriptions publiques désactivées.
 
 ## Règles
 

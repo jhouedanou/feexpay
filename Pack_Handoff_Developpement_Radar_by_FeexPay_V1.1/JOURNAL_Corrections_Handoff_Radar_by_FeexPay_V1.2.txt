@@ -1,0 +1,19 @@
+RADAR BY FEEXPAY — JOURNAL DE CONSOLIDATION
+Version 1.2 — 8 septembre 2026
+
+- Remplacement du plan de tracking V1.1 par la V1.2.
+- Suppression des références à Google Tag Manager dans le plan de tracking.
+- Intégration des identifiants GA4 et Meta Pixel fournis.
+- Préparation de l’emplacement du jeton CAPI et usage du Test Event Code limité à la recette.
+- Remplacement des maquettes par les exports corrigés V1.2.
+- Conservation des dépendances locales support.js, _ds/ et assets/.
+- Validation documentaire du bandeau cookies compact en bas, non bloquant, à deux boutons.
+- Déplacement de l’option « cookies nécessaires uniquement » dans « Personnaliser ».
+- Confirmation des consentements obligatoire et facultatif dans le formulaire.
+- Intégration de la matrice de scoring V2.2 et de sa règle de départage programmable.
+- Mise à jour de la date cible de mise en ligne au vendredi 25 septembre 2026.
+- Ajout de la volumétrie de référence de 1 000 participations par mois.
+- Confirmation de la prise en charge des frais d’hébergement et de services par Big Five.
+- Clarification de la recette : Cossi CODJIA pilote et remonte les anomalies ; Jean-Luc HOUÉDANOU corrige et débogue.
+- Pré-référencement de l’Annexe 05 juridique sous son nom final exact.
+
