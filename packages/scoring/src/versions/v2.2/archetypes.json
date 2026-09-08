@@ -1,0 +1,138 @@
+[
+  {
+    "code": "Stratège",
+    "inspirePar": "Samory Touré",
+    "dims": [
+      "STR",
+      "ADA",
+      "ORG"
+    ],
+    "poids": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "traits": "Analytique, patient, observateur et anticipateur",
+    "forces": "Anticipation, lecture stratégique, allocation des ressources",
+    "risque": "Suranalyse et lenteur dans la décision"
+  },
+  {
+    "code": "Visionnaire",
+    "inspirePar": "Kwame Nkrumah",
+    "dims": [
+      "VIS",
+      "INF",
+      "TRA"
+    ],
+    "poids": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "traits": "Ambitieux, intuitif, tourné vers l’avenir et inspirant",
+    "forces": "Projection, ambition et mobilisation autour d’une vision",
+    "risque": "Sous-estimation des contraintes opérationnelles"
+  },
+  {
+    "code": "Bâtisseur",
+    "inspirePar": "Aliko Dangote",
+    "dims": [
+      "EXE",
+      "ORG",
+      "STR"
+    ],
+    "poids": [
+      0.5,
+      0.35,
+      0.15
+    ],
+    "traits": "Structuré, constant, méthodique et pragmatique",
+    "forces": "Exécution, structuration et croissance progressive",
+    "risque": "Stabilité privilégiée au détriment de l’agilité"
+  },
+  {
+    "code": "Conquérant",
+    "inspirePar": "Shaka Zulu",
+    "dims": [
+      "AUD",
+      "EXE",
+      "VIS"
+    ],
+    "poids": [
+      0.5,
+      0.35,
+      0.15
+    ],
+    "traits": "Audacieux, compétitif, rapide et déterminé",
+    "forces": "Expansion, accélération et courage décisionnel",
+    "risque": "Prise de risque excessive ou dispersion"
+  },
+  {
+    "code": "Fédérateur",
+    "inspirePar": "Nelson Mandela",
+    "dims": [
+      "INF",
+      "ADA",
+      "VIS"
+    ],
+    "poids": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "traits": "Relationnel, rassembleur, diplomate et empathique",
+    "forces": "Mobilisation, adhésion, alliances et intelligence relationnelle",
+    "risque": "Recherche excessive du consensus"
+  },
+  {
+    "code": "Résilient",
+    "inspirePar": "Béhanzin",
+    "dims": [
+      "ADA",
+      "EXE",
+      "AUD"
+    ],
+    "poids": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "traits": "Endurant, persévérant, adaptable et combatif",
+    "forces": "Rebond, endurance, adaptation et persévérance",
+    "risque": "Persistance dans une situation devenue défavorable"
+  },
+  {
+    "code": "Gestionnaire",
+    "inspirePar": "Tidjane Thiam",
+    "dims": [
+      "ORG",
+      "STR",
+      "EXE"
+    ],
+    "poids": [
+      0.45,
+      0.3,
+      0.25
+    ],
+    "traits": "Discipliné, organisé, rationnel et précis",
+    "forces": "Organisation, maîtrise des ressources et pilotage",
+    "risque": "Optimisation privilégiée au détriment de l’audace"
+  },
+  {
+    "code": "Réformateur",
+    "inspirePar": "Thomas Sankara",
+    "dims": [
+      "TRA",
+      "AUD",
+      "VIS"
+    ],
+    "poids": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "traits": "Critique, indépendant, innovant et orienté transformation",
+    "forces": "Remise en question, transformation et évolution des systèmes",
+    "risque": "Multiplication des changements ou adoption insuffisamment accompagnée"
+  }
+]

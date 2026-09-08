@@ -61,6 +61,7 @@ useSeoMeta({ title: `${copy.kicker} — Radar by FeexPay` })
 
 const { etat: autre, charger: chargerAutre } = useAutreDiagnostic(type)
 const part = useParticipation(type)
+const { $track } = useNuxtApp()
 const loading = ref(false)
 const error = ref<string | null>(null)
 const resumeIndex = ref<number | null>(null)
@@ -83,7 +84,10 @@ async function go(resume = false) {
   loading.value = true
   error.value = null
   try {
-    if (!resume || !part.token.value) await part.start()
+    if (!resume || !part.token.value) {
+      await part.start()
+      $track('quiz_start', { diagnostic: type })
+    }
     const s = await part.state()
     await navigateTo(`/diagnostic/${type}/question/${resume ? s.current_index : 1}`)
   } catch {

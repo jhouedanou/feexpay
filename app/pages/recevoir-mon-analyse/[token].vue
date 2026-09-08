@@ -51,7 +51,14 @@ const form = reactive({
   taille: '' as (typeof TAILLES)[number] | '',
 })
 const consent = ref(false)
-const prochaines = ref(false)
+const contactOk = ref(false)
+const { $track } = useNuxtApp()
+const formCommence = ref(false)
+function debutSaisie() {
+  if (formCommence.value) return
+  formCommence.value = true
+  $track('form_start', { form: 'p10' })
+}
 const envoi = ref(false)
 const erreur = ref<string | null>(null)
 const erreurs = reactive<Record<string, string>>({})
@@ -71,7 +78,7 @@ function valider() {
   if (!form.secteur) erreurs.secteur = 'Champ requis.'
   if (form.secteur === 'Autre' && !form.secteurAutre.trim()) erreurs.secteurAutre = 'Précisez votre secteur.'
   if (!form.taille) erreurs.taille = 'Champ requis.'
-  if (!consent.value) erreurs.consent = 'Votre accord est nécessaire pour vous envoyer l’analyse.'
+  if (!consent.value) erreurs.consent = 'La première case est obligatoire pour envoyer le formulaire. La seconde ne bloque jamais le parcours.'
   return Object.keys(erreurs).length === 0
 }
 
@@ -80,10 +87,14 @@ async function envoyer() {
   envoi.value = true
   erreur.value = null
   try {
+    const eventId = crypto.randomUUID()
     const res = await $fetch<{ reportToken: string; email: { sent: boolean; to: string } }>('/api/public/leads', {
       method: 'POST',
       headers: { 'Idempotency-Key': idempotencyKey.value },
       body: {
+        consentTraitement: consent.value,
+        consentContact: contactOk.value,
+        eventId,
         participationToken: token,
         prenom: form.prenom.trim(),
         nom: form.nom.trim(),
@@ -95,6 +106,7 @@ async function envoyer() {
         taille: form.taille,
       },
     })
+    $track('generate_lead', { event_id: eventId, diagnostic: type.value })
     // Contexte de la confirmation (P11) : email saisi, diagnostic et nom du rapport.
     try {
       localStorage.setItem(
@@ -132,7 +144,7 @@ async function envoyer() {
 
     <section class="flex-1 lg:bg-gray-50 lg:py-14 lg:pb-[72px]">
       <div class="wrap lg:flex lg:items-start lg:gap-8 lg:!px-6">
-        <form class="min-w-0 flex-1 pt-6 pb-7 md:pt-8 md:pb-10 lg:card lg:p-9" novalidate @submit.prevent="envoyer">
+        <form class="min-w-0 flex-1 pt-6 pb-7 md:pt-8 md:pb-10 lg:card lg:p-9" novalidate @submit.prevent="envoyer" @focusin.once="debutSaisie">
           <h1 class="mb-2.5 hidden text-[32px] leading-[1.18] font-semibold tracking-[-0.02em] text-navy-600 lg:block">Où souhaitez-vous recevoir votre rapport ?</h1>
           <p class="mb-8 hidden text-base leading-[1.6] text-gray-600 lg:block">Six champs, une minute. Votre rapport part immédiatement après l’envoi.</p>
 
@@ -201,27 +213,21 @@ async function envoyer() {
 
           <div class="my-[22px] h-px bg-gray-100 lg:mt-6 lg:mb-6" />
 
-          <div class="mb-[22px] flex flex-col gap-3.5 lg:mb-7">
-            <label class="flex cursor-pointer items-start gap-3">
+          <!-- CMP01 · consentement au traitement des données (maquette V1.2) -->
+          <div class="mb-[22px] rounded-xl border border-gray-200 bg-gray-50 px-5 py-5 lg:mb-7 lg:px-[26px] lg:py-6">
+            <p class="eyebrow mb-3.5 text-[11px] text-gray-500 lg:mb-4">Consentement au traitement des données</p>
+            <label class="mb-2 flex cursor-pointer items-start gap-3">
               <input v-model="consent" type="checkbox" class="sr-only" >
-              <span class="mt-px inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md" :class="consent ? 'bg-orange-600 text-white' : 'border-[1.5px] border-gray-300 bg-white'" aria-hidden="true">
-                <UiIcon v-if="consent" name="check" :size="16" />
-              </span>
-              <span class="text-[15px] leading-[1.5] text-gray-700">
-                J’ai lu et j’accepte la <NuxtLink to="/confidentialite" class="text-orange-600 hover:underline">politique de confidentialité</NuxtLink>. <span class="text-orange-600">*</span>
-              </span>
+              <span class="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px]" :class="consent ? 'border-navy-600 bg-navy-600 text-white' : 'border-gray-400 bg-white'" aria-hidden="true"><UiIcon v-if="consent" name="check" :size="16" /></span>
+              <span class="text-[13px] leading-[1.55] text-gray-700 lg:text-[15px]">J’accepte le traitement de mes données pour recevoir mon diagnostic. <span class="text-red-600">*</span></span>
             </label>
-            <p v-if="erreurs.consent" class="-mt-1.5 text-[13px] leading-[1.4] text-red-600" role="alert">{{ erreurs.consent }}</p>
+            <p class="mb-[18px] pl-[34px] text-xs leading-[1.5] text-gray-500 lg:mb-5 lg:text-[13px]">Voir la <NuxtLink to="/politique-de-confidentialite" target="_blank" class="text-orange-600 hover:underline">politique de confidentialité</NuxtLink>.</p>
             <label class="flex cursor-pointer items-start gap-3">
-              <input v-model="prochaines" type="checkbox" class="sr-only" >
-              <span class="mt-px inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md" :class="prochaines ? 'bg-orange-600 text-white' : 'border-[1.5px] border-gray-300 bg-white'" aria-hidden="true">
-                <UiIcon v-if="prochaines" name="check" :size="16" />
-              </span>
-              <span class="text-[15px] leading-[1.5] text-gray-700">
-                Je souhaite recevoir les prochaines analyses FeexPay.<br >
-                <span class="text-[13px] leading-[1.5] text-gray-500">Facultatif. Vous recevrez votre rapport dans tous les cas.</span>
-              </span>
+              <input v-model="contactOk" type="checkbox" class="sr-only" >
+              <span class="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px]" :class="contactOk ? 'border-navy-600 bg-navy-600 text-white' : 'border-gray-400 bg-white'" aria-hidden="true"><UiIcon v-if="contactOk" name="check" :size="16" /></span>
+              <span class="text-[13px] leading-[1.55] text-gray-700 lg:text-[15px]">J’accepte d’être contacté(e) par FeexPay. <span class="text-gray-500">(facultatif)</span></span>
             </label>
+            <p v-if="erreurs.consent" class="mt-3 text-xs leading-[1.5] text-red-600 lg:text-[13px]" role="alert">{{ erreurs.consent }}</p>
           </div>
 
           <p v-if="erreur" class="mb-4 flex gap-3 rounded-[10px] bg-red-100 px-4 py-3.5 text-sm leading-[1.5] text-gray-700" role="alert">
@@ -229,7 +235,7 @@ async function envoyer() {
             <span><span class="block font-semibold text-red-600">Envoi impossible</span>{{ erreur }}</span>
           </p>
 
-          <button type="submit" :disabled="envoi" class="btn btn-primary h-[52px] w-full text-base lg:h-14 lg:w-[320px]">
+          <button type="submit" :disabled="envoi || !consent" class="btn btn-primary h-[52px] w-full text-base lg:h-14 lg:w-[320px]">
             {{ envoi ? 'Envoi en cours…' : 'Recevoir mon analyse complète' }}
           </button>
         </form>

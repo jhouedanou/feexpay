@@ -6,6 +6,7 @@ import {
   type Answers,
 } from '@radar/scoring'
 import { envoyerRapport } from '../../utils/email'
+import { envoyerCapi } from '../../utils/capi'
 import { reportByToken } from '../../utils/report'
 
 /**
@@ -33,6 +34,11 @@ const Body = z
     secteur: z.string().trim().min(1).max(120),
     secteurAutre: z.string().trim().max(200).optional(),
     taille: z.enum(['Seul', '2 à 5', '6 à 20', '21 à 50', 'Plus de 50']),
+    /** CMP01 : case obligatoire, vérifiée aussi côté serveur. */
+    consentTraitement: z.literal(true),
+    consentContact: z.boolean().default(false),
+    /** Identifiant d'événement partagé avec le Pixel pour la déduplication CAPI. */
+    eventId: z.string().uuid().optional(),
   })
   .strict()
 
@@ -75,12 +81,13 @@ export default defineEventHandler(async (event) => {
         `update contact set prenom = $2, nom = $3, entreprise = $4, secteur = $5,
                             secteur_autre = $6, taille = $7,
                             phone_e164 = coalesce(phone_e164, $8),
-                            match_conflict = coalesce($9::jsonb, match_conflict)
+                            match_conflict = coalesce($9::jsonb, match_conflict),
+                            contact_allowed = contact_allowed or $10
           where id = $1`,
         [
           contactId, b.prenom, b.nom, b.entreprise, b.secteur,
           b.secteurAutre ?? null, b.taille, b.phone,
-          conflit ? JSON.stringify(conflit) : null,
+          conflit ? JSON.stringify(conflit) : null, b.consentContact,
         ]
       )
     } else {
@@ -99,14 +106,23 @@ export default defineEventHandler(async (event) => {
       }
       const ins = await c.query<{ id: string }>(
         `insert into contact (prenom, nom, email_norm, phone_e164, entreprise, secteur,
-                              secteur_autre, taille, match_conflict)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`,
+                              secteur_autre, taille, match_conflict, contact_allowed)
+         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning id`,
         [
           b.prenom, b.nom, emailNorm, b.phone, b.entreprise, b.secteur,
-          b.secteurAutre ?? null, b.taille, conflit ? JSON.stringify(conflit) : null,
+          b.secteurAutre ?? null, b.taille, conflit ? JSON.stringify(conflit) : null, b.consentContact,
         ]
       )
       contactId = ins.rows[0]!.id
+    }
+
+    // --- Preuve de consentement (CMP01) : horodatage, version du texte, portée, origine ---
+    for (const [type, ok] of [['traitement', true], ['contact', b.consentContact]] as const) {
+      await c.query(
+        `insert into consent_record (session_id, contact_id, type, statut, policy_version, text_version, source)
+         values ($1, $2, $3, $4, '2026-09-07', 'cmp01-v1.2', 'p10')`,
+        [session.id, contactId, type, ok ? 'accepte' : 'refuse'],
+      )
     }
 
     // --- Participations de la session, rattachées au contact -----------------
@@ -205,6 +221,8 @@ export default defineEventHandler(async (event) => {
       email = { sent: false, to: emailNorm, error: e instanceof Error ? e.message : String(e) }
     }
   }
+
+  await envoyerCapi(event, 'Lead', b.eventId, { email: emailNorm, phone: b.phone }, { diagnostic: out.croisement ? 'deux' : 'un' })
 
   setResponseStatus(event, 201)
   return {

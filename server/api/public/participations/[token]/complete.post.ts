@@ -15,12 +15,16 @@ import {
  * Le calcul est fait par le moteur pur, jamais côté client : seul ce qui est destiné
  * à l'affichage sort d'ici (pas de pilotage, d'affinités, de tie-break ni d'hypothèses).
  */
+import { envoyerCapi } from '../../../../utils/capi'
+
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
   if (!token) throw apiError(event, 'VALIDATION_ERROR', 'Jeton manquant.')
 
   const session = await requireSession(event)
   const p = await participationByToken(event, token, session.id)
+  const corps = (await readBody(event).catch(() => null)) as { eventId?: string } | null
+  const eventId = typeof corps?.eventId === 'string' && /^[0-9a-f-]{36}$/i.test(corps.eventId) ? corps.eventId : undefined
 
   if (p.status === 'completed') {
     return { ...(await readSnapshot(event, p.id)), alreadyCompleted: true }
@@ -81,6 +85,8 @@ export default defineEventHandler(async (event) => {
   })
 
   setResponseStatus(event, 201)
+  await envoyerCapi(event, 'quiz_completed', eventId, {}, { diagnostic: p.diagnostic_type })
+
   return {
     token,
     type: p.diagnostic_type,

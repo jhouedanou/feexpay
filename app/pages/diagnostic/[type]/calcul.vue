@@ -9,6 +9,7 @@ const route = useRoute()
 const type = route.params.type as DiagType
 if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCode: 404 })
 const part = useParticipation(type)
+const { $track } = useNuxtApp()
 const slow = ref(false)
 const error = ref<string | null>(null)
 const etape = ref(0)
@@ -38,7 +39,9 @@ onMounted(async () => {
 
   const t = setTimeout(() => (slow.value = true), 10_000)
   try {
-    await part.complete()
+    const eventId = crypto.randomUUID()
+    await part.complete(eventId)
+    $track('quiz_complete', { event_id: eventId, diagnostic: type })
     etape.value = ETAPES.length
     await navigateTo(`/resultat/${type}/${part.token.value}`, { replace: true })
   } catch (e: unknown) {

@@ -164,7 +164,7 @@ const etapes = [
             </p>
           </div>
         </div>
-        <NuxtLink to="/confidentialite" class="hidden shrink-0 text-sm leading-none font-medium text-orange-600 hover:underline md:block lg:text-[15px]">
+        <NuxtLink to="/politique-de-confidentialite" class="hidden shrink-0 text-sm leading-none font-medium text-orange-600 hover:underline md:block lg:text-[15px]">
           Politique de confidentialité
         </NuxtLink>
       </div>

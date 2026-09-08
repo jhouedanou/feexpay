@@ -9,14 +9,14 @@
  * Idempotent : si la version existe déjà, il ne réécrit rien (le trigger
  * `guard_scoring_version` interdit de toute façon toute modification d'une version publiée).
  *
- *   nvm use 22 && pnpm seed:scoring
+ *   nvm use 22 && pnpm seed:scoring [version]   (défaut : 2.2)
  */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import pg from 'pg'
 
-const VERSION = '2.1'
+const VERSION = process.argv[2] ?? '2.2'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(here, '..', 'packages', 'scoring', 'src', 'versions', `v${VERSION}`)
@@ -85,7 +85,15 @@ async function main() {
       return
     }
 
+    // Une seule version publiée à la fois : la précédente passe en `archived` (autorisé par
+    // le garde, qui ne verrouille que version, checksum et published_at). Les participations
+    // ouvertes gardent leur version_id et restent calculées avec.
+    await client.query(`update scoring_version set status = 'archived' where status = 'published'`)
+
     const inserted = await client.query<{ id: string }>(
+      // Une seule version publiée à la fois : la précédente passe en `archived` (autorisé
+      // par le garde, qui ne verrouille que version, checksum et published_at). Les
+      // participations ouvertes gardent leur version_id et restent calculées avec.
       `insert into scoring_version (version, status, checksum, published_at)
        values ($1, 'published', $2, now()) returning id`,
       [VERSION, checksum]

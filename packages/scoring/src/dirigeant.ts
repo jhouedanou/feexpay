@@ -44,8 +44,11 @@ function plus2Counts(options: OptionData[]): Record<Dimension, number> {
 }
 
 /**
- * Départage des archétypes à égalité d'affinité arrondie (PLAN §5.1, défaut §10.1 :
- * dimension centrale, comparaison après arrondi). Journalisé dans `tie_break`.
+ * Départage des archétypes à égalité d'affinité arrondie (matrice V2.2, onglet Archétypes) :
+ * 1) score normalisé de la dimension centrale, arrondi à deux décimales ; 2) nombre de +2
+ * sur cette dimension ; 3) somme brute des trois dimensions de l'empreinte ; 4) ordre
+ * technique versionné. Chaque étape journalise les valeurs comparées et le gagnant dans
+ * `tie_break`, comme l'exige le contrôle de départage de la matrice.
  */
 function breakTie(
   candidates: ArchetypeData[],
@@ -55,7 +58,7 @@ function breakTie(
   ordreTechnique: ArchetypeCode[],
 ): { winner: ArchetypeData; steps: TieBreakStep[] } {
   const criteria: { regle: string; value: (a: ArchetypeData) => number; direction: 'desc' | 'asc' }[] = [
-    { regle: 'normCentrale', value: (a) => norm[a.dims[0]], direction: 'desc' },
+    { regle: 'normCentrale', value: (a) => round2(norm[a.dims[0]]), direction: 'desc' },
     { regle: 'plus2Centrale', value: (a) => plus2[a.dims[0]], direction: 'desc' },
     { regle: 'sommeBrute', value: (a) => a.dims.reduce((s, d) => s + raw[d], 0), direction: 'desc' },
     { regle: 'ordreTechnique', value: (a) => ordreTechnique.indexOf(a.code), direction: 'asc' },

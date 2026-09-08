@@ -64,6 +64,14 @@ function build(raw: {
   }
 }
 
+import archetypesV22 from './versions/v2.2/archetypes.json'
+import checksumV22 from './versions/v2.2/checksum.json'
+import combinedRulesV22 from './versions/v2.2/combined-rules.json'
+import constantsV22 from './versions/v2.2/constants.json'
+import dimensionsV22 from './versions/v2.2/dimensions.json'
+import optionsV22 from './versions/v2.2/options.json'
+import questionsV22 from './versions/v2.2/questions.json'
+
 export const V2_1: ScoringVersion = build({
   version: (constantsV21 as Constants).version,
   checksum: (checksumV21 as { sha256: string }).sha256,
@@ -75,10 +83,29 @@ export const V2_1: ScoringVersion = build({
   constants: constantsV21 as Constants,
 })
 
-const REGISTRY = new Map<string, ScoringVersion>([[V2_1.version, V2_1]])
+/**
+ * V2.2 (7 septembre 2026) : mêmes questions, options, constats et règles que la V2.1 ;
+ * seule la règle de départage est précisée (score central arrondi à deux décimales) et un
+ * cas de contrôle ajouté. Les snapshots V2.1 restent relus avec la V2.1.
+ */
+export const V2_2: ScoringVersion = build({
+  version: (constantsV22 as Constants).version,
+  checksum: (checksumV22 as { sha256: string }).sha256,
+  questions: questionsV22 as QuestionData[],
+  options: optionsV22 as OptionData[],
+  archetypes: archetypesV22 as ArchetypeData[],
+  dimensions: dimensionsV22 as DimensionData[],
+  combinedRules: combinedRulesV22 as CombinedRuleData[],
+  constants: constantsV22 as Constants,
+})
+
+const REGISTRY = new Map<string, ScoringVersion>([
+  [V2_1.version, V2_1],
+  [V2_2.version, V2_2],
+])
 
 /** Version par défaut du moteur (dernière publiée). */
-export const CURRENT_VERSION = V2_1.version
+export const CURRENT_VERSION = V2_2.version
 
 export function getVersion(version: string = CURRENT_VERSION): ScoringVersion {
   const found = REGISTRY.get(version)

@@ -60,7 +60,7 @@ export function useParticipation(type: DiagType) {
   const answer = (questionCode: string, optionCode: string) =>
     $fetch(`/api/public/participations/${token.value}/answers/${questionCode}`, { method: 'PUT', body: { optionCode } })
 
-  const complete = () => $fetch<{ result: unknown; event_id: string }>(`/api/public/participations/${token.value}/complete`, { method: 'POST' })
+  const complete = (eventId?: string) => $fetch<{ result: unknown; event_id: string }>(`/api/public/participations/${token.value}/complete`, { method: 'POST', body: eventId ? { eventId } : {} })
 
   return { token, load, save, start, state, answer, complete }
 }

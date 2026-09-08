@@ -5,7 +5,7 @@
  */
 export { answersFromLetters, validate, type ValidatedAnswers } from './answers'
 export { crossReading } from './cross'
-export { CURRENT_VERSION, getVersion, listVersions, V2_1, type ScoringVersion } from './data'
+export { CURRENT_VERSION, getVersion, listVersions, V2_1, V2_2, type ScoringVersion } from './data'
 export { scoreDirigeant } from './dirigeant'
 export { ScoringError, type ScoringErrorCode } from './errors'
 export { buildInsights, type InsightInput } from './insights'

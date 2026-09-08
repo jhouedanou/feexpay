@@ -42,7 +42,7 @@ check('POST /sessions reprend la session existante', s2.data?.resumed === true)
 const p = await call('POST', '/api/public/participations', { type: 'dirigeant' })
 check('POST /participations → 201', p.status === 201, `total=${p.data?.total}`)
 check('total = 14 questions dirigeant', p.data?.total === 14)
-check('version publiée = 2.1', p.data?.version === '2.1')
+check('version publiée = 2.2', p.data?.version === '2.2')
 const token = p.data?.token
 
 const pAgain = await call('POST', '/api/public/participations', { type: 'dirigeant' })

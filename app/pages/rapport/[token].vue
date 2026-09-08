@@ -35,6 +35,7 @@ const sections = computed(() =>
 )
 const active = ref('')
 onMounted(() => {
+  useNuxtApp().$track('report_view', { rapport: token })
   const obs = new IntersectionObserver(
     (entries) => {
       for (const e of entries) if (e.isIntersecting) active.value = e.target.id

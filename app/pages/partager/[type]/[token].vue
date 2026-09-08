@@ -68,6 +68,7 @@ const message = computed(() => `${texteLibre.value} Faites le test avec Radar by
 const whatsapp = computed(() => `https://wa.me/?text=${encodeURIComponent(message.value)}`)
 const linkedin = computed(() => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(lien)}`)
 
+const { $track } = useNuxtApp()
 const info = ref<string | null>(null)
 let minuterie: ReturnType<typeof setTimeout> | undefined
 function signaler(t: string) {
@@ -77,6 +78,7 @@ function signaler(t: string) {
 }
 
 async function copier() {
+  $track('share', { canal: 'lien', diagnostic: type })
   try {
     await navigator.clipboard.writeText(lien)
     signaler('Lien copié')
@@ -86,6 +88,7 @@ async function copier() {
 }
 
 async function partagerNatif() {
+  $track('share', { canal: 'natif', diagnostic: type })
   if (navigator.share) {
     try {
       await navigator.share({ title: 'Radar by FeexPay', text: texteLibre.value, url: lien })
@@ -106,6 +109,7 @@ function image(src: string) {
 
 /** Dessine la carte au format choisi et déclenche l'enregistrement. */
 async function telecharger() {
+  $track('share', { canal: 'image', diagnostic: type })
   const f = FORMATS[format.value]!
   const canvas = document.createElement('canvas')
   canvas.width = f.w
@@ -300,10 +304,10 @@ useSeoMeta({ title: `${dirigeant ? 'Partager mon profil' : 'Partager le rayonnem
               <button type="button" class="btn h-[52px] text-base lg:hidden" :class="dirigeant ? 'btn-primary' : 'btn-navy'" @click="partagerNatif">
                 <UiIcon name="share-variant-outline" :size="18" />Partager
               </button>
-              <a :href="whatsapp" target="_blank" rel="noopener" class="btn hidden h-[52px] text-[15px] lg:inline-flex" :class="dirigeant ? 'btn-primary' : 'btn-navy'">
+              <a :href="whatsapp" target="_blank" rel="noopener" class="btn hidden h-[52px] text-[15px] lg:inline-flex" :class="dirigeant ? 'btn-primary' : 'btn-navy'" @click="$track('share', { canal: 'whatsapp', diagnostic: type })">
                 <UiIcon name="whatsapp" :size="19" />Partager sur WhatsApp
               </a>
-              <a :href="linkedin" target="_blank" rel="noopener" class="btn btn-outline hidden h-[52px] text-[15px] lg:inline-flex">
+              <a :href="linkedin" target="_blank" rel="noopener" class="btn btn-outline hidden h-[52px] text-[15px] lg:inline-flex" @click="$track('share', { canal: 'linkedin', diagnostic: type })">
                 <UiIcon name="linkedin" :size="19" />Partager sur LinkedIn
               </a>
               <button type="button" class="btn btn-outline h-[52px] text-base lg:text-[15px]" @click="telecharger">

@@ -1,0 +1,42 @@
+[
+  {
+    "code": "VIS",
+    "nom": "Vision",
+    "definition": "Capacité à projeter une direction future et à relier les décisions à une ambition."
+  },
+  {
+    "code": "STR",
+    "nom": "Stratégie",
+    "definition": "Capacité à lire le terrain, comparer des options, choisir et anticiper."
+  },
+  {
+    "code": "EXE",
+    "nom": "Exécution",
+    "definition": "Capacité à transformer une intention en actions et résultats."
+  },
+  {
+    "code": "ORG",
+    "nom": "Organisation",
+    "definition": "Capacité à structurer ressources, rôles, processus et contrôles."
+  },
+  {
+    "code": "INF",
+    "nom": "Influence",
+    "definition": "Capacité à mobiliser, convaincre, fédérer et construire des alliances."
+  },
+  {
+    "code": "AUD",
+    "nom": "Audace",
+    "definition": "Capacité à décider dans l’incertitude et à créer du mouvement."
+  },
+  {
+    "code": "ADA",
+    "nom": "Adaptabilité",
+    "definition": "Capacité à ajuster la trajectoire et apprendre du contexte."
+  },
+  {
+    "code": "TRA",
+    "nom": "Transformation",
+    "definition": "Capacité à remettre en question un système et conduire son évolution."
+  }
+]

@@ -14,7 +14,10 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
 
 ## Arborescence
 
-- `packages/scoring` — moteur pur V2.1, zéro dépendance. Données JSON extraites de la matrice,
+- `packages/scoring` — moteur pur, zéro dépendance. Versions V2.1 (archivée) et V2.2
+  (publiée le 8 septembre 2026 : même matrice, règle de départage précisée, cas de contrôle
+  `CCDBDACABDDACB` → Réformateur) coexistent dans `src/versions/` ; un snapshot est toujours
+  relu avec sa version. Données JSON extraites de la matrice,
   44 tests de contrôle. `public.ts` produit les projections d'affichage : le pilotage, les
   affinités, le tie-break et les hypothèses ne sortent jamais du serveur.
 - `scripts/extract-matrix.ts` — xlsx → `packages/scoring/src/versions/v2.1/*.json` + checksum.
@@ -74,7 +77,7 @@ toutes (deny-all, accès service role uniquement), triggers d'immutabilité sur 
 l'historique des réponses et les versions publiées.
 
 ```bash
-pnpm seed:scoring   # version 2.1 published + 21 questions + 84 options (idempotent)
+pnpm seed:scoring [version]   # publie la version (défaut 2.2), archive la précédente (idempotent)
 ```
 
 Comptes admin : `pnpm seed:admins` crée l'administrateur principal (`amedeel@feexpay.me`) et
@@ -92,6 +95,12 @@ inscriptions publiques désactivées.
   commerciale restent serveur (vérifié par test sur la réponse de l'API). Décision client du
   8 septembre 2026 : la maquette prime, donc le niveau de pilotage et sa lecture (P08, P12),
   la force et la difficulté déclarées (P09) sont publics.
+- Consentement (CDC V1.2) : bandeau C01 et panneau C02 dans `app/components/consent/Banner.vue`,
+  choix tenu six mois dans le navigateur et prouvé dans `consent_record` ; GA4 et Meta Pixel
+  ne se chargent qu'après le choix (`app/plugins/tracking.client.ts`, identifiants lus dans
+  `app_setting`). CMP01 dans P10 : case obligatoire vérifiée côté serveur, case contact
+  facultative, preuve par ligne `consent_record`. CAPI serveur pour Lead et quiz_completed
+  avec l'`event_id` du Pixel (`server/utils/capi.ts`). Pages L01 et L02 avec textes provisoires.
 - Email : sans domaine vérifié chez Resend, `onboarding@resend.dev` ne délivre qu'à l'adresse du
   titulaire du compte. Chaque tentative laisse une ligne `notification` (accepted ou failed avec
   l'erreur) ; le rapport et le PDF restent accessibles par le lien quoi qu'il arrive.

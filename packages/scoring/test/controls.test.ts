@@ -8,6 +8,7 @@ import {
   buildInsights,
   crossReading,
   getVersion,
+  listVersions,
   scoreDirigeant,
   scoreRayonnement,
   ScoringError,
@@ -379,5 +380,27 @@ describe('invariants de la matrice V2.1', () => {
     expect(dump).not.toMatch(/produit feexpay/i)
     expect(dump).not.toMatch(/product_/i)
     expect(dump).not.toMatch(/recommended_offer/i)
+  })
+})
+
+describe('matrice V2.2 — contrôle du départage', () => {
+  it('CCDBDACABDDACB : Visionnaire et Réformateur à 37,25, le score central tranche pour le Réformateur', () => {
+    const d = scoreDirigeant(answersFromLetters('dirigeant', 'CCDBDACABDDACB', '2.2'), '2.2')
+    expect(d.version).toBe('2.2')
+    expect(d.principal.code).toBe('Réformateur')
+    expect(d.tieBreak).not.toBeNull()
+    expect(d.tieBreak!.affinite).toBe(37.25)
+    expect(d.tieBreak!.exAequo.sort()).toEqual(['Réformateur', 'Visionnaire'])
+    const etape = d.tieBreak!.etapes[0]!
+    expect(etape.regle).toBe('normCentrale')
+    expect(etape.gagnant).toBe('Réformateur')
+    const valeur = (code: string) => etape.candidats.find((c) => c.code === code)!.valeur
+    expect(valeur('Réformateur')).toBe(41.18)
+    expect(valeur('Visionnaire')).toBe(33.33)
+  })
+
+  it('les deux versions partagent questions, options et constats', () => {
+    expect(listVersions().sort()).toEqual(['2.1', '2.2'])
+    expect(getVersion('2.2').options.length).toBe(getVersion('2.1').options.length)
   })
 })

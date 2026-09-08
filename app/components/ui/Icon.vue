@@ -68,6 +68,8 @@ import {
   mdiOpenInNew,
   mdiKeyOutline,
   mdiCellphone,
+  mdiCookieOutline,
+  mdiGavel,
 } from '@mdi/js'
 
 const ICONS: Record<string, string> = {
@@ -113,6 +115,8 @@ const ICONS: Record<string, string> = {
   'weather-rainy': mdiWeatherRainy,
   'weather-sunny': mdiWeatherSunny,
   whatsapp: mdiWhatsapp,
+  'cookie-outline': mdiCookieOutline,
+  gavel: mdiGavel,
   'logout': mdiLogout,
   'cog-outline': mdiCogOutline,
   'pause': mdiPause,

@@ -49,6 +49,8 @@ const lead = {
   prenom: 'Aya',
   nom: 'Konan',
   email,
+  consentTraitement: true,
+  consentContact: false,
   phone: '+2250700000000',
   entreprise: 'Boutique Aya',
   secteur: 'Commerce de détail',
