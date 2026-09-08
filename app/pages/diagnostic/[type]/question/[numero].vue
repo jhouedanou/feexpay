@@ -56,9 +56,38 @@ async function next() {
 </script>
 
 <template>
+  <div class="mx-auto grid max-w-[1200px] gap-10 px-5 py-8 md:px-8 lg:grid-cols-[240px_1fr]">
+    <!-- Rail de progression, desktop seulement (maquette planche 05).
+         La maquette nomme cinq thèmes (« Décision et arbitrage », « Maîtrise financière »…)
+         qui n'existent ni dans questions.json ni dans les dimensions de la matrice V2.1 :
+         ce découpage éditorial est absent du pack livré. On affiche donc la progression
+         réelle plutôt qu'un thème inventé. À demander avec le TDR (PLAN.md §10b, point 6). -->
+    <aside class="hidden lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:block lg:self-start">
+      <p class="type-eyebrow">Diagnostic en cours</p>
+      <h2 class="mt-2 type-h3">
+        {{ type === 'dirigeant' ? 'Profil du dirigeant' : 'Rayonnement de l’entreprise' }}
+      </h2>
+      <p class="mt-5 flex items-baseline gap-2">
+        <span class="type-figure text-4xl leading-none">{{ numero }}</span>
+        <span class="text-[15px] text-gray-500">sur {{ total }}</span>
+      </p>
+      <ol class="mt-6 space-y-2">
+        <li
+          v-for="n in total"
+          :key="n"
+          class="h-1.5 rounded-full"
+          :class="n < numero ? 'bg-orange-600' : n === numero ? 'bg-orange-300' : 'bg-gray-100'"
+        />
+      </ol>
+      <p class="mt-6 text-[13px] leading-[1.6] text-gray-500">
+        Vos réponses sont enregistrées à chaque écran. Vous pouvez fermer cette page et
+        reprendre plus tard.
+      </p>
+    </aside>
+
   <!-- Colonne plafonnée : 640 px en desktop, 600 px en tablette (maquette planche 04). -->
-  <section class="mx-auto max-w-[600px] px-5 py-8 lg:max-w-[640px]">
-    <RadarProgressBar :current="numero" :total="total" />
+  <section class="mx-auto w-full max-w-[600px] lg:mx-0 lg:max-w-[640px]">
+    <RadarProgressBar class="lg:hidden" :current="numero" :total="total" />
     <RadarStepMeta
       class="mt-2"
       :current="numero"
@@ -104,5 +133,6 @@ async function next() {
         {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
       </button>
     </div>
-  </section>
+    </section>
+  </div>
 </template>

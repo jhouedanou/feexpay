@@ -93,11 +93,11 @@ async function envoyer() {
 
 <template>
   <section class="mx-auto max-w-[760px] px-5 py-12 md:px-8">
-    <p class="type-eyebrow">Étape 3 sur 3</p>
+    <p class="type-eyebrow">Recevoir mon analyse</p>
+    <p class="mt-2 type-caption text-gray-500">Dernière étape</p>
     <h1 class="mt-2 type-h1">Où souhaitez-vous recevoir votre rapport ?</h1>
-    <p class="mt-3 type-body text-gray-700">
-      Six champs, une minute. Votre résultat est déjà acquis : cette étape ne sert qu’à vous
-      transmettre l’analyse détaillée.
+    <p class="mt-4 text-[17px] leading-[1.6] text-gray-600">
+      Six champs, une minute. Votre rapport part immédiatement après l’envoi.
     </p>
 
     <form class="mt-9 space-y-5" novalidate @submit.prevent="envoyer">
