@@ -237,7 +237,7 @@ body {
 
 @media (min-width: 1024px) {
   .type-display {
-    font-size: 52px;
+    font-size: 56px; /* maquette : 56px/1.08 en desktop */
   }
   .type-h1 {
     font-size: 44px;

@@ -7,37 +7,61 @@ if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCo
 
 const copy = {
   dirigeant: {
-    titre: 'Profil du dirigeant',
+    kicker: 'Profil du dirigeant',
+    titre: 'Votre manière de diriger, mise en mots',
     intro:
-      '14 situations concrètes. Choisissez la réponse la plus proche de votre façon de faire. Il n’y a pas de bonne réponse.',
+      'Quatorze situations concrètes, tirées du quotidien d’un dirigeant. Il n’y a pas de bonne réponse : choisissez celle qui ressemble le plus à ce que vous faites réellement.',
     meta: [
       '14 questions, une par écran',
       '4 à 6 minutes',
       'Retour arrière à tout moment',
       'Résultat automatique',
     ],
-    // Les libellés des dimensions viennent de la matrice V2.1, qui prime sur la
-    // maquette pour les contenus normatifs (notice des maquettes §6).
-    listeTitre: 'Les huit profils',
+    portee:
+      'Portée indicative : ce diagnostic est un outil de restitution et de prise de recul. Il ne constitue pas un test psychométrique et ne porte aucun jugement sur votre entreprise.',
+    listeTitre: 'Les huit profils possibles',
     liste: [
       'Stratège', 'Bâtisseur', 'Gestionnaire', 'Fédérateur',
       'Conquérant', 'Résilient', 'Visionnaire', 'Réformateur',
     ],
+    // La maquette nomme ici « Maîtrise financière, Relation client, Délégation ».
+    // La matrice V2.1 prime pour les contenus normatifs (notice des maquettes §6) :
+    // on reprend ses libellés, ceux-là mêmes qu'affiche la page de résultat.
+    liste2Titre: 'Les dimensions évaluées',
+    liste2: [
+      'Vision', 'Stratégie', 'Exécution', 'Organisation',
+      'Influence', 'Audace', 'Adaptabilité', 'Transformation',
+    ],
+    note: null,
   },
   rayonnement: {
-    titre: 'Rayonnement de l’entreprise',
+    kicker: 'Rayonnement de l’entreprise',
+    titre: 'Ce que votre marché perçoit de votre entreprise',
     intro:
-      '7 questions sur la manière dont votre entreprise est perçue. Répondez selon la situation actuelle.',
-    meta: ['7 questions, une par écran', '2 à 4 minutes', 'Score sur 100, niveau et météo'],
-    listeTitre: 'Les cinq niveaux',
-    liste: [
-      'Dominant', 'Challenger fort', 'Acteur silencieux',
-      'Marque fragile', 'Zone de disparition',
+      'Sept questions sur la notoriété, la différenciation, la présence numérique et l’empreinte de votre activité. Répondez d’après ce que vous observez, pas d’après ce que vous visez.',
+    meta: [
+      '7 questions, une par écran',
+      '2 à 4 minutes',
+      'Score sur 100, niveau et météo',
+      'Débloque votre lecture croisée',
     ],
+    portee:
+      'Portée indicative : le rayonnement décrit ce qui est observable aujourd’hui. Il ne mesure ni la qualité de votre offre, ni votre potentiel.',
+    listeTitre: 'Les cinq niveaux de lecture',
+    liste: [
+      '80+ · Dominant',
+      '65–79 · Challenger fort',
+      '45–64 · Acteur silencieux',
+      '25–44 · Marque fragile',
+      '0–24 · Zone de disparition',
+    ],
+    liste2Titre: null,
+    liste2: [],
+    note: 'Le niveau n’est pas un classement entre entreprises. Il situe ce que votre marché peut observer de vous aujourd’hui.',
   },
 }[type]
 
-useSeoMeta({ title: `${copy.titre} — Radar by FeexPay` })
+useSeoMeta({ title: `${copy.kicker} — Radar by FeexPay` })
 
 const other = useParticipation(type === 'dirigeant' ? 'rayonnement' : 'dirigeant')
 const part = useParticipation(type)
@@ -75,43 +99,39 @@ async function go(resume = false) {
 </script>
 
 <template>
-  <section class="mx-auto max-w-[760px] px-5 py-12 md:px-8">
-    <p class="type-eyebrow">Étape 2 sur 3 · avant de commencer</p>
-    <h1 class="mt-2 type-h1">{{ copy.titre }}</h1>
-    <p class="mt-4 type-body text-gray-700">{{ copy.intro }}</p>
+  <section class="mx-auto max-w-[760px] px-5 py-12 md:px-8 md:py-16">
+    <p class="type-eyebrow">{{ copy.kicker }}</p>
+    <p class="mt-2 type-caption text-gray-500">Étape 2 sur 3 · avant de commencer</p>
+    <h1 class="mt-3 type-h1">{{ copy.titre }}</h1>
+    <p class="mt-5 text-[17px] leading-[1.6] text-gray-600">{{ copy.intro }}</p>
 
-    <ul class="mt-6 grid gap-2 sm:grid-cols-2">
-      <li
-        v-for="m in copy.meta"
-        :key="m"
-        class="flex items-start gap-2 type-small text-gray-600"
-      >
+    <ul class="mt-7 grid gap-2.5 sm:grid-cols-2">
+      <li v-for="m in copy.meta" :key="m" class="flex items-start gap-2.5 text-[15px] text-gray-600">
         <UiIcon name="check" :size="18" class="mt-0.5 shrink-0 text-orange-600" />
         <span>{{ m }}</span>
       </li>
     </ul>
 
     <p
-      class="mt-6 border border-navy-100 bg-navy-50 p-4 type-small text-navy-700"
+      class="mt-7 border border-navy-100 bg-navy-50 p-4 text-[15px] leading-[1.6] text-navy-700"
       style="border-radius: var(--radius-control)"
     >
-      Portée indicative : ce diagnostic éclaire une situation déclarée. Il ne constitue pas un
-      test psychométrique.
+      {{ copy.portee }}
     </p>
 
     <p
       v-if="type === 'rayonnement' && other.token.value"
-      class="mt-4 border border-navy-100 bg-navy-50 p-4 type-small text-navy-700"
+      class="mt-4 border border-orange-200 bg-orange-50 p-4 text-[15px] leading-[1.6] text-navy-700"
       style="border-radius: var(--radius-control)"
     >
-      Vous avez déjà commencé le profil du dirigeant : les deux lectures seront croisées dans
-      votre rapport.
+      Vous avez déjà commencé le profil du dirigeant : les deux lectures seront croisées.
     </p>
 
     <p
       v-if="error"
       class="mt-4 bg-red-100 p-4 type-small text-red-600"
       style="border-radius: var(--radius-control)"
+      role="alert"
     >
       {{ error }}
     </p>
@@ -143,19 +163,32 @@ async function go(resume = false) {
       </button>
       <NuxtLink
         to="/diagnostic"
-        class="inline-flex items-center justify-center px-5 type-small font-medium text-gray-600 hover:text-navy-700"
-        style="min-height: var(--control-h)"
+        class="inline-flex items-center justify-center border border-gray-300 px-6 text-[15px] font-semibold text-navy-600 hover:border-navy-300"
+        style="min-height: var(--control-h-mobile); border-radius: var(--radius-control)"
       >
         Revenir au choix
       </NuxtLink>
     </div>
 
     <!-- Listes de contexte : desktop seulement dans la maquette. -->
-    <div class="mt-12 hidden border-t border-gray-200 pt-8 md:block">
-      <h2 class="type-h3">{{ copy.listeTitre }}</h2>
-      <ul class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 lg:grid-cols-4">
-        <li v-for="item in copy.liste" :key="item" class="type-small text-gray-600">{{ item }}</li>
+    <div class="mt-14 hidden border-t border-gray-200 pt-9 md:block">
+      <p class="type-eyebrow">{{ copy.listeTitre }}</p>
+      <ul class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2.5 lg:grid-cols-4">
+        <li v-for="item in copy.liste" :key="item" class="text-[15px] text-gray-600">
+          {{ item }}
+        </li>
       </ul>
+
+      <template v-if="copy.liste2Titre">
+        <p class="mt-9 type-eyebrow">{{ copy.liste2Titre }}</p>
+        <ul class="mt-4 grid grid-cols-2 gap-x-8 gap-y-2.5 lg:grid-cols-4">
+          <li v-for="item in copy.liste2" :key="item" class="text-[15px] text-gray-600">
+            {{ item }}
+          </li>
+        </ul>
+      </template>
+
+      <p v-if="copy.note" class="mt-8 text-[15px] leading-[1.6] text-gray-500">{{ copy.note }}</p>
     </div>
   </section>
 </template>

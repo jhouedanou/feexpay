@@ -63,9 +63,13 @@ onUnmounted(() => clearInterval(cadence))
         width="64"
         height="64"
       >
-      <h1 class="mt-7 type-h2">Nous assemblons votre lecture</h1>
-      <p class="mt-2 type-body text-gray-600">
-        Quelques secondes suffisent. Ne fermez pas cette page.
+      <h1 class="mt-7 type-h1">Nous assemblons votre lecture</h1>
+      <p class="mx-auto mt-4 max-w-[520px] text-[17px] leading-[1.6] text-gray-600">
+        {{
+          type === 'dirigeant'
+            ? 'Vos quatorze réponses sont mises en regard des huit dimensions de direction. Quelques secondes suffisent.'
+            : 'Vos sept réponses sont mises en regard des cinq dimensions de rayonnement. Quelques secondes suffisent.'
+        }}
       </p>
 
       <ul class="mx-auto mt-9 max-w-sm space-y-3 text-left">
