@@ -20,6 +20,7 @@ const date = computed(() =>
   new Date(r.value.etabliLe).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
 )
 const pdf = `/api/public/reports/${token}/pdf`
+const partage = computed(() => `/partager/${r.value.dirigeant ? 'dirigeant' : 'rayonnement'}/${token}?rapport=1`)
 const minuscule = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : '')
 const phrase = (s: string) => (s ? s.replace(/\.?$/, '.') : '')
 
@@ -81,14 +82,16 @@ useSeoMeta({ title: () => `Rapport complet · ${titre.value} — Radar by FeexPa
     <header class="border-b border-gray-200 bg-white">
       <div class="wrap flex items-center justify-between py-3.5 lg:h-[76px] lg:py-0 lg:!px-6">
         <div class="flex items-center gap-4">
+          <NuxtLink :to="`/confirmation/${token}`" class="-ml-2.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 lg:ml-0 lg:h-auto lg:w-auto lg:rounded-none lg:hover:bg-transparent" aria-label="Retour"><UiIcon name="arrow-left" :size="22" /></NuxtLink>
           <NuxtLink to="/" aria-label="Radar by FeexPay, accueil"><img src="/brand/logo-feexpay.svg" alt="FeexPay" class="h-[18px] w-auto lg:h-6" ></NuxtLink>
           <span class="hidden h-6 w-px bg-gray-200 lg:block" />
           <img v-if="r.dirigeant" :src="`/brand/emb-${slugArchetype(r.dirigeant.archetype.code)}-64.png`" :alt="`Emblème du profil ${r.dirigeant.archetype.code}`" class="hidden h-[26px] w-[26px] lg:block" >
           <span class="hidden text-[15px] leading-none font-medium text-navy-600 lg:inline">Rapport complet · {{ titre }}</span>
         </div>
         <div class="-my-2.5 -mr-2.5 flex gap-1.5 lg:my-0 lg:mr-0 lg:gap-3">
-          <NuxtLink v-if="r.dirigeant || r.rayonnement" :to="`/partager/${r.dirigeant ? 'dirigeant' : 'rayonnement'}/rapport-${token}`" class="hidden" aria-hidden="true" />
           <a :href="pdf" class="inline-flex h-11 w-11 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 lg:hidden" aria-label="Télécharger le PDF"><UiIcon name="download-outline" :size="20" /></a>
+          <NuxtLink :to="partage" class="inline-flex h-11 w-11 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 lg:hidden" aria-label="Partager"><UiIcon name="share-variant-outline" :size="20" /></NuxtLink>
+          <NuxtLink :to="partage" class="btn btn-outline hidden h-11 rounded-[10px] px-4 text-sm lg:inline-flex"><UiIcon name="share-variant-outline" :size="17" />Partager</NuxtLink>
           <a :href="pdf" class="btn btn-navy hidden h-11 rounded-[10px] px-[18px] text-sm lg:inline-flex"><UiIcon name="download-outline" :size="17" />Télécharger le PDF</a>
         </div>
       </div>

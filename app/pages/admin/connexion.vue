@@ -18,7 +18,7 @@ async function connecter() {
   envoi.value = true
   erreur.value = null
   try {
-    const r = await $fetch<{ mfa: { requise: boolean; verifiee: boolean } }>('/api/admin/auth/login', {
+    const r = await apiAdmin<{ mfa: { requise: boolean; verifiee: boolean } }>('/api/admin/auth/login', {
       method: 'POST',
       body: { email: email.value.trim(), password: password.value },
     })

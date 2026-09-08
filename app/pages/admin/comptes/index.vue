@@ -60,14 +60,19 @@ async function agir(fn: () => Promise<unknown>, message: string) {
   }
 }
 const patch = (id: string, body: Record<string, unknown>, message: string) =>
-  agir(() => $fetch(`/api/admin/users/${id}`, { method: 'PATCH', body }), message)
+  agir(async () => {
+    await apiAdmin(`/api/admin/users/${id}`, { method: 'PATCH', body })
+  }, message)
 const renvoyer = (id: string) =>
   agir(async () => {
-    const r = await $fetch<{ lien: string; email: { sent: boolean } }>(`/api/admin/invitations/${id}/resend`, { method: 'POST' })
+    const r = (await apiAdmin(`/api/admin/invitations/${id}/resend`, { method: 'POST' })) as { lien: string; email: { sent: boolean } }
     lienInvitation.value = r.lien
     if (!r.email.sent) info.value = 'Email non remis : copiez le lien et transmettez-le.'
   }, 'Invitation renvoyée, l’ancien lien est invalidé.')
-const annuler = (id: string) => agir(() => $fetch(`/api/admin/invitations/${id}/cancel`, { method: 'POST' }), 'Invitation annulée.')
+const annuler = (id: string) =>
+  agir(async () => {
+    await apiAdmin(`/api/admin/invitations/${id}/cancel`, { method: 'POST' })
+  }, 'Invitation annulée.')
 const lienInvitation = ref<string | null>(null)
 async function copierLien() {
   if (!lienInvitation.value) return

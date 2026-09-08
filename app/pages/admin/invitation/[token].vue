@@ -25,7 +25,7 @@ async function accepter() {
   if (password.value.length < 12) return (erreur.value = 'Le mot de passe doit compter au moins 12 caractères.')
   envoi.value = true
   try {
-    await $fetch('/api/admin/invitations/accept', { method: 'POST', body: { token, prenom: prenom.value.trim(), nom: nom.value.trim(), password: password.value } })
+    await apiAdmin('/api/admin/invitations/accept', { method: 'POST', body: { token, prenom: prenom.value.trim(), nom: nom.value.trim(), password: password.value } })
     await charger()
     await navigateTo(inv.value?.mfa_required ? '/admin/2fa' : '/admin')
   } catch (e) {

@@ -111,10 +111,14 @@ onUnmounted(() => clearInterval(cadence))
 
       <template v-else>
         <p class="text-base text-red-600" role="alert">{{ error }}</p>
-        <button type="button" class="btn btn-primary mt-5 h-[52px] px-7 text-base" @click="reloadNuxtApp()">
-          <UiIcon name="refresh" :size="18" />
-          Réessayer
-        </button>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+          <button type="button" class="btn btn-primary h-[52px] px-7 text-base" @click="reloadNuxtApp()">
+            <UiIcon name="refresh" :size="18" />
+            Réessayer
+          </button>
+          <NuxtLink :to="`/diagnostic/${type}/question/1`" class="btn btn-outline h-[52px] px-6 text-base">Revoir mes réponses</NuxtLink>
+          <NuxtLink :to="`/diagnostic/${type}/introduction`" class="btn btn-outline h-[52px] px-6 text-base">Revenir à l’introduction</NuxtLink>
+        </div>
       </template>
     </section>
   </div>

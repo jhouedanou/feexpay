@@ -30,7 +30,7 @@ async function enregistrer() {
     body[c.key] = v
   }
   try {
-    if (Object.keys(body).length) await $fetch('/api/admin/settings', { method: 'PATCH', body })
+    if (Object.keys(body).length) await apiAdmin('/api/admin/settings', { method: 'PATCH', body })
     for (const k of Object.keys(valeurs)) delete valeurs[k]
     await refresh()
     info.value = 'Réglages enregistrés. Prise en compte dans la minute.'

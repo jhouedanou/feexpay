@@ -243,7 +243,7 @@ useSeoMeta({
                 </p>
               </div>
               <NuxtLink v-if="autre.termine" :to="recevoir" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
-              <NuxtLink v-else :to="`/diagnostic/${autreType}/introduction`" class="btn btn-white mt-4 hidden h-[52px] shrink-0 px-6 text-[15px] lg:mt-0 lg:inline-flex"><UiIcon name="compass-outline" :size="18" />Faire le second diagnostic</NuxtLink>
+              <NuxtLink v-else :to="`/diagnostic/${autreType}/introduction`" class="btn btn-white mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0"><UiIcon name="compass-outline" :size="18" />Faire le second diagnostic</NuxtLink>
             </div>
           </div>
         </div>

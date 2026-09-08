@@ -4,6 +4,12 @@ export interface AdminMe {
   mfa: { requise: boolean; enrolee: boolean; verifiee: boolean }
 }
 
+/**
+ * `$fetch` sans typage par route : le typage généré par Nuxt sature sur les chemins admin
+ * (« Excessive stack depth »). Les réponses sont typées à l'appel.
+ */
+export const apiAdmin = $fetch as unknown as <T = any>(url: string, opts?: Record<string, unknown>) => Promise<T>
+
 export const ROLE_RANK = { lecture: 0, commercial: 1, analyste: 2, admin: 3 } as const
 
 /** Contexte de l'admin connecté, partagé entre le layout, le middleware et les pages. */

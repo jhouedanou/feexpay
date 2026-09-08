@@ -33,7 +33,7 @@ async function envoyer() {
   envoi.value = true
   erreur.value = null
   try {
-    resultat.value = await $fetch('/api/admin/invitations', {
+    resultat.value = await apiAdmin('/api/admin/invitations', {
       method: 'POST',
       body: { ...form, email: form.email.trim().toLowerCase(), team: form.team.trim() || null, mfa_required: form.mfa_required || mfaImposee.value },
     })

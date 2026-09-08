@@ -21,8 +21,7 @@ onMounted(async () => {
 async function demarrerEnrolement() {
   erreur.value = null
   try {
-    const r: unknown = await $fetch('/api/admin/auth/2fa/enroll', { method: 'POST' })
-    enrolement.value = r as { factorId: string; secret: string; qr: string }
+    enrolement.value = await apiAdmin<{ factorId: string; secret: string; qr: string }>('/api/admin/auth/2fa/enroll', { method: 'POST' })
     mode.value = 'enroler'
   } catch (e) {
     erreur.value = messageErreur(e)
@@ -34,7 +33,7 @@ async function verifier() {
   envoi.value = true
   erreur.value = null
   try {
-    const r = await $fetch<{ codesRecuperation: string[] | null }>('/api/admin/auth/2fa/verify', {
+    const r = await apiAdmin<{ codesRecuperation: string[] | null }>('/api/admin/auth/2fa/verify', {
       method: 'POST',
       body: { code: code.value.trim(), factorId: mode.value === 'enroler' ? enrolement.value?.factorId : undefined },
     })
@@ -57,7 +56,7 @@ async function recuperer() {
   envoi.value = true
   erreur.value = null
   try {
-    await $fetch('/api/admin/auth/2fa/recovery', { method: 'POST', body: { code: recup.value.trim() } })
+    await apiAdmin('/api/admin/auth/2fa/recovery', { method: 'POST', body: { code: recup.value.trim() } })
     await charger()
     await demarrerEnrolement()
   } catch (e) {

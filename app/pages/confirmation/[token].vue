@@ -34,7 +34,7 @@ const second = computed(() =>
     ? { titre: 'Ajoutez la lecture du rayonnement', texte: 'Sept questions supplémentaires suffisent pour comparer vos fondations internes et ce que votre marché perçoit.' }
     : { titre: 'Ajoutez la lecture de votre pilotage', texte: 'Quatorze questions supplémentaires suffisent pour comparer ce que votre marché perçoit et vos fondations internes.' },
 )
-const partage = computed(() => (ctx.value ? `/partager/${ctx.value.type}/${ctx.value.token}` : null))
+const partage = computed(() => `/partager/${r.value.dirigeant ? 'dirigeant' : 'rayonnement'}/${token}?rapport=1`)
 const pdf = `/api/public/reports/${token}/pdf`
 
 useSeoMeta({ title: 'Votre analyse est prête — Radar by FeexPay' })
@@ -72,7 +72,7 @@ useSeoMeta({ title: 'Votre analyse est prête — Radar by FeexPay' })
           <div class="flex justify-center gap-3.5">
             <NuxtLink :to="`/rapport/${token}`" class="btn btn-primary h-14 px-[30px] text-base"><UiIcon name="file-document-outline" :size="18" />Consulter mon rapport</NuxtLink>
             <a :href="pdf" class="btn btn-outline h-14 px-6 text-base"><UiIcon name="download-outline" :size="18" />Télécharger le PDF</a>
-            <NuxtLink v-if="partage" :to="partage" class="btn btn-outline h-14 px-6 text-base"><UiIcon name="share-variant-outline" :size="18" />Partager</NuxtLink>
+            <NuxtLink :to="partage" class="btn btn-outline h-14 px-6 text-base"><UiIcon name="share-variant-outline" :size="18" />Partager</NuxtLink>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ useSeoMeta({ title: 'Votre analyse est prête — Radar by FeexPay' })
       <div class="flex flex-col gap-3">
         <NuxtLink :to="`/rapport/${token}`" class="btn btn-primary h-[52px] text-base"><UiIcon name="file-document-outline" :size="18" />Consulter mon rapport</NuxtLink>
         <a :href="pdf" class="btn btn-outline h-[52px] text-base"><UiIcon name="download-outline" :size="18" />Télécharger le PDF</a>
-        <NuxtLink v-if="partage" :to="partage" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon résultat</NuxtLink>
+        <NuxtLink :to="partage" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon résultat</NuxtLink>
       </div>
     </div>
 

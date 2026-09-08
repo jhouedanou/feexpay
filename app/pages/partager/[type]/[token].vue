@@ -23,10 +23,14 @@ const type = route.params.type as DiagType
 const token = route.params.token as string
 if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCode: 404 })
 
-const { data, error } = await useFetch<any>(`/api/public/results/${token}`)
-if (error.value) throw createError({ statusCode: 404, statusMessage: 'Résultat introuvable ou expiré' })
-const r = computed(() => data.value?.result)
 const dirigeant = type === 'dirigeant'
+/** Depuis P11/P12, le jeton est celui du rapport (sans session) ; depuis P08/P09, celui de la participation. */
+const depuisRapport = route.query.rapport === '1'
+const { data, error } = await useFetch<any>(depuisRapport ? `/api/public/reports/${token}` : `/api/public/results/${token}`)
+if (error.value) throw createError({ statusCode: 404, statusMessage: 'Résultat introuvable ou expiré' })
+const r = computed(() => (depuisRapport ? data.value?.[type] : data.value?.result))
+if (!r.value) throw createError({ statusCode: 404, statusMessage: 'Ce rapport ne contient pas ce diagnostic' })
+const retour = depuisRapport ? `/rapport/${token}` : `/resultat/${type}/${token}`
 
 const config = useRuntimeConfig()
 const lien = config.public.appBaseUrl
@@ -211,13 +215,13 @@ useSeoMeta({ title: `${dirigeant ? 'Partager mon profil' : 'Partager le rayonnem
 <template>
   <div class="flex flex-1 flex-col">
     <RadarTopBar
-      :back="`/resultat/${type}/${token}`"
+      :back="retour"
       close
       :label="dirigeant ? 'Partager mon résultat' : 'Partager le rayonnement de votre entreprise'"
       :label-mobile="dirigeant ? 'Partager mon résultat' : 'Partager le rayonnement'"
     >
       <template #right>
-        <NuxtLink :to="`/resultat/${type}/${token}`" class="hidden hover:underline lg:inline">Retour au rapport</NuxtLink>
+        <NuxtLink :to="retour" class="hidden hover:underline lg:inline">{{ depuisRapport ? 'Retour au rapport' : 'Retour au résultat' }}</NuxtLink>
       </template>
     </RadarTopBar>
 
