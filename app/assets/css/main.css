@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+/* Tokens Radar — palette normative README_Actifs_graphiques.txt (interface),
+   distincte des couleurs du logotype (cf. public/brand/README.md). */
+@theme {
+  --color-fx-navy: #112c56;
+  --color-fx-orange: #d45d00;
+  --color-fx-navy-600: #173154;
+  --color-fx-orange-600: #d35e14;
+}
+
+:root {
+  --fx-navy: #112c56;
+  --fx-orange: #d45d00;
+}
+
+body {
+  @apply bg-white text-fx-navy antialiased;
+}

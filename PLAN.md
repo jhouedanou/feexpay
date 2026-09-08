@@ -6,6 +6,57 @@
 
 ---
 
+## 0. État d'avancement (mis à jour le 2026-09-08)
+
+| §9 | Étape | État |
+|---|---|---|
+| 1 | Workspace pnpm + TS | partiel — workspace + `packages/scoring` OK ; **Nuxt 4.5 installé, `pnpm dev` opérationnel** (`nuxt.config.ts`, `app/{app.vue,layouts,pages/index.vue,assets/css}`, `server/api/public/health.get.ts`, Tailwind 4 via `@tailwindcss/vite`, `X-Robots-Tag` par `routeRules`). Manque : ESLint/Prettier, Playwright, modules `@nuxtjs/supabase` / `nuxt-og-image`, Poppins, MDI |
+| 2 | Supabase local + `.env.example` | **projet en ligne opérationnel** (`lssvoupqvcdlufbegghd`, PostgreSQL 17.6) : `.env` renseigné, connexion Postgres et API REST vérifiées le 2026-09-08. Manque : `supabase start` en local (CLI et Docker absents du poste), séparation staging/prod |
+| 3 | `packages/db` (Drizzle, RLS, seed) | **migration appliquée en ligne** : 21 tables, RLS activé sans policy sur les 21 (deny-all, service role seul), 18 triggers dont immutabilité — testé, `VERSION_LOCKED` remonte bien. Manque : `packages/db` (schéma Drizzle + drizzle-kit), seed admin, config Auth (signups off, HIBP, MFA) |
+| 4 | CI, logger, en-têtes sécurité | partiel — `correlation_id` en place (`server/middleware/correlation.ts`, en-tête `x-correlation-id` + repris dans chaque erreur). Manque : logger pino, HSTS/CSP. **CI GitHub Actions abandonnée** : déploiement via Vercel |
+| 5 | Assets de marque | partiel — logos SVG corrigés dans `public/brand/` (cf. son README). Manque : PNG/emblèmes, tokens CSS `--fx-*`, Poppins, MDI |
+| 6 | `docs/ARCHITECTURE.md` | à faire |
+| 6b | `scripts/extract-matrix.ts` → JSON v2.1 | **fait** — 21 questions, 84 options, 8 archétypes, 16 règles, checksum `4513791…` |
+| 7 | `packages/scoring` + tests §5.5 | **fait** — 44 tests verts (`pnpm --filter @radar/scoring test`) |
+| 8 | Seed `scoring_version 2.1` | **fait** — `scripts/seed-scoring-version.ts` (idempotent, transactionnel) : version 2.1 `published`, 14 + 7 questions, 84 options, checksum `4513791…` identique au moteur (`GET /api/public/health` → `checksumMatch: true`) |
+| 9 | Lot 1 étape 9 — API parcours | **fait** — `server/api/public/{sessions.post,participations.post,participations/[token].get,participations/[token]/answers/[questionCode].put,participations/[token]/abandon.post}.ts` + `server/utils/{db,tokens,errors,session,participation}.ts`. Cookie `radar_sid` httpOnly 7 j glissants, acquisition first-touch, jetons hashés, zod strict. 26 contrôles verts (`pnpm test:api`) |
+| 10+ | Lot 1 étape 10 et suivants | à faire — **prochaine étape : P01–P07** (écrans du parcours) |
+
+Écart assumé vs §2 : **Nuxt 4.5** au lieu de Nuxt 3 — même API, et sa structure par défaut
+(`app/pages`, `app/components`, `app/layouts`) est exactement l'arborescence cible du §3.
+Tailwind 4 est câblé par le plugin Vite officiel plutôt que par `@nuxtjs/tailwindcss`
+(le module n'est pas requis pour Tailwind 4).
+
+Prérequis machine : `node` par défaut est en v10 → `nvm use 22` avant tout `pnpm`.
+`supabase` CLI et `docker` **ne sont pas installés** sur ce poste : `supabase start` est
+impossible en l'état. On travaille donc directement sur le projet Supabase en ligne.
+
+**Déploiement : Vercel** (décidé le 2026-09-08, pas de CI GitHub Actions). Deux conséquences
+à traiter avant la première mise en ligne :
+
+1. **La connexion directe ne marchera pas sur Vercel.** `db.<ref>.supabase.co` ne publie aucun
+   enregistrement A, uniquement AAAA : elle est IPv6-only. Elle fonctionne depuis un poste
+   ayant IPv6 (vérifié en local), mais les fonctions Vercel n'ont pas d'egress IPv6.
+   Il faut donc, pour l'environnement Vercel, un `DATABASE_URL` pointant le **pooler Supavisor
+   en mode session** (port 5432, user `postgres.<ref>` — chaîne exacte à copier depuis
+   Dashboard → Connect). Le mode transaction (6543) est à proscrire : il ne supporte pas les
+   prepared statements dont pg-boss a besoin. Le pooler résout bien en IPv4 (vérifié).
+   Alternative : add-on IPv4 payant. La connexion directe reste bonne en local.
+2. **pg-boss + PDF Playwright sont incompatibles avec des fonctions éphémères.** Le §2 le notait
+   déjà (« exige un runtime Node long-running »). Sur Vercel, le worker de la queue et le rendu
+   PDF devront vivre ailleurs (worker dédié type Railway/Fly/VPS, ou service managé), ou être
+   remplacés. À trancher **avant le Lot 3**, c'est structurant.
+
+Mot de passe `DATABASE_URL` : percent-encodé le 2026-09-08 (`&`→`%26`, `+`→`%2B`, `*`→`%2A`),
+connexion revérifiée. Le mot de passe brut est rappelé en commentaire dans `.env`.
+
+Détail du moteur livré (§7) : `src/{types,errors,utils,data,answers,dirigeant,rayonnement,cross,insights,public}.ts`.
+`public.ts` produit les projections P08/P09 sans pilotage, sans classement des 8 archétypes, sans affinités —
+le reste ne sort jamais du serveur. Règle de départage appliquée : dimension centrale, comparaison après
+arrondi à 2 décimales (défaut §10.1, à confirmer par Cossi CODJIA).
+
+---
+
 ## 1. Contexte
 
 FeexPay (accompagné par Big Five) veut **Radar by FeexPay** (`radar.feexpay.me`) : web app mobile-first, publique sans compte, avec deux diagnostics indépendants :
