@@ -17,6 +17,7 @@
     "test:leads": "node test/api-leads.mjs",
     "test:admin": "node test/api-admin.mjs",
     "test:metier": "node test/api-metier.mjs",
+    "test:lot6": "node test/api-lot6.mjs",
     "seed:admins": "tsx scripts/seed-admins.ts"
   },
   "devDependencies": {

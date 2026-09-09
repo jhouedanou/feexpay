@@ -9,6 +9,7 @@ export { CURRENT_VERSION, getVersion, listVersions, V2_1, V2_2, type ScoringVers
 export { scoreDirigeant } from './dirigeant'
 export { ScoringError, type ScoringErrorCode } from './errors'
 export { buildInsights, type InsightInput } from './insights'
+export { CAS_ARCHETYPES, CAS_CONTROLE, CAS_DEPARTAGE, executerControles, type ResultatControle } from './controls'
 export { toPublicDirigeant, toPublicRayonnement } from './public'
 export { scoreRayonnement } from './rayonnement'
 export { level, round, round2 } from './utils'

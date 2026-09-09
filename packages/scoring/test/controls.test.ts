@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import {
   answersFromLetters,
   buildInsights,
+  executerControles,
   crossReading,
   getVersion,
   listVersions,
@@ -402,5 +403,14 @@ describe('matrice V2.2 — contrôle du départage', () => {
   it('les deux versions partagent questions, options et constats', () => {
     expect(listVersions().sort()).toEqual(['2.1', '2.2'])
     expect(getVersion('2.2').options.length).toBe(getVersion('2.1').options.length)
+  })
+})
+
+describe('executerControles (T01)', () => {
+  it('toutes les versions embarquées passent leurs contrôles', () => {
+    for (const v of listVersions()) {
+      const r = executerControles(v)
+      expect(r.filter((x) => !x.ok)).toEqual([])
+    }
   })
 })

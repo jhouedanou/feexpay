@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import { nomRapport, type RapportPublic } from './report'
 import { nomFichierPdf, rapportPdf } from './pdf'
+import { journalEnvoi } from './rapports'
 
 /**
  * Envoi du rapport par email (Resend), PDF en pièce jointe. Chaque envoi laisse une ligne
@@ -27,12 +28,14 @@ export async function envoyerRapport(
     [reportId, template, to],
   )
   const notifId = notif.rows[0]!.id
+  await journalEnvoi(notifId, 'generated', `moteur ${rapport.dirigeant?.version ?? rapport.rayonnement?.version ?? ''}`.trim())
 
   const echec = async (message: string) => {
     await db().query(`update notification set status = 'failed', last_error = $2, updated_at = now() where id = $1`, [
       notifId,
       message.slice(0, 500),
     ])
+    await journalEnvoi(notifId, 'failed', message.slice(0, 200))
     return { sent: false, to, error: message }
   }
 
@@ -54,6 +57,7 @@ export async function envoyerRapport(
       `update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`,
       [notifId, data?.id ?? null],
     )
+    await journalEnvoi(notifId, 'accepted')
     await db().query(`update report set status = 'ready', updated_at = now() where id = $1`, [reportId])
     return { sent: true, to }
   } catch (e) {
@@ -84,7 +88,7 @@ function texteRapport(r: RapportPublic, lien: string): string {
   ].join('\n')
 }
 
-function htmlRapport(r: RapportPublic, lien: string): string {
+export function htmlRapport(r: RapportPublic, lien: string): string {
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   const resume = lignesResume(r)
     .map((l) => `<li style="margin:0 0 6px;font:400 15px/1.5 Poppins,'Segoe UI',sans-serif;color:#373E4B">${esc(l)}</li>`)

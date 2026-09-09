@@ -343,7 +343,7 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 16. A02 dashboard KPI ; A03 liste ; A04/A05/A06 ; cartes Difficulty/Force/Hypothesis/Fact, SeverityTag, KpiCard, EmptyState/EmptyValue. Livré le 8 septembre 2026 : migration `20260908140000_admin_metier.sql` (leviers, suivi, notes), utilitaire `server/utils/admin-metier.ts`, dix routes `/api/admin/**`, pages `admin/index`, `admin/prospects/**`, `admin/participations/**`, `admin/reglages/leviers`, test `test/api-metier.mjs`.
 
 **Lot 6 — Ops admin**
-17. A07 rapports + renvoi ; exports async journalisés ; T01 versions + publication contrôlée ; A08 états.
+17. A07 rapports + renvoi ; exports async journalisés ; T01 versions + publication contrôlée ; A08 états. Livré le 9 septembre 2026 : migration `20260909000000_rapports_versions.sql` (journal d'envoi, ouverture en ligne), `server/utils/{rapports,versions}.ts`, `packages/scoring/src/controls.ts` (cas de contrôle partagés test/admin), webhook Resend, pages `admin/rapports`, `admin/versions`, test `test/api-lot6.mjs`.
 
 **Lot 7 — Lancement**
 18. Tracking complet + recette 14 tests ; WCAG 2.2 AA (axe + clavier) ; Lighthouse (LCP ≤2.5 s, CLS ≤0.1) ; revue OWASP ASVS ; sauvegarde/restauration testée ; docs (architecture, OpenAPI, runbook, manuel admin).

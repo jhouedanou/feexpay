@@ -66,6 +66,7 @@ pnpm test:api      # parcours HTTP : session, réponses, reprise, abandon (26 co
 pnpm test:results  # calcul, snapshot, idempotence, cas normatifs §5.5 (14 contrôles)
 pnpm test:admin    # invitation, 2FA TOTP, RBAC, gardes admin (22 contrôles, crée des comptes de test)
 pnpm test:metier   # admin métier : dashboard, prospects, fiche, participation, leviers, exports (30 contrôles)
+pnpm test:lot6     # rapports et emails, webhook Resend, versions du moteur (24 contrôles)
 ```
 
 Les deux derniers exigent un serveur lancé et écrivent dans la base pointée par
@@ -98,6 +99,16 @@ commercial (statut, responsable, notes internes) vit dans `prospect_suivi` / `pr
 Chaque export (CSV, PDF de fiche, JSON de réponses) exige `export_allowed` sur le compte et
 laisse une ligne dans `export_job` et `audit_log`. « Renvoyer le rapport » réémet le même
 rapport avec un nouveau jeton, l'ancien lien devenant invalide.
+
+Rapports et emails (lot 6, cadre A07) : taux de remise, d'ouverture et de consultation en
+ligne comparés à la période précédente, journal des envois filtrable, renvoi, correction
+d'adresse puis renvoi, relance groupée des échecs, aperçu des modèles avec le cas de contrôle
+principal. Les statuts « remis », « ouvert » et « rejeté » viennent du webhook Resend
+(`POST /api/public/webhooks/resend`, signature Svix vérifiée avec `RESEND_WEBHOOK_SECRET`,
+à déclarer dans le dashboard Resend une fois le domaine vérifié). Versions du moteur (T01) :
+registre des versions du code et de la base, contrôles automatiques (cas §5.5, huit
+archétypes, départage V2.2, checksum), publication ou réactivation par un Administrateur,
+journalisées. Une version publiée reste immuable et chaque participation garde la sienne.
 
 ## Règles
 
