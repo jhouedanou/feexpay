@@ -16,6 +16,10 @@ vendredi 25 septembre 2026 sur `radar.feexpay.me`.
 | Admin métier : dashboard, prospects, fiche, participation, leviers, exports | `pnpm test:metier` | 30 |
 | Rapports et emails, webhook Resend, versions du moteur | `pnpm test:lot6` | 24 |
 
+Aucune intégration continue : le dépôt n'a pas de workflow GitHub Actions (décision du
+9 septembre 2026, le déploiement passe par Vercel). Ces commandes sont donc à lancer en local
+avant chaque livraison ; le tableau ci-dessus est l'état de la passe du 9 septembre.
+
 Typecheck de l'application : aucune erreur (les deux erreurs restantes sont dans la
 configuration Nuxt et le paquet moteur, connues et sans effet à l'exécution).
 Build de production `nuxt build` : succès. Le bundle public `.output/public` ne contient ni

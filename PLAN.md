@@ -13,7 +13,7 @@
 | 1 | Workspace pnpm + TS | partiel — workspace + `packages/scoring` OK ; **Nuxt 4.5 installé, `pnpm dev` opérationnel** (`nuxt.config.ts`, `app/{app.vue,layouts,pages/index.vue,assets/css}`, `server/api/public/health.get.ts`, Tailwind 4 via `@tailwindcss/vite`, `X-Robots-Tag` par `routeRules`). Manque : ESLint/Prettier, Playwright, modules `@nuxtjs/supabase` / `nuxt-og-image`, Poppins, MDI |
 | 2 | Supabase local + `.env.example` | **projet en ligne opérationnel** (`lssvoupqvcdlufbegghd`, PostgreSQL 17.6) : `.env` renseigné, connexion Postgres et API REST vérifiées le 2026-09-08. Manque : `supabase start` en local (CLI et Docker absents du poste), séparation staging/prod |
 | 3 | `packages/db` (Drizzle, RLS, seed) | **migration appliquée en ligne** : 21 tables, RLS activé sans policy sur les 21 (deny-all, service role seul), 18 triggers dont immutabilité — testé, `VERSION_LOCKED` remonte bien. Manque : `packages/db` (schéma Drizzle + drizzle-kit), seed admin, config Auth (signups off, HIBP, MFA) |
-| 4 | CI, logger, en-têtes sécurité | partiel — `correlation_id` en place (`server/middleware/correlation.ts`, en-tête `x-correlation-id` + repris dans chaque erreur). Manque : logger pino, HSTS/CSP. **CI GitHub Actions abandonnée** : déploiement via Vercel |
+| 4 | CI, logger, en-têtes sécurité | partiel — `correlation_id` en place (`server/middleware/correlation.ts`, en-tête `x-correlation-id` + repris dans chaque erreur). Manque : logger pino, HSTS/CSP. **CI GitHub Actions abandonnée et le workflow supprimé le 9 septembre 2026** : déploiement via Vercel, contrôles lancés en local |
 | 5 | Assets de marque | **fait** — logos, 8 emblèmes, hero, tokens CSS, **Poppins self-hosted** (4 graisses woff2, latin + latin-ext, 52 Ko, preload), **icônes MDI** en sous-ensemble SVG (`app/components/ui/Icon.vue`) remplaçant les emoji interdits par le design system. Manque : variantes AVIF/WebP du hero |
 | 6 | `docs/ARCHITECTURE.md` | à faire |
 | 6b | `scripts/extract-matrix.ts` → JSON v2.1 | **fait** — 21 questions, 84 options, 8 archétypes, 16 règles, checksum `4513791…` |
@@ -104,7 +104,7 @@ Résultat gratuit affiché **avant** tout formulaire. Formulaire (P10) débloque
 | UI | Tailwind 4 + tokens CSS Radar (`--fx-*`), Poppins self-hosted, MDI subset SVG, composants Vue SFC maison | Maquette prévaut sur `_ds/` générique (bundle React inutilisable) |
 | Tests | **Vitest** (scoring unitaire, handlers Nitro via `@nuxt/test-utils`), **Playwright** e2e | Cas de contrôle obligatoires |
 | Infra locale | **Supabase CLI** (`supabase start` : postgres, auth, storage, inbucket mail) | Env dev sans données réelles |
-| CI | GitHub Actions : lint, typecheck, vitest, migrations sur DB éphémère, e2e smoke | Lot 0 |
+| CI | Aucune : contrôles lancés en local (`pnpm test`, `pnpm typecheck:app`, suites HTTP) avant chaque livraison. Déploiement Vercel | Décision du 9 septembre 2026 |
 
 Écartés : Next.js (préférence équipe Vue) ; BullMQ/Redis (pg-boss suffit, un service de moins) ; auth maison complète (Supabase couvre TOTP/sessions).
 Point d'attention : Supabase sans région Afrique → Frankfurt ; mesurer latence Abidjan sur p95 API ≤ 500 ms.
@@ -308,7 +308,7 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 1. ✅ (partiel : ESLint/Prettier/Playwright e2e non installés) `pnpm` workspace, Nuxt 3, TS strict, Vitest ; modules `@nuxtjs/supabase`, `nuxt-og-image`, Tailwind.
 2. ⏳ (Supabase en ligne retenu, pas de CLI local ; env à renseigner) `supabase init` + `supabase start` (postgres, auth, storage, inbucket) ; projet Supabase staging/prod région Frankfurt ; `.env.example` documenté (`SUPABASE_URL`, `SUPABASE_KEY` anon, `SUPABASE_SERVICE_KEY` serveur, `DATABASE_URL`).
 3. ✅ (`supabase/migrations/20260905000000_init.sql` source de vérité + `server/db/schema.ts` miroir Lot 1–3 ; seed admin ⏳) `packages/db` : schéma Drizzle complet (§4), migrations, triggers immutabilité, RLS deny-all sur tables métier (accès service role seulement), seed admin initial (script one-shot : `inviteUserByEmail` + ligne `admin_user`). Config Auth : signups off, password ≥12 + HIBP, MFA TOTP on.
-4. ✅ CI GitHub Actions ; ✅ `correlation_id` ; ⏳ pino, headers sécurité (HSTS/CSP). Headers sécurité (HSTS, CSP, noindex middleware).
+4. ❌ CI GitHub Actions retirée le 9 septembre 2026 (déploiement Vercel, contrôles en local) ; ✅ `correlation_id` ; ⏳ pino, headers sécurité (HSTS/CSP). Headers sécurité (HSTS, CSP, noindex middleware).
 5. ✅ (assets → `public/brand/`, tokens CSS Tailwind 4 ; ⏳ Poppins self-hosted, MDI) Copier assets Annexe 02 `assets/` → `app/public/brand/` ; tokens CSS Radar ; Poppins self-hosted ; MDI subset.
 6. ⏳ `docs/ARCHITECTURE.md` (livrable H.2 n°2, exigé par CDC F.1 « choix consignés dans la documentation d'architecture ») :
    - choix techniques (§2 de ce plan) avec, pour chacun, l'exigence CDC satisfaite (E.1, F.1, G.1, G.3, G.5…) ;
@@ -402,7 +402,7 @@ Textes (thème, signaux, hypothèse, relance) : onglet « Règles combinées » 
 
 ## 12. Vérification (definition of done par lot)
 
-- Lot 0 : `supabase start` + `pnpm dev` OK ; migrations reproductibles ; CI verte ; `docs/ARCHITECTURE.md` relu et validé par Jean-Luc.
+- Lot 0 : `supabase start` + `pnpm dev` OK ; migrations reproductibles ; contrôles locaux verts ; `docs/ARCHITECTURE.md` relu et validé par Jean-Luc.
 - Scoring : `pnpm --filter scoring test` → 5 cas limites + 8 accessibilité + tie + invariant 7/7 verts.
 - Lot 1–3 : e2e Playwright : parcours complet Dirigeant puis Rayonnement → résultat avant formulaire → lead → rapport → PDF → carte ; à 390/834/1440 ; double soumission neutralisée ; reprise après reload.
 - Lot 4–6 : tests API RBAC (403 par rôle), dernier admin, invitation expirée ; renvoi sans recalcul.
