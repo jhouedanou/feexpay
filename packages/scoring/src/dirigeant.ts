@@ -58,8 +58,9 @@ function breakTie(
   ordreTechnique: ArchetypeCode[],
 ): { winner: ArchetypeData; steps: TieBreakStep[] } {
   const criteria: { regle: string; value: (a: ArchetypeData) => number; direction: 'desc' | 'asc' }[] = [
-    { regle: 'normCentrale', value: (a) => round2(norm[a.dims[0]]), direction: 'desc' },
-    { regle: 'plus2Centrale', value: (a) => plus2[a.dims[0]], direction: 'desc' },
+    // `dims[0]` est la dimension centrale de l'archétype : la matrice en donne toujours trois.
+    { regle: 'normCentrale', value: (a) => round2(norm[a.dims[0]!]), direction: 'desc' },
+    { regle: 'plus2Centrale', value: (a) => plus2[a.dims[0]!], direction: 'desc' },
     { regle: 'sommeBrute', value: (a) => a.dims.reduce((s, d) => s + raw[d], 0), direction: 'desc' },
     { regle: 'ordreTechnique', value: (a) => ordreTechnique.indexOf(a.code), direction: 'asc' },
   ]

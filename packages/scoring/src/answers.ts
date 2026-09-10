@@ -41,7 +41,8 @@ export function validate(type: DiagnosticType, answers: Answers, version?: strin
 
   const options: OptionData[] = []
   for (const q of order) {
-    const code = answers[q]
+    // Le contrôle `missing` ci-dessus garantit une réponse pour chaque question de l'ordre.
+    const code = answers[q]!
     const option = v.optionByCode.get(code)
     if (!option || option.questionCode !== q) {
       throw new ScoringError('INVALID_ANSWER', `Option « ${code} » invalide pour la question ${q}`, {
