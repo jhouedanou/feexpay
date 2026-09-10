@@ -40,11 +40,15 @@ export default defineEventHandler(async (event) => {
 
   const champs: Record<string, string> = {}
   let image: Buffer | null = null
+  let imageType: 'image/png' | 'image/jpeg' | null = null
   for (const p of parties) {
     if (p.name === 'image') {
       if (p.data.length > TAILLE_MAX) throw apiError(event, 'VALIDATION_ERROR', 'Image trop lourde.')
-      if (p.type !== 'image/png') throw apiError(event, 'VALIDATION_ERROR', 'Image attendue au format PNG.')
+      if (p.type !== 'image/png' && p.type !== 'image/jpeg') {
+        throw apiError(event, 'VALIDATION_ERROR', 'Image attendue au format PNG ou JPEG.')
+      }
       image = p.data
+      imageType = p.type
     } else if (p.name) {
       champs[p.name] = p.data.toString('utf8')
     }
@@ -106,7 +110,7 @@ export default defineEventHandler(async (event) => {
                      image_type  = coalesce(excluded.image_type, share_asset.image_type),
                      image_at    = coalesce(excluded.image_at, share_asset.image_at),
                      created_at  = now()`,
-    [reportId, participationId, format, objectKey, hashToken(jeton), jeton, image, image ? 'image/png' : null],
+    [reportId, participationId, format, objectKey, hashToken(jeton), jeton, image, imageType],
   )
 
   setResponseStatus(event, 201)

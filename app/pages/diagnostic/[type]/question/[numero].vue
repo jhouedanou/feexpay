@@ -64,6 +64,14 @@ watch(numero, () => {
 /** Réponse qui partira au serveur : le choix courant, ou celle déjà enregistrée. */
 const reponse = computed(() => selected.value ?? answers.value[q.value?.code ?? ''] ?? null)
 
+/**
+ * « Suivant » n'apparaît qu'une fois la réponse partie de l'appareil, quand l'indicateur
+ * affiche « Enregistré ». Un choix encore en attente ou en cours d'envoi ne suffit pas. Une
+ * réponse venue du serveur au chargement compte comme enregistrée, de même qu'une réponse
+ * mise en file hors ligne : l'internaute ne doit pas rester bloqué sans réseau.
+ */
+const enregistree = computed(() => Boolean(reponse.value) && !saving.value && answers.value[q.value?.code ?? ''] === reponse.value)
+
 const precedent = computed(() =>
   numero.value > 1 ? `/diagnostic/${type}/question/${numero.value - 1}` : `/diagnostic/${type}/introduction`,
 )
@@ -244,7 +252,8 @@ async function allerPrecedent() {
       <div class="flex justify-center border-t border-gray-200 px-5 pt-4 pb-6 md:px-10 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8">
         <div class="flex w-full items-center gap-3 md:max-w-[600px] lg:max-w-[640px]">
           <button type="button" class="btn btn-outline h-[52px] w-24 shrink-0 text-[15px] md:w-[120px] lg:w-[130px]" @click="allerPrecedent">Précédent</button>
-          <button type="button" :disabled="!reponse || saving" class="btn btn-primary h-[52px] flex-1 text-base" @click="next">
+          <!-- Le bouton n'apparaît qu'une fois la réponse enregistrée, voir `enregistree`. -->
+          <button v-if="enregistree" type="button" class="btn btn-primary h-[52px] flex-1 text-base" @click="next">
             {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
             <UiIcon name="arrow-right" :size="18" />
           </button>

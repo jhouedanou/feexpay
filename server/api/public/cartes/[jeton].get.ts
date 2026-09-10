@@ -17,14 +17,18 @@ export default defineEventHandler(async (event) => {
   const { rows } = await db().query<{
     participation_id: string
     created_at: Date
-    a_image: boolean
+    image_type: string | null
   }>(
-    `select participation_id, created_at, image is not null as a_image
+    `select participation_id, created_at, case when image is null then null else image_type end as image_type
        from share_asset where jeton = $1`,
     [jeton],
   )
   const carte = rows[0]
   if (!carte) throw apiError(event, 'NOT_FOUND', 'Carte introuvable.')
+
+  // WhatsApp n'affiche pas une image d'aperçu dont l'adresse ne se termine pas par une
+  // extension d'image. L'extension suit le type stocké ; `og.get` la retire avant de chercher.
+  const extension = carte.image_type === 'image/jpeg' ? '.jpg' : '.png'
 
   const { type, result } = await readSnapshot(event, carte.participation_id)
   const r = result as {
@@ -37,7 +41,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     type,
-    image: carte.a_image ? `/api/public/og/${jeton}` : null,
+    image: carte.image_type ? `/api/public/og/${jeton}${extension}` : null,
+    imageType: carte.image_type,
     titre: dirigeant
       ? `Profil de dirigeant : ${r.archetype?.code ?? ''}`.trim()
       : `Rayonnement : ${r.scoreAffiche ?? 0} / 100`,
