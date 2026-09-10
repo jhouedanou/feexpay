@@ -80,4 +80,33 @@ describe('migration init', () => {
   it('notification : exactement un parent', async () => {
     expect(await fails(`insert into notification (template, recipient) values ('t','x@y.z')`)).toMatch(/check/i)
   })
+  it('notification : la réinitialisation est un parent admis, et un seul', async () => {
+    // La contrainte d'origine (`notification_check`) n'admettait que deux parents ; la
+    // migration la remplace. Si le remplacement échouait en silence, l'insertion
+    // ci-dessous serait refusée.
+    const contraintes = await q<{ conname: string }>(
+      `select conname from pg_constraint where conrelid='notification'::regclass and contype='c'`,
+    )
+    expect(contraintes.map((c) => c.conname)).toEqual(['notification_origine_unique'])
+
+    const [u] = await q(`select id from admin_user where status='active' limit 1`)
+    const [r] = await q(
+      `insert into admin_password_reset (admin_user_id, token_hash, expires_at)
+       values ($1,'rh', now() + interval '1 hour') returning id`,
+      [u.id],
+    )
+    await q(`insert into notification (admin_password_reset_id, template, recipient) values ($1,'reinitialisation-admin','a@feexpay.me')`, [r.id])
+    // Deux parents à la fois restent interdits.
+    const [inv] = await q(
+      `insert into admin_invitation (email, role, token_hash, inviter_id, expires_at)
+       values ('z@feexpay.me','lecture','ih',$1, now() + interval '7 days') returning id`,
+      [u.id],
+    )
+    expect(
+      await fails(
+        `insert into notification (admin_password_reset_id, admin_invitation_id, template, recipient) values ($1,$2,'t','a@feexpay.me')`,
+        [r.id, inv.id],
+      ),
+    ).toMatch(/check/i)
+  })
 })

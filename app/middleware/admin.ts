@@ -1,11 +1,13 @@
 /**
  * Pages /admin/** : session exigée, second facteur exigé quand il s'impose, rôle vérifié.
- * Les pages libres : connexion, acceptation d'invitation. La page 2FA est accessible dès
- * la connexion (c'est là qu'on enrôle ou vérifie).
+ * Les pages libres : connexion, acceptation d'invitation, réinitialisation du mot de passe
+ * — sans session, par construction. La page 2FA est accessible dès la connexion (c'est là
+ * qu'on enrôle ou vérifie).
  */
 export default defineNuxtRouteMiddleware(async (to) => {
   if (!to.path.startsWith('/admin')) return
-  if (to.path === '/admin/connexion' || to.path.startsWith('/admin/invitation/')) return
+  if (to.path === '/admin/connexion') return
+  if (to.path.startsWith('/admin/invitation/') || to.path.startsWith('/admin/mot-de-passe-oublie')) return
   const { me, charger, peut } = useAdmin()
   if (!me.value) await charger()
   if (!me.value) return navigateTo(`/admin/connexion?suite=${encodeURIComponent(to.fullPath)}`)
