@@ -4,12 +4,23 @@
 import type { NuxtError } from '#app'
 const props = defineProps<{ error: NuxtError }>()
 const code = computed(() => props.error.statusCode ?? 500)
+const { horsLigne } = useHorsLigne()
+onMounted(() => {
+  horsLigne.value = !navigator.onLine
+  window.addEventListener('online', () => (horsLigne.value = false))
+  window.addEventListener('offline', () => (horsLigne.value = true))
+})
 const titre = computed(() => {
+  if (horsLigne.value) return 'Vous êtes hors ligne'
   if (code.value === 404) return props.error.statusMessage && !/^page not found/i.test(props.error.statusMessage) ? props.error.statusMessage : 'Cette page n’existe pas'
   return 'Une erreur est survenue'
 })
 const texte = computed(() => {
   const m = props.error.statusMessage ?? ''
+  // Coupure réseau : rien n'est perdu, les réponses attendent sur l'appareil.
+  if (horsLigne.value || m === 'REPONSES_EN_ATTENTE') {
+    return 'Votre appareil est hors ligne. Vos réponses sont conservées ici et seront envoyées dès le retour du réseau : reprenez là où vous en étiez.'
+  }
   if (/expir/i.test(m)) return 'Le lien de résultat n’est plus valide : la session expire après sept jours sans activité. Vous pouvez refaire le diagnostic en quelques minutes.'
   if (/rapport/i.test(m)) return 'Ce lien de rapport n’est plus actif. Si un rapport vous a été renvoyé, utilisez le lien du dernier email reçu.'
   if (code.value === 404) return 'L’adresse demandée ne correspond à aucun écran de Radar by FeexPay.'

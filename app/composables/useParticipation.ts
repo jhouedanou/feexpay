@@ -9,10 +9,86 @@ export interface PublicQuestion {
 }
 
 const KEY = (type: DiagType) => `radar:participation:${type}`
+const FILE_KEY = (type: DiagType) => `radar:file:${type}`
+
+interface ReponseEnAttente {
+  token: string
+  questionCode: string
+  optionCode: string
+  at: number
+}
+
+/**
+ * État réseau partagé par les écrans du parcours (PLAN.md §7). `enAttente` compte les
+ * réponses enregistrées localement, pas encore parvenues au serveur.
+ */
+export function useHorsLigne() {
+  return {
+    horsLigne: useState<boolean>('radar-hors-ligne', () => false),
+    enAttente: useState<number>('radar-file-attente', () => 0),
+  }
+}
+
+/** Une erreur portant un code HTTP vient du serveur ; sans code, c'est le réseau. */
+function estPanneReseau(e: unknown): boolean {
+  if (import.meta.client && !navigator.onLine) return true
+  const code = (e as { statusCode?: number; status?: number })?.statusCode ?? (e as { status?: number })?.status
+  return typeof code !== 'number'
+}
+
+function lireFile(type: DiagType): ReponseEnAttente[] {
+  try {
+    const brut = localStorage.getItem(FILE_KEY(type))
+    return brut ? (JSON.parse(brut) as ReponseEnAttente[]) : []
+  } catch {
+    return []
+  }
+}
+
+function ecrireFile(type: DiagType, file: ReponseEnAttente[]) {
+  try {
+    file.length ? localStorage.setItem(FILE_KEY(type), JSON.stringify(file)) : localStorage.removeItem(FILE_KEY(type))
+  } catch {}
+}
 
 /** Jeton de participation par type, en localStorage (reprise 7 j). */
 export function useParticipation(type: DiagType) {
   const token = useState<string | null>(`participation-token-${type}`, () => null)
+  const { horsLigne, enAttente } = useHorsLigne()
+
+  const majCompteur = () => {
+    if (import.meta.client) enAttente.value = lireFile(type).length
+  }
+
+  /**
+   * Rejoue les réponses en attente, dans l'ordre. L'enregistrement est idempotent côté
+   * serveur (`on conflict do update`), le rejeu est donc sans risque. Une réponse refusée
+   * par le serveur (jeton expiré, question inconnue) est écartée : la réessayer
+   * indéfiniment bloquerait celles qui suivent.
+   */
+  const vider = async (): Promise<void> => {
+    if (!import.meta.client) return
+    let file = lireFile(type)
+    while (file.length) {
+      const r = file[0]!
+      try {
+        await $fetch(`/api/public/participations/${r.token}/answers/${r.questionCode}`, {
+          method: 'PUT',
+          body: { optionCode: r.optionCode },
+        })
+      } catch (e) {
+        if (estPanneReseau(e)) {
+          horsLigne.value = true
+          return
+        }
+        console.warn('[file] réponse écartée', r.questionCode, e)
+      }
+      file = file.slice(1)
+      ecrireFile(type, file)
+      majCompteur()
+    }
+    horsLigne.value = false
+  }
 
   const load = () => {
     if (!import.meta.client) return
@@ -21,6 +97,20 @@ export function useParticipation(type: DiagType) {
     } catch {
       token.value = null
     }
+    majCompteur()
+    // Un retour du réseau relance la file sans que l'internaute ait à faire quoi que ce soit.
+    if (!ecouteurs.has(type)) {
+      ecouteurs.add(type)
+      window.addEventListener('online', () => {
+        horsLigne.value = false
+        void vider()
+      })
+      window.addEventListener('offline', () => {
+        horsLigne.value = true
+      })
+    }
+    if (navigator.onLine) void vider()
+    else horsLigne.value = true
   }
   const save = (t: string | null) => {
     token.value = t
@@ -57,13 +147,53 @@ export function useParticipation(type: DiagType) {
       `/api/public/participations/${token.value}`,
     )
 
-  const answer = (questionCode: string, optionCode: string) =>
-    $fetch(`/api/public/participations/${token.value}/answers/${questionCode}`, { method: 'PUT', body: { optionCode } })
+  /**
+   * Enregistre une réponse. Une coupure réseau ne doit pas arrêter le parcours : la
+   * réponse est mise en file locale et rejouée au retour en ligne. Une erreur du serveur,
+   * elle, remonte à l'appelant — c'est une réponse refusée, pas un problème de réseau.
+   */
+  const answer = async (questionCode: string, optionCode: string) => {
+    const t = token.value
+    if (!t) throw new Error('Participation absente')
+    try {
+      const r = await $fetch(`/api/public/participations/${t}/answers/${questionCode}`, {
+        method: 'PUT',
+        body: { optionCode },
+      })
+      horsLigne.value = false
+      return r
+    } catch (e) {
+      if (!estPanneReseau(e)) throw e
+      const file = lireFile(type).filter((x) => !(x.token === t && x.questionCode === questionCode))
+      file.push({ token: t, questionCode, optionCode, at: Date.now() })
+      ecrireFile(type, file)
+      majCompteur()
+      horsLigne.value = true
+      return { differee: true as const }
+    }
+  }
 
-  const complete = (eventId?: string) => $fetch<{ result: unknown; event_id: string }>(`/api/public/participations/${token.value}/complete`, { method: 'POST', body: eventId ? { eventId } : {} })
+  /**
+   * Complétion : les réponses en attente doivent être parties avant le calcul, sinon le
+   * serveur refuserait un parcours incomplet. En cas d'échec, la file reste et l'erreur
+   * remonte pour que l'écran de calcul invite à réessayer.
+   */
+  const complete = async (eventId?: string) => {
+    await vider()
+    if (import.meta.client && lireFile(type).length) {
+      throw createError({ statusCode: 503, statusMessage: 'REPONSES_EN_ATTENTE' })
+    }
+    return $fetch<{ result: unknown; event_id: string }>(`/api/public/participations/${token.value}/complete`, {
+      method: 'POST',
+      body: eventId ? { eventId } : {},
+    })
+  }
 
-  return { token, load, save, start, state, answer, complete }
+  return { token, load, save, start, state, answer, complete, vider, horsLigne, enAttente }
 }
+
+/** Écouteurs `online`/`offline` posés une seule fois par type de diagnostic. */
+const ecouteurs = new Set<DiagType>()
 
 export const useQuestions = (type: DiagType) =>
   useFetch<{ version: string; questions: PublicQuestion[] }>(`/api/public/questions/${type}`, { key: `questions-${type}` })

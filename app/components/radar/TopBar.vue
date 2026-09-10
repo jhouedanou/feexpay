@@ -16,6 +16,10 @@ defineProps<{
   /** Libellé réservé aux petits écrans, quand il diffère. */
   labelMobile?: string
 }>()
+
+// État réseau du parcours : la bannière ne s'affiche que si quelque chose attend
+// réellement d'être envoyé, pour ne pas alarmer sur une coupure sans conséquence.
+const { horsLigne, enAttente } = useHorsLigne()
 </script>
 
 <template>
@@ -40,5 +44,14 @@ defineProps<{
         <slot name="right" />
       </div>
     </div>
+
+    <p
+      v-if="horsLigne && enAttente > 0"
+      class="flex items-center justify-center gap-2 bg-amber-100 px-4 py-2 text-xs leading-[1.4] font-medium text-orange-800 lg:text-[13px]"
+      role="status"
+    >
+      <UiIcon name="cloud-off-outline" :size="16" class="shrink-0 text-amber-600" />
+      <span>Hors ligne · {{ enAttente }} réponse{{ enAttente > 1 ? 's' : '' }} conservée{{ enAttente > 1 ? 's' : '' }} sur cet appareil, envoyée{{ enAttente > 1 ? 's' : '' }} au retour du réseau.</span>
+    </p>
   </header>
 </template>

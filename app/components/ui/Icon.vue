@@ -15,6 +15,7 @@ import {
   mdiFilterVariant,
   mdiChevronLeft,
   mdiCloseCircleOutline,
+  mdiCloudOffOutline,
   mdiCodeJson,
   mdiFilePdfBox,
   mdiCashFast,
@@ -86,6 +87,7 @@ import {
 } from '@mdi/js'
 
 const ICONS: Record<string, string> = {
+  'cloud-off-outline': mdiCloudOffOutline,
   'account-outline': mdiAccountOutline,
   'alert-circle-outline': mdiAlertCircleOutline,
   'alert-outline': mdiAlertOutline,

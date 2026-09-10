@@ -45,10 +45,16 @@ onMounted(async () => {
     etape.value = ETAPES.length
     await navigateTo(`/resultat/${type}/${part.token.value}`, { replace: true })
   } catch (e: unknown) {
-    const err = e as { data?: { data?: { code?: string }; code?: string } }
+    const err = e as { data?: { data?: { code?: string }; code?: string }; statusMessage?: string }
     const code = err?.data?.data?.code ?? err?.data?.code
     if (code === 'INCOMPLETE_PARTICIPATION') return navigateTo(`/diagnostic/${type}/question/1`)
-    error.value = 'Le calcul a échoué. Réessayez dans un instant.'
+    // Des réponses attendent encore d'être envoyées : le calcul ne peut pas partir sans elles.
+    if (err?.statusMessage === 'REPONSES_EN_ATTENTE') {
+      error.value =
+        'Certaines réponses n’ont pas encore été envoyées : votre appareil est hors ligne. Elles sont conservées ici — rétablissez la connexion, puis réessayez.'
+    } else {
+      error.value = 'Le calcul a échoué. Réessayez dans un instant.'
+    }
   } finally {
     clearTimeout(t)
     clearInterval(cadence)
