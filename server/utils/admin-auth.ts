@@ -233,5 +233,3 @@ export async function verifierMotDePasse(pwd: string): Promise<string | null> {
   }
   return null
 }
-
-export { supabaseAdmin }
