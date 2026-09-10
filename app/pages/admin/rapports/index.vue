@@ -90,13 +90,17 @@ const MODELES = [
   { cle: 'croise', nom: 'Rapport croisé complet', detail: '4 lectures croisées', icone: 'vector-intersection', actif: true },
   { cle: 'relance', nom: 'Relance à 7 jours', detail: 'Désactivé · en attente de validation', icone: 'email-sync-outline', actif: false },
 ]
-const apercu = (cle: string) => window.open(`/api/admin/rapports/apercu?modele=${cle}`, '_blank', 'noopener')
+// Modèles modifiés depuis l'admin : la carte le signale, l'éditeur porte le détail.
+const { data: modeles, refresh: rafraichirModeles } = await useFetch<{ modeles: { cle: string; personnalise: boolean }[] }>('/api/admin/rapports/modeles', { headers: useRequestHeaders(['cookie']) })
+const personnalise = (cle: string) => modeles.value?.modeles.find((m) => m.cle === cle)?.personnalise ?? false
+/** Modèle ouvert dans l'éditeur, qui porte aussi l'aperçu. */
+const edition = ref<string | null>(null)
 </script>
 
 <template>
   <div>
     <AdminHeader titre="Rapports et emails" :sous-titre="sousTitre">
-      <button type="button" class="btn btn-outline h-10 gap-2 rounded-[10px] px-3.5 text-sm" @click="apercu('croise')"><UiIcon name="cog-outline" :size="18" class="text-gray-500" />Modèles d’email</button>
+      <button type="button" class="btn btn-outline h-10 gap-2 rounded-[10px] px-3.5 text-sm" @click="edition = 'croise'"><UiIcon name="cog-outline" :size="18" class="text-gray-500" />Modèles d’email</button>
       <button v-if="data?.totaux.echecs" type="button" class="btn btn-primary h-10 gap-2 rounded-[10px] px-4 text-sm" :disabled="occupe === 'relance'" @click="relancer"><UiIcon name="refresh" :size="18" />Relancer les {{ data.totaux.echecs }} échec{{ data.totaux.echecs > 1 ? 's' : '' }}</button>
     </AdminHeader>
     <div class="px-8 pt-7 pb-9">
@@ -172,13 +176,25 @@ const apercu = (cle: string) => window.open(`/api/admin/rapports/apercu?modele=$
             <div class="card p-6">
               <p class="mb-4 text-xs leading-none font-semibold tracking-[0.08em] text-gray-500 uppercase">Modèles actifs</p>
               <div class="flex flex-col gap-3">
-                <button v-for="m in MODELES" :key="m.cle" type="button" class="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-left" :class="m.actif ? 'hover:bg-gray-50' : 'cursor-default bg-gray-50'" :disabled="!m.actif" @click="apercu(m.cle)">
+                <!-- Modèle actif : ouvre l'éditeur, qui porte l'aperçu. Modèle désactivé : simple carte, sans action. -->
+                <button
+                  v-for="m in MODELES"
+                  :key="m.cle"
+                  type="button"
+                  class="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-left"
+                  :class="m.actif ? 'hover:bg-gray-50' : 'cursor-default bg-gray-50'"
+                  :disabled="!m.actif"
+                  @click="edition = m.cle"
+                >
                   <UiIcon :name="m.icone" :size="20" class="shrink-0" :class="m.actif ? 'text-navy-600' : 'text-gray-400'" />
-                  <div class="flex-1"><p class="mb-0.5 text-sm leading-[1.35] font-medium" :class="m.actif ? 'text-navy-600' : 'text-gray-500'">{{ m.nom }}</p><p class="text-xs leading-[1.4]" :class="m.actif ? 'text-gray-500' : 'text-gray-400'">{{ m.detail }}</p></div>
-                  <span class="inline-flex h-5 w-[34px] shrink-0 items-center rounded-full px-[3px]" :class="m.actif ? 'justify-end bg-green-600' : 'bg-gray-300'"><span class="h-3.5 w-3.5 rounded-full bg-white" /></span>
+                  <div class="flex-1">
+                    <p class="mb-0.5 text-sm leading-[1.35] font-medium" :class="m.actif ? 'text-navy-600' : 'text-gray-500'">{{ m.nom }}</p>
+                    <p class="text-xs leading-[1.4]" :class="m.actif ? 'text-gray-500' : 'text-gray-400'">{{ m.detail }}<template v-if="personnalise(m.cle)"> · <span class="font-semibold text-orange-600">texte modifié</span></template></p>
+                  </div>
+                  <span class="inline-flex h-5 w-[34px] shrink-0 items-center rounded-full px-[3px]" :class="m.actif ? 'justify-end bg-green-600' : 'bg-gray-300'" aria-hidden="true"><span class="h-3.5 w-3.5 rounded-full bg-white" /></span>
                 </button>
               </div>
-              <p class="mt-3 text-xs leading-[1.4] text-gray-500">Les modèles sont versionnés avec le code. Cliquer ouvre l’aperçu avec le cas de contrôle principal.</p>
+              <p class="mt-3 text-xs leading-[1.4] text-gray-500">Cliquer un modèle ouvre son texte et son aperçu. La modification est réservée au rôle Administrateur ; les textes d’origine restent versionnés avec le code.</p>
             </div>
             <div class="card p-6">
               <p class="mb-4 text-xs leading-none font-semibold tracking-[0.08em] text-gray-500 uppercase">Journal du dernier envoi</p>
@@ -195,5 +211,6 @@ const apercu = (cle: string) => window.open(`/api/admin/rapports/apercu?modele=$
         </div>
       </template>
     </div>
+    <AdminModeleEmail v-if="edition" :cle="edition" @close="edition = null" @enregistre="rafraichirModeles()" />
   </div>
 </template>

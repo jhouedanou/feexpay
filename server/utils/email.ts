@@ -3,6 +3,7 @@ import { nomRapport, type RapportPublic } from './report'
 import { nomFichierPdf, rapportPdf } from './pdf'
 import { journalEnvoi } from './rapports'
 import { envoyerGa4 } from './ga4'
+import { chargerModele, cleDuRapport, rendreTexte, variablesDuRapport, type ChampsModele } from './modeles-email'
 
 /**
  * Envoi du rapport par email (Resend), PDF en pièce jointe. Chaque envoi laisse une ligne
@@ -44,13 +45,15 @@ export async function envoyerRapport(
 
   try {
     const pdf = rapportPdf(rapport, base)
+    // Textes du modèle, réécrits ou non depuis l'admin ; les variables sont remplacées ici.
+    const { champs } = await chargerModele(cleDuRapport(rapport))
     const resend = new Resend(config.resendApiKey)
     const { data, error } = await resend.emails.send({
       from: config.resendFrom,
       to,
-      subject: `${nomRapport(rapport)} — Radar by FeexPay`,
-      html: htmlRapport(rapport, lien),
-      text: texteRapport(rapport, lien),
+      subject: rendreTexte(champs.sujet, variablesDuRapport(rapport, lien)),
+      html: htmlRapport(rapport, lien, champs),
+      text: texteRapport(rapport, lien, champs),
       attachments: [{ filename: nomFichierPdf(rapport), content: pdf.toString('base64') }],
     })
     if (error) return echec(`${error.name}: ${error.message}`)
@@ -78,18 +81,21 @@ function lignesResume(r: RapportPublic): string[] {
   ].filter(Boolean) as string[]
 }
 
-function texteRapport(r: RapportPublic, lien: string): string {
+/** Version texte de l'email, mêmes champs que le HTML ; le lien suit l'introduction. */
+export function texteRapport(r: RapportPublic, lien: string, champs: ChampsModele): string {
+  const v = variablesDuRapport(r, lien)
+  const t = (champ: keyof ChampsModele) => rendreTexte(champs[champ], v)
   return [
-    `Bonjour ${r.contact.prenom},`,
+    t('salutation'),
     '',
-    `${nomRapport(r)} est prêt. Il est joint à cet email au format PDF et reste consultable en ligne :`,
+    t('introduction'),
     lien,
     '',
     ...lignesResume(r),
     '',
-    'Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à donnees@feexpay.me.',
+    t('mention'),
     '',
-    'Radar by FeexPay · Powered by FeexPay',
+    t('pied'),
   ].join('\n')
 }
 
@@ -103,8 +109,11 @@ function texteRapport(r: RapportPublic, lien: string): string {
  * hauteur vient du `padding`, et `mso-line-height-rule:exactly` empêche Word d'arrondir
  * l'interligne à sa façon — Outlook Windows ignorant `height`, `inline-block` et `border-radius`.
  */
-export function htmlRapport(r: RapportPublic, lien: string): string {
+export function htmlRapport(r: RapportPublic, lien: string, champs: ChampsModele): string {
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const v = variablesDuRapport(r, lien)
+  // Texte d'un champ, variables remplacées puis échappé : un modèle ne porte jamais de HTML.
+  const t = (champ: keyof ChampsModele) => esc(rendreTexte(champs[champ], v))
   const resume = lignesResume(r)
     .map((l) => `<li style="margin:0 0 6px;font:400 15px/1.5 Poppins,'Segoe UI',sans-serif;color:#373E4B">${esc(l)}</li>`)
     .join('')
@@ -113,19 +122,19 @@ export function htmlRapport(r: RapportPublic, lien: string): string {
 <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;background:#fff;border:1px solid #E0E4EB;border-radius:14px;overflow:hidden">
 <tr><td style="background:#112C56;padding:28px 32px">
   <p style="margin:0 0 8px;font:600 12px/1 Poppins,'Segoe UI',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#F6B684">Radar by FeexPay</p>
-  <p style="margin:0;font:600 24px/1.25 Poppins,'Segoe UI',sans-serif;color:#fff">${esc(nomRapport(r))}</p>
+  <p style="margin:0;font:600 24px/1.25 Poppins,'Segoe UI',sans-serif;color:#fff">${t('titre')}</p>
 </td></tr>
 <tr><td style="padding:28px 32px">
-  <p style="margin:0 0 16px;font:400 16px/1.6 Poppins,'Segoe UI',sans-serif;color:#373E4B">Bonjour ${esc(r.contact.prenom)},</p>
-  <p style="margin:0 0 20px;font:400 16px/1.6 Poppins,'Segoe UI',sans-serif;color:#373E4B">Votre rapport est prêt. Il est joint à cet email au format PDF et reste consultable en ligne.</p>
+  <p style="margin:0 0 16px;font:400 16px/1.6 Poppins,'Segoe UI',sans-serif;color:#373E4B">${t('salutation')}</p>
+  <p style="margin:0 0 20px;font:400 16px/1.6 Poppins,'Segoe UI',sans-serif;color:#373E4B">${t('introduction')}</p>
   <ul style="margin:0 0 24px;padding:0 0 0 18px">${resume}</ul>
   <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
     <td bgcolor="#D45D00" style="background:#D45D00;border-radius:12px">
-      <a href="${esc(lien)}" style="display:block;padding:17px 28px;font:600 16px/18px Poppins,'Segoe UI',sans-serif;mso-line-height-rule:exactly;color:#ffffff;text-decoration:none">Consulter mon rapport</a>
+      <a href="${esc(lien)}" style="display:block;padding:17px 28px;font:600 16px/18px Poppins,'Segoe UI',sans-serif;mso-line-height-rule:exactly;color:#ffffff;text-decoration:none">${t('bouton')}</a>
     </td>
   </tr></table>
-  <p style="margin:24px 0 0;font:400 13px/1.55 Poppins,'Segoe UI',sans-serif;color:#6C7686">Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à donnees@feexpay.me.</p>
+  <p style="margin:24px 0 0;font:400 13px/1.55 Poppins,'Segoe UI',sans-serif;color:#6C7686">${t('mention')}</p>
 </td></tr>
-<tr><td style="padding:18px 32px;border-top:1px solid #E0E4EB"><p style="margin:0;font:400 12px/1.5 Poppins,'Segoe UI',sans-serif;color:#7E97BF">Radar by FeexPay · Powered by FeexPay</p></td></tr>
+<tr><td style="padding:18px 32px;border-top:1px solid #E0E4EB"><p style="margin:0;font:400 12px/1.5 Poppins,'Segoe UI',sans-serif;color:#7E97BF">${t('pied')}</p></td></tr>
 </table></td></tr></table></body></html>`
 }
