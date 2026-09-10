@@ -119,6 +119,32 @@ const co = await nouveau('POST', '/api/admin/auth/login', { email: EMAIL, passwo
 check('connexion avec le nouveau mot de passe', co.status === 200, JSON.stringify(co.data?.data ?? ''))
 check('compteur d’échecs remis à zéro', (await db.query(`select failed_logins from admin_user where id = $1`, [userId])).rows[0].failed_logins === 0)
 
+// 4 bis. Changement de mot de passe par un administrateur connecté.
+// Le contrôle décisif est la reconnexion : le 10 septembre, le changement avait « réussi »
+// sans que personne ne vérifie que le nouveau mot de passe ouvrait une session, et le compte
+// s'est retrouvé avec un mot de passe que personne ne connaissait.
+const PWD3 = `Radar-Reset-${suffixe}-Trois!!`
+const chg = async (body) => nouveau('POST', '/api/admin/auth/password', body)
+
+const mauvaisActuel = await chg({ actuel: `${PWD2}-faux`, nouveau: PWD3 })
+check('changement : mot de passe actuel faux refusé', mauvaisActuel.status === 401, mauvaisActuel.data?.data?.code)
+const memeMdp = await chg({ actuel: PWD2, nouveau: PWD2 })
+check('changement : mot de passe identique refusé', memeMdp.status === 400, memeMdp.data?.data?.message)
+const faible = await chg({ actuel: PWD2, nouveau: 'password1234' })
+check('changement : mot de passe compromis refusé', faible.status === 400, faible.data?.data?.message)
+
+const chgOk = await chg({ actuel: PWD2, nouveau: PWD3 })
+check('changement accepté', chgOk.status === 200, JSON.stringify(chgOk.data?.data ?? chgOk.data))
+check('la session courante survit au changement', (await nouveau('GET', '/api/admin/auth/me')).status === 200)
+
+// Le contrôle qui manquait.
+const co3 = await session()('POST', '/api/admin/auth/login', { email: EMAIL, password: PWD3 })
+check('connexion effective avec le mot de passe changé', co3.status === 200, JSON.stringify(co3.data?.data ?? ''))
+const co2 = await session()('POST', '/api/admin/auth/login', { email: EMAIL, password: PWD2 })
+check('mot de passe précédent refusé', co2.status === 401)
+await db.query(`update admin_user set failed_logins = 0, locked_until = null where id = $1`, [userId])
+check('changement journalisé', (await db.query(`select count(*)::int c from audit_log where target_id = $1 and action = 'password.change.done'`, [userId])).rows[0].c >= 1)
+
 // 5. Compte suspendu : pas de lien envoyé.
 await db.query(`update admin_user set status = 'suspended' where id = $1`, [userId])
 const avantSuspension = (await db.query(`select count(*)::int c from admin_password_reset where admin_user_id = $1`, [userId])).rows[0].c
