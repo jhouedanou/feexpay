@@ -8,7 +8,10 @@ import { libelleSource, numeroQuestion } from '../../utils/admin-metier'
  */
 export default defineEventHandler(async (event) => {
   await requireAdmin(event, 'lecture')
-  const q = getQuery(event)
+  // L'export appelle ce handler pour parcourir toute la sélection : il impose sa pagination
+  // par le contexte. Réécrire `req.url` ne servirait à rien — h3 met le chemin en cache dans
+  // `event._path` dès le routage, et `getQuery` lit ce cache.
+  const q: Record<string, unknown> = (event.context.prospectsQuery as Record<string, unknown> | undefined) ?? getQuery(event)
   const s = (k: string) => (typeof q[k] === 'string' && (q[k] as string).trim() ? (q[k] as string).trim() : null)
   const page = Math.max(1, Number.parseInt(String(q.page ?? '1'), 10) || 1)
   const taille = Math.min(100, Math.max(5, Number.parseInt(String(q.taille ?? '20'), 10) || 20))

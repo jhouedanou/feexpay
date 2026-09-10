@@ -42,7 +42,7 @@ watch(() => route.fullPath, () => (menu.value = false))
 
         <!-- Desktop : renvoi vers feexpay.me et bouton long. -->
         <div class="hidden items-center gap-3.5 lg:flex">
-          <a href="https://feexpay.me" rel="noopener noreferrer" class="text-[15px] font-medium leading-none text-navy-600 hover:underline">feexpay.me</a>
+          <a href="https://feexpay.me" target="_blank" rel="noopener noreferrer" class="text-[15px] font-medium leading-none text-navy-600 hover:underline">feexpay.me</a>
           <UiLienRapport />
           <UiMenuProfil />
           <NuxtLink to="/diagnostic" class="btn btn-primary h-11 rounded-[10px] px-5 text-[15px]">Commencer un diagnostic</NuxtLink>
