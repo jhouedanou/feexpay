@@ -68,40 +68,83 @@ const precedent = computed(() =>
   numero.value > 1 ? `/diagnostic/${type}/question/${numero.value - 1}` : `/diagnostic/${type}/introduction`,
 )
 
+// --- Indicateur d'enregistrement -------------------------------------------
+// Il ne s'agit pas d'un ornement : c'est la seule preuve visible que la réponse a quitté
+// l'appareil. Il porte donc un instant réel, et distingue l'envoi abouti de la mise en file
+// locale quand le réseau manque.
+const enregistreLe = ref<number | null>(null)
+const differee = ref(false)
+/** Rafraîchi à la minute pour que « à l'instant » vieillisse tout seul. */
+const maintenant = ref(Date.now())
+let horloge: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  horloge = setInterval(() => (maintenant.value = Date.now()), 30_000)
+})
+onUnmounted(() => clearInterval(horloge))
+
+const etatEnregistrement = computed(() => {
+  if (saving.value) return 'Enregistrement…'
+  if (differee.value) return 'Hors ligne · conservé sur cet appareil'
+  if (enregistreLe.value) {
+    const s = Math.round((maintenant.value - enregistreLe.value) / 1000)
+    if (s < 45) return 'Enregistré · à l’instant'
+    const m = Math.round(s / 60)
+    return `Enregistré · il y a ${m} minute${m > 1 ? 's' : ''}`
+  }
+  // Réponse venue du serveur au chargement : enregistrée, sans instant connu.
+  return answers.value[q.value?.code ?? ''] ? 'Réponse enregistrée' : null
+})
+
+/**
+ * La réponse part dès qu'elle est choisie, sans attendre « Suivant » : c'est ce qui rend
+ * l'indicateur ci-dessus utile, et ce qui met le parcours à l'abri d'un onglet fermé. Un court
+ * délai évite d'envoyer autant de requêtes que d'hésitations.
+ */
+let differe: ReturnType<typeof setTimeout> | undefined
+function choisir(code: string) {
+  selected.value = code
+  clearTimeout(differe)
+  differe = setTimeout(() => void enregistrer().catch(() => {}), 400)
+}
+onUnmounted(() => clearTimeout(differe))
+
 /** Envoie le choix courant s'il diffère de ce qui est déjà enregistré. */
 async function enregistrer(): Promise<boolean> {
   const code = selected.value
   if (!code || code === answers.value[q.value!.code]) return true
-  await part.answer(q.value!.code, code)
-  answers.value[q.value!.code] = code
-  return true
+  saving.value = true
+  error.value = null
+  try {
+    const r = (await part.answer(q.value!.code, code)) as { differee?: boolean } | undefined
+    answers.value[q.value!.code] = code
+    differee.value = r?.differee === true
+    enregistreLe.value = differee.value ? null : Date.now()
+    maintenant.value = Date.now()
+    return true
+  } finally {
+    saving.value = false
+  }
 }
 
 async function next() {
-  if (!reponse.value || saving.value) return
-  saving.value = true
-  error.value = null
+  if (!reponse.value) return
+  clearTimeout(differe)
   try {
     await enregistrer()
     if (numero.value < total.value) await navigateTo(`/diagnostic/${type}/question/${numero.value + 1}`)
     else await navigateTo(`/diagnostic/${type}/calcul`)
   } catch {
     error.value = 'Réponse non enregistrée. Réessayez.'
-  } finally {
-    saving.value = false
   }
 }
 
 /** Revenir en arrière ne doit pas perdre une modification en cours. */
 async function allerPrecedent() {
-  if (saving.value) return
-  saving.value = true
+  clearTimeout(differe)
   try {
     await enregistrer()
   } catch {
     // Le réseau manque : la file locale a déjà pris la réponse, on continue.
-  } finally {
-    saving.value = false
   }
   await navigateTo(precedent.value)
 }
@@ -162,6 +205,7 @@ async function allerPrecedent() {
         <div class="h-1.5 overflow-hidden rounded-full bg-gray-100" role="progressbar" :aria-valuenow="numero" :aria-valuemin="0" :aria-valuemax="total" :aria-label="`Progression : question ${numero} sur ${total}`">
           <div class="h-full rounded-full bg-orange-600" :style="{ width: pct + '%', transition: 'width var(--dur-card) var(--ease-standard)' }" />
         </div>
+        <p v-if="etatEnregistrement" class="mt-1.5 text-right text-[12px] leading-none" :class="differee ? 'text-amber-600' : 'text-gray-500'" role="status">{{ etatEnregistrement }}</p>
       </div>
 
       <!-- Barre desktop. -->
@@ -170,7 +214,7 @@ async function allerPrecedent() {
           <UiIcon name="arrow-left" :size="20" />
           Question précédente
         </button>
-        <span v-if="answers[q!.code]" class="text-sm leading-none text-gray-500">Réponse enregistrée</span>
+        <span v-if="etatEnregistrement" class="text-sm leading-none" :class="differee ? 'text-amber-600' : 'text-gray-500'">{{ etatEnregistrement }}</span>
       </div>
 
       <div class="flex flex-1 justify-center px-5 pt-7 pb-5 md:px-10 md:pt-12 md:pb-8 lg:pt-16 lg:pb-10">
@@ -190,7 +234,7 @@ async function allerPrecedent() {
               :selected="selected === o.code"
               :enregistree="answers[q!.code] === o.code"
               :modification="dejaRepondue && selected === o.code && answers[q!.code] !== o.code"
-              @click="selected = o.code"
+              @click="choisir(o.code)"
             />
           </div>
           <p v-if="error" class="mt-4 text-sm text-red-600" role="alert">{{ error }}</p>
