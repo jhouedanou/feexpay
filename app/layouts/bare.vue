@@ -4,13 +4,15 @@
 // mentions, « Gérer mes cookies ») est présent partout sauf sur les questions et le calcul,
 // où rien ne doit distraire de la réponse.
 const route = useRoute()
-const { ouvrir: gererCookies } = useConsent()
+const { ouvrir: gererCookies, panneau } = useConsent()
 const piedDePage = computed(() => !/\/diagnostic\/[^/]+\/(question|calcul)/.test(route.path))
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col bg-white">
-    <main class="flex flex-1 flex-col"><slot /></main>
+    <!-- Le bandeau de cookies est ancré en bas et capte les clics : sans cette réserve, il
+         recouvre le dernier bouton de la page en mobile (constaté sur P11). -->
+    <main class="flex flex-1 flex-col" :class="{ 'pb-[152px] md:pb-[120px] lg:pb-0': panneau }"><slot /></main>
     <footer v-if="piedDePage" class="bg-navy-600 px-5 py-5 md:px-10 lg:px-0 lg:py-[26px]">
       <div class="wrap flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8 lg:!px-6">
         <img src="/brand/logo-feexpay-white.svg" alt="FeexPay" class="h-5 w-auto lg:h-6" >

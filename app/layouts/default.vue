@@ -2,7 +2,7 @@
 // Navigation de site et pied de page : réservés à la landing (P01) et aux pages cadres.
 // Trois compositions, relevées sur les cadres 390, 834 et 1440 de la maquette.
 const menu = ref(false)
-const { ouvrir: gererCookies } = useConsent()
+const { ouvrir: gererCookies, panneau } = useConsent()
 const route = useRoute()
 watch(() => route.fullPath, () => (menu.value = false))
 </script>
@@ -59,7 +59,8 @@ watch(() => route.fullPath, () => (menu.value = false))
       </nav>
     </header>
 
-    <main class="flex-1"><slot /></main>
+    <!-- Réserve la hauteur du bandeau de cookies, ancré en bas et cliquable. -->
+    <main class="flex-1" :class="{ 'pb-[152px] md:pb-[120px] lg:pb-0': panneau }"><slot /></main>
 
     <footer class="bg-navy-600 lg:border-t lg:border-white/15">
       <!-- Mobile -->

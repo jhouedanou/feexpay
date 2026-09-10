@@ -18,7 +18,7 @@ const stats = [
 ]
 
 const etapes = [
-  { titre: 'Vous répondez une question par écran', texte: 'Une seule réponse au choix par question.' },
+  { titre: 'Vous répondez à une question par écran', texte: 'Une seule réponse au choix par question.' },
   { titre: 'Votre résultat s’affiche immédiatement', texte: 'Votre profil apparaît dès la dernière question répondue.' },
   { titre: 'Vous recevez l’analyse complète', texte: 'Rapport en ligne, PDF et lecture croisée si vous réalisez les deux diagnostics.' },
 ]

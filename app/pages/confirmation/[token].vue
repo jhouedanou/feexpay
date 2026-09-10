@@ -1,8 +1,12 @@
 <script setup lang="ts">
 /**
  * P11 — confirmation. Cadres 390 et 1440. « Célébration sobre : une icône, aucune
- * animation festive. » Le rapport est relu depuis son jeton ; l'état de l'envoi vient
- * de P10 (bandeau vert « Email envoyé » ou ambre si l'envoi a échoué).
+ * animation festive. »
+ *
+ * L'état de l'envoi vient du serveur, pas du navigateur : `report.status` passe à `ready`
+ * quand le fournisseur accepte le message. Il était auparavant lu dans `localStorage`, ce qui
+ * affichait « Email non remis » à tort dès qu'on rechargeait la page, qu'on l'ouvrait depuis
+ * l'email ou sur un autre appareil — et faisait basculer le bandeau après l'hydratation.
  */
 import type { DiagType } from '~/composables/useParticipation'
 
@@ -13,22 +17,18 @@ const token = route.params.token as string
 const { data: r, error } = await useFetch<any>(`/api/public/reports/${token}`)
 if (error.value || !r.value) throw createError({ statusCode: 404, statusMessage: 'Rapport introuvable' })
 
-/** Contexte laissé par P10 : jeton de participation (pour la carte) et état de l'envoi. */
-const ctx = ref<{ type: DiagType; token: string; envoye?: boolean } | null>(null)
-onMounted(() => {
-  try {
-    const raw = localStorage.getItem(`radar:rapport:${token}`)
-    if (raw) ctx.value = JSON.parse(raw)
-  } catch {}
-})
-
 const rapport = computed(() =>
   r.value.dirigeant ? `Votre rapport ${r.value.dirigeant.archetype.code} complet` : 'Votre rapport Rayonnement complet',
 )
 const email = computed(() => r.value.contact.email as string)
-const envoye = computed(() => ctx.value?.envoye === true)
+const envoye = computed(() => r.value.status === 'ready')
 const complet = computed(() => Boolean(r.value.dirigeant && r.value.rayonnement))
 const autreType = computed<DiagType>(() => (r.value.dirigeant ? 'rayonnement' : 'dirigeant'))
+
+// Le CTA du second diagnostic ne s'affiche que s'il reste à faire : le rapport ne dit rien des
+// parcours menés depuis son émission, il faut interroger la session (comme P08/P09).
+const { etat: autre, charger: chargerAutre } = useAutreDiagnostic(r.value.dirigeant ? 'dirigeant' : 'rayonnement')
+onMounted(chargerAutre)
 const second = computed(() =>
   autreType.value === 'rayonnement'
     ? { titre: 'Ajoutez la lecture du rayonnement', texte: 'Sept questions supplémentaires suffisent pour comparer vos fondations internes et ce que votre marché perçoit.' }
@@ -95,7 +95,7 @@ useSeoMeta({ title: 'Votre analyse est prête — Radar by FeexPay' })
       </div>
     </div>
 
-    <section v-if="!complet" class="px-5 pt-6 pb-7 md:mx-auto md:w-full md:max-w-[520px] md:px-0 lg:max-w-none lg:px-0 lg:pt-0 lg:pb-[72px]">
+    <section v-if="!complet && !autre.termine" class="px-5 pt-6 pb-7 md:mx-auto md:w-full md:max-w-[520px] md:px-0 lg:max-w-none lg:px-0 lg:pt-0 lg:pb-[72px]">
       <div class="wrap lg:!px-6">
         <div class="rounded-2xl bg-navy-600 px-5 py-[22px] lg:flex lg:items-center lg:justify-between lg:gap-12 lg:rounded-[14px] lg:px-10 lg:py-9">
           <div>

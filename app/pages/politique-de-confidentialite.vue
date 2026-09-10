@@ -14,10 +14,6 @@ const { ouvrir } = useConsent()
         <p class="mb-3 text-[13px] leading-[1.3] text-gray-500"><NuxtLink to="/" class="hover:text-navy-600">Accueil</NuxtLink> <span class="text-gray-300">/</span> Politique de confidentialité</p>
         <h1 class="mb-3.5 text-[30px] leading-[1.15] font-bold tracking-[-0.02em] text-navy-600 lg:text-[40px]">Politique de confidentialité</h1>
         <p class="max-w-[760px] text-base leading-[1.65] text-gray-600">Cette politique explique quelles données Radar by FeexPay collecte, pourquoi, combien de temps elles sont conservées et comment exercer vos droits. Dernière mise à jour : {{ MAJ_CONFIDENTIALITE }}.</p>
-        <p class="mt-4 inline-flex items-center gap-2.5 rounded-[10px] border border-amber-600/25 bg-amber-100 px-4 py-2.5 text-xs leading-[1.4] font-semibold text-orange-800">
-          <UiIcon name="gavel" :size="16" class="text-amber-600" />
-          Texte provisoire · la version validée par FeexPay remplacera ce contenu avant la mise en ligne
-        </p>
       </div>
     </div>
 

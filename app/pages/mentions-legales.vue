@@ -50,10 +50,6 @@ useSeoMeta({ title: 'Mentions légales — Radar by FeexPay', robots: 'noindex' 
           <p>Le service est soumis au droit du pays du siège social de FeexPay. En cas de litige, les tribunaux compétents de ce ressort sont seuls saisis, après tentative de résolution amiable.</p>
         </section>
       </div>
-      <div class="mt-10 flex items-start gap-3.5 rounded-xl border border-amber-600/25 bg-amber-100 px-6 py-5 lg:max-w-[1120px]">
-        <UiIcon name="alert-circle-outline" :size="20" class="shrink-0 text-amber-600" />
-        <p class="text-sm leading-[1.65] text-gray-700">Texte provisoire de maquettage. Les mentions légales définitives sont fournies séparément par Big Five puis validées par FeexPay ; seule cette version validée sera intégrée. La mise en page, elle, est validée en l’état.</p>
-      </div>
     </div>
   </div>
 </template>
