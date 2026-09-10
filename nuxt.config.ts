@@ -1,5 +1,44 @@
 import tailwindcss from '@tailwindcss/vite'
 
+// Les règles d'en-têtes sont figées au build. En développement, Vite a besoin d'`eval` et
+// d'une connexion WebSocket pour le rechargement à chaud : la CSP n'est posée qu'en
+// production, le reste des en-têtes s'applique partout.
+const PRODUCTION = process.env.NODE_ENV === 'production'
+
+// Origines tierces autorisées, strictement celles du plan de tracking (annexe 04) :
+// GA4 par gtag.js, Meta par fbevents.js, Poppins servi en local mais Google Fonts laissé
+// ouvert pour les gabarits d'email ouverts dans un onglet.
+const CSP = [
+  "default-src 'self'",
+  // Nuxt écrit le payload d'hydratation dans un script en ligne, sans nonce : `unsafe-inline`
+  // est inévitable tant qu'on ne passe pas par un middleware de nonce. Compromis consigné
+  // dans docs/ARCHITECTURE.md.
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  // blob: et data: servent les cartes de partage dessinées sur canvas (P13/P14).
+  "img-src 'self' data: blob: https://www.google-analytics.com https://www.facebook.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://connect.facebook.net https://graph.facebook.com",
+  "frame-src https://www.facebook.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ')
+
+const ENTETES_SECURITE: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+  ...(PRODUCTION
+    ? {
+        'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+        'Content-Security-Policy': CSP,
+      }
+    : {}),
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2026-09-08',
@@ -33,8 +72,8 @@ export default defineNuxtConfig({
   // PLAN.md §7 : seule P01 est indexable, tout le reste est noindex.
   // En-tête posé directement (pas de module robots pour l'instant).
   routeRules: {
-    '/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
-    '/': { headers: { 'X-Robots-Tag': 'index, follow' } },
+    '/**': { headers: { ...ENTETES_SECURITE, 'X-Robots-Tag': 'noindex, nofollow' } },
+    '/': { headers: { ...ENTETES_SECURITE, 'X-Robots-Tag': 'index, follow' } },
   },
 
   css: ['~/assets/css/main.css'],
