@@ -87,7 +87,7 @@ function texteRapport(r: RapportPublic, lien: string): string {
     '',
     ...lignesResume(r),
     '',
-    'Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à contact.ci@feexpay.me.',
+    'Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à donnees@feexpay.me.',
     '',
     'Radar by FeexPay · Powered by FeexPay',
   ].join('\n')
@@ -124,7 +124,7 @@ export function htmlRapport(r: RapportPublic, lien: string): string {
       <a href="${esc(lien)}" style="display:block;padding:17px 28px;font:600 16px/18px Poppins,'Segoe UI',sans-serif;mso-line-height-rule:exactly;color:#ffffff;text-decoration:none">Consulter mon rapport</a>
     </td>
   </tr></table>
-  <p style="margin:24px 0 0;font:400 13px/1.55 Poppins,'Segoe UI',sans-serif;color:#6C7686">Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à contact.ci@feexpay.me.</p>
+  <p style="margin:24px 0 0;font:400 13px/1.55 Poppins,'Segoe UI',sans-serif;color:#6C7686">Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment en écrivant à donnees@feexpay.me.</p>
 </td></tr>
 <tr><td style="padding:18px 32px;border-top:1px solid #E0E4EB"><p style="margin:0;font:400 12px/1.5 Poppins,'Segoe UI',sans-serif;color:#7E97BF">Radar by FeexPay · Powered by FeexPay</p></td></tr>
 </table></td></tr></table></body></html>`

@@ -23,6 +23,7 @@
     "test:metier": "node test/api-metier.mjs",
     "test:lot6": "node test/api-lot6.mjs",
     "test:reset": "node test/api-reset.mjs",
+    "test:suppression": "node test/api-suppression.mjs",
     "openapi": "node scripts/openapi.mjs",
     "seed:admins": "tsx scripts/seed-admins.ts"
   },

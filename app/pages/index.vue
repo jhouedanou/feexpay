@@ -166,7 +166,7 @@ const etapes = [
           <div>
             <p class="mb-1 text-base leading-[1.35] font-semibold text-navy-600 md:text-[17px] lg:mb-[5px] lg:text-lg">Vos données sont protégées</p>
             <p class="text-sm leading-[1.55] text-gray-600 md:max-w-[520px] lg:max-w-[620px] lg:text-[15px] lg:leading-[1.6]">
-              Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment.
+              Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en <NuxtLink to="/supprimer-mes-donnees" class="underline underline-offset-2 hover:no-underline">demander la suppression</NuxtLink> à tout moment.
             </p>
           </div>
         </div>
@@ -182,7 +182,7 @@ const etapes = [
         <div>
           <h2 class="mb-2.5 text-[30px] leading-[1.2] font-semibold tracking-[-0.02em] text-white">Dix minutes pour savoir où vous en êtes</h2>
           <p class="max-w-[560px] text-base leading-[1.6] text-navy-200">
-            Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment.
+            Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en <NuxtLink to="/supprimer-mes-donnees" class="underline underline-offset-2 hover:no-underline">demander la suppression</NuxtLink> à tout moment.
           </p>
         </div>
         <NuxtLink to="/diagnostic" class="btn btn-primary h-14 shrink-0 px-[30px] text-base">Commencer un diagnostic</NuxtLink>

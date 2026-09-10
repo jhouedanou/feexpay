@@ -276,7 +276,7 @@ async function envoyer() {
             <UiIcon name="shield-check-outline" :size="24" class="shrink-0 text-navy-600" />
             <div>
               <p class="mb-1 text-[15px] leading-[1.35] font-semibold text-navy-600">Vos données sont protégées</p>
-              <p class="text-[13px] leading-[1.55] text-gray-600">Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en demander la suppression à tout moment.</p>
+              <p class="text-[13px] leading-[1.55] text-gray-600">Vos réponses servent à produire votre rapport, rien d’autre. Vous pouvez en <NuxtLink to="/supprimer-mes-donnees" class="underline underline-offset-2 hover:no-underline">demander la suppression</NuxtLink> à tout moment.</p>
             </div>
           </div>
         </aside>
