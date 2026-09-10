@@ -6,11 +6,23 @@ formulaire**. Plan complet et décisions : [PLAN.md](PLAN.md). Sources normative
 
 ## Stack
 
-Nuxt 4 (monolithe : public + API Nitro) · Supabase Postgres · `pg` en accès direct serveur ·
+Nuxt 4 (monolithe : public + API Nitro) · Supabase Postgres 17 · `pg` en accès direct serveur ·
 Tailwind 4 · Vitest · Resend (email, PDF en pièce jointe) · jsPDF (PDF en JavaScript pur).
 
 Aucun navigateur sans interface, aucune file d'attente, aucun second serveur : tout tient dans
 des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dépendance externe.
+Les écarts par rapport à la stack annoncée au PLAN.md §2 — pas de Drizzle, pas de
+`@nuxtjs/supabase`, pas de `nuxt-og-image`, pas de pg-boss — sont motivés dans
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Documentation
+
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — choix techniques et exigence CDC satisfaite,
+  modèle de données, flux sensibles, déploiement, sauvegardes, risques.
+- [docs/RUNBOOK.md](docs/RUNBOOK.md) — exploitation courante et incidents.
+- [docs/MANUEL_ADMIN.md](docs/MANUEL_ADMIN.md) — manuel de l'espace interne.
+- [docs/RECETTE.md](docs/RECETTE.md) — recette technique et restes avant mise en ligne.
+- `openapi.json` — contrat des 55 routes, régénéré par `pnpm openapi`.
 
 ## Arborescence
 
@@ -18,7 +30,7 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
   (publiée le 8 septembre 2026 : même matrice, règle de départage précisée, cas de contrôle
   `CCDBDACABDDACB` → Réformateur) coexistent dans `src/versions/` ; un snapshot est toujours
   relu avec sa version. Données JSON extraites de la matrice,
-  44 tests de contrôle. `public.ts` produit les projections d'affichage : le pilotage, les
+  47 contrôles. `public.ts` produit les projections d'affichage : le pilotage, les
   affinités, le tie-break et les hypothèses ne sortent jamais du serveur.
 - `scripts/extract-matrix.ts` — xlsx → `packages/scoring/src/versions/v2.1/*.json` + checksum.
 - `scripts/extract-maquette-frames.mjs` — maquette annexe 02 → `docs/maquette/frames/*.html`, un
@@ -26,7 +38,7 @@ des fonctions éphémères, ce qui rend le déploiement Vercel possible sans dé
   contrôle visuel : `python3 -m http.server 8765` à la racine puis
   `/docs/maquette/frames/index.html`.
 - `scripts/seed-scoring-version.ts` — seed idempotent de la version publiée en base.
-- `supabase/migrations/` — schéma SQL, **source de vérité**.
+- `supabase/migrations/` — schéma SQL, **source de vérité** : 28 tables.
 - `server/api/public/` — sessions, participations, réponses, complétion, résultats, questions,
   leads (P10 : contact, rapport, lecture croisée, envoi de l'email avec le PDF joint),
   rapports (`reports/{token}` pour P12, `reports/{token}/pdf` généré à la demande avec jsPDF).
@@ -61,16 +73,21 @@ transaction) : il ne supporte pas les prepared statements.
 ## Tests
 
 ```bash
-pnpm test          # moteur (44) + migration SQL sur PGlite (9), sans base externe
+pnpm test          # moteur (47) + migrations SQL sur PGlite (10), sans base externe
 pnpm test:api      # parcours HTTP : session, réponses, reprise, abandon (26 contrôles)
-pnpm test:results  # calcul, snapshot, idempotence, cas normatifs §5.5 (14 contrôles)
-pnpm test:admin    # invitation, 2FA TOTP, RBAC, gardes admin (22 contrôles, crée des comptes de test)
+pnpm test:results  # calcul, snapshot, idempotence, cas normatifs §5.5 (15 contrôles)
+pnpm test:leads    # contact, consentement CMP01, rapport, email (10 contrôles)
+pnpm test:admin    # invitation, 2FA TOTP, RBAC, gardes admin (23 contrôles, crée des comptes de test)
 pnpm test:metier   # admin métier : dashboard, prospects, fiche, participation, leviers, exports (30 contrôles)
-pnpm test:lot6     # rapports et emails, webhook Resend, versions du moteur (24 contrôles)
+pnpm test:lot6     # rapports et emails, webhook Resend, versions du moteur (23 contrôles)
+pnpm test:reset    # réinitialisation du mot de passe admin (23 contrôles)
 ```
 
-Les deux derniers exigent un serveur lancé et écrivent dans la base pointée par
-`DATABASE_URL`. Ils acceptent `APP_BASE_URL` pour viser un déploiement plutôt que localhost.
+Sauf `pnpm test`, toutes exigent un serveur lancé et écrivent dans la base pointée par
+`DATABASE_URL` — ne jamais les lancer sur la production. Elles acceptent `APP_BASE_URL` pour
+viser un déploiement plutôt que localhost.
+
+Il n'y a pas d'intégration continue : ces commandes sont le seul filet avant livraison.
 
 ## Base de données
 
@@ -122,8 +139,29 @@ journalisées. Une version publiée reste immuable et chaque participation garde
   choix tenu six mois dans le navigateur et prouvé dans `consent_record` ; GA4 et Meta Pixel
   ne se chargent qu'après le choix (`app/plugins/tracking.client.ts`, identifiants lus dans
   `app_setting`). CMP01 dans P10 : case obligatoire vérifiée côté serveur, case contact
-  facultative, preuve par ligne `consent_record`. CAPI serveur pour Lead et quiz_completed
-  avec l'`event_id` du Pixel (`server/utils/capi.ts`). Pages L01 et L02 avec textes provisoires.
+  facultative, preuve par ligne `consent_record`. La politique de confidentialité s'ouvre en
+  fenêtre modale sur P10 : quitter la page ferait perdre la saisie en cours. Pages L01 et L02
+  avec textes provisoires — le corps de L01 vit dans `LegalConfidentialiteTexte`, partagé par
+  la page et la modale.
+- Tracking serveur : ce que le navigateur ne peut pas envoyer passe par
+  `tracking_event_outbox`, dont l'unicité d'`event_id` rend chaque envoi idempotent. CAPI pour
+  Lead et quiz_completed avec l'`event_id` du Pixel (`server/utils/capi.ts`) ; GA4 Measurement
+  Protocol pour `report_generated` et `report_sent` (`server/utils/ga4.ts`, secret d'API à
+  saisir dans Réglages). Aucun envoi n'est bloquant : les échecs restent visibles dans la table
+  avec leur cause.
+- Sécurité HTTP : HSTS, CSP, `X-Frame-Options: DENY`, `Referrer-Policy` et `Permissions-Policy`
+  posés par `routeRules`. HSTS et CSP en production seulement — le rechargement à chaud de Vite
+  exige `eval` et un WebSocket. La CSP porte `script-src 'unsafe-inline'` : Nuxt écrit le
+  payload d'hydratation en ligne sans nonce (compromis détaillé dans docs/ARCHITECTURE.md).
+- Parcours hors ligne : une réponse qui ne part pas faute de réseau est conservée dans le
+  navigateur et rejouée au retour, l'écriture serveur étant idempotente. La complétion vide la
+  file avant de lancer le calcul.
+- Parcours abandonnés : `/api/cron/abandon`, appelée quotidiennement par la tâche planifiée de
+  `vercel.json` (jeton `CRON_SECRET`), clôture les participations dont la session de reprise a
+  expiré. Les réponses ne sont pas touchées.
+- Administration : mot de passe oublié sur `/admin/mot-de-passe-oublie`, lien d'une heure à
+  usage unique. La réponse est la même que l'adresse existe ou non, le second facteur reste
+  exigé, et l'application du nouveau mot de passe ferme les sessions ouvertes.
 - Email : sans domaine vérifié chez Resend, `onboarding@resend.dev` ne délivre qu'à l'adresse du
   titulaire du compte. Chaque tentative laisse une ligne `notification` (accepted ou failed avec
   l'erreur) ; le rapport et le PDF restent accessibles par le lien quoi qu'il arrive.
