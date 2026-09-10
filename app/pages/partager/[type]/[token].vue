@@ -37,8 +37,10 @@ const lien = config.public.appBaseUrl
 const meteoIcone = computed(() => METEO_ICONE[r.value?.meteo] ?? 'weather-cloudy')
 const meteoMin = computed(() => String(r.value?.meteo ?? '').toLowerCase())
 
+// Les quatre formats de l'énumération `share_format` (PLAN.md §4).
 const FORMATS = [
   { nom: 'Carré · 1080 × 1080', w: 1080, h: 1080 },
+  { nom: 'Portrait · 1080 × 1350', w: 1080, h: 1350 },
   { nom: 'Bannière · 1200 × 630', w: 1200, h: 630 },
   { nom: 'Story · 1080 × 1920', w: 1080, h: 1920 },
 ]
@@ -188,12 +190,20 @@ async function telecharger() {
 
   canvas.toBlob((blob) => {
     if (!blob) return signaler('Génération impossible')
+    const nomFichier = `radar-feexpay-${dirigeant ? slugArchetype(r.value.archetype.code) : 'rayonnement'}-${f.w}x${f.h}.png`
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `radar-feexpay-${dirigeant ? slugArchetype(r.value.archetype.code) : 'rayonnement'}-${f.w}x${f.h}.png`
+    a.download = nomFichier
     a.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+    // Trace de la carte produite (`share_asset`). L'image ne quitte pas l'appareil :
+    // un échec ici n'empêche pas l'enregistrement, il n'est donc pas signalé.
+    $fetch(`/api/public/shares/${token}`, {
+      method: 'POST',
+      body: { format: `${f.w}x${f.h}`, diagnostic: type, rapport: depuisRapport, objectKey: nomFichier },
+    }).catch(() => {})
   }, 'image/png')
 }
 
