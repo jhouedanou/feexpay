@@ -109,7 +109,7 @@ async function partagerNatif() {
       const fichier = blob ? new File([blob], nomFichier(f), { type: 'image/png' }) : null
       if (fichier && navigator.canShare?.({ files: [fichier] })) {
         await navigator.share({ files: [fichier], title: 'Radar by FeexPay', text: texteLibre.value })
-        void publier(f, f.w === 1200 && f.h === 630 ? blob : null)
+        void publier(f)
         return
       }
       await navigator.share({ title: 'Radar by FeexPay', text: texteLibre.value, url: await lienPartage() })
@@ -134,8 +134,11 @@ function image(src: string) {
   })
 }
 
-/** Dessine la carte au format demandé et rend l'image. */
-async function dessiner(f: (typeof FORMATS)[number]): Promise<Blob> {
+/**
+ * Dessine la carte au format demandé et rend l'image. PNG par défaut, pour le téléchargement
+ * et le partage de fichier ; JPEG pour la bannière d'aperçu, voir `publier`.
+ */
+async function dessiner(f: (typeof FORMATS)[number], mime: 'image/png' | 'image/jpeg' = 'image/png'): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = f.w
   canvas.height = f.h
@@ -212,7 +215,7 @@ async function dessiner(f: (typeof FORMATS)[number]): Promise<Blob> {
   c.fillText('Powered by FeexPay', m, f.h - m - 6 * s)
 
   return await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('canvas vide'))), 'image/png'),
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('canvas vide'))), mime, 0.85),
   )
 }
 
@@ -223,15 +226,20 @@ const nomFichier = (f: (typeof FORMATS)[number]) =>
  * Enregistre la carte côté serveur et rend son jeton public. La bannière 1200 × 630 part avec
  * l'image : c'est elle qui sert d'aperçu à WhatsApp et à LinkedIn, qui ne savent recevoir
  * qu'une URL. Les autres formats ne laissent qu'une trace.
+ *
+ * La bannière est envoyée en JPEG, pas en PNG : WhatsApp ignore toute image d'aperçu au-delà
+ * de 300 Ko, et le dégradé de fond pèse 700 Ko en PNG contre moins de 100 Ko en JPEG.
  */
-async function publier(f: (typeof FORMATS)[number], blob: Blob | null): Promise<string | null> {
+async function publier(f: (typeof FORMATS)[number]): Promise<string | null> {
   try {
+    const banniere = f.w === 1200 && f.h === 630
+    const blob = banniere ? await dessiner(f, 'image/jpeg').catch(() => null) : null
     const corps = new FormData()
     corps.set('format', `${f.w}x${f.h}`)
     corps.set('diagnostic', type)
     corps.set('rapport', depuisRapport ? '1' : '0')
     corps.set('objectKey', nomFichier(f))
-    if (blob) corps.set('image', blob, nomFichier(f))
+    if (blob) corps.set('image', blob, nomFichier(f).replace(/\.png$/, '.jpg'))
     const r = await $fetch<{ jeton: string }>(`/api/public/shares/${token}`, { method: 'POST', body: corps })
     return r.jeton
   } catch {
@@ -245,7 +253,7 @@ const jetonCarte = ref<string | null>(null)
 async function assurerCartePublique(): Promise<string | null> {
   if (jetonCarte.value) return jetonCarte.value
   const banniere = FORMATS.find((x) => x.w === 1200 && x.h === 630)!
-  jetonCarte.value = await publier(banniere, await dessiner(banniere).catch(() => null))
+  jetonCarte.value = await publier(banniere)
   return jetonCarte.value
 }
 
@@ -270,7 +278,7 @@ async function telecharger() {
   a.download = nomFichier(f)
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
-  await publier(f, f.w === 1200 && f.h === 630 ? blob : null)
+  await publier(f)
   void assurerCartePublique()
 }
 

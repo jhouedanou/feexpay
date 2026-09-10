@@ -25,10 +25,13 @@ useSeoMeta({
   description: 'Deux lectures de votre entreprise en moins de dix minutes : votre manière de diriger, et ce que votre marché perçoit.',
   robots: 'index, follow',
   ogTitle: carte.value.titre,
-  ogDescription: carte.value.sousTitre || 'Faites le diagnostic Radar by FeexPay.',
+  ogDescription: carte.value.sousTitre
+    ? `${carte.value.sousTitre}. Faites le test avec Radar by FeexPay : deux lectures de votre entreprise en moins de dix minutes.`
+    : 'Faites le test avec Radar by FeexPay : deux lectures de votre entreprise en moins de dix minutes.',
   ogType: 'website',
   ogUrl: url,
   ogImage: image.value,
+  ogImageType: carte.value.imageType ?? undefined,
   ogImageWidth: 1200,
   ogImageHeight: 630,
   twitterCard: 'summary_large_image',

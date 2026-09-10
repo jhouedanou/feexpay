@@ -8,7 +8,7 @@
  * Elle ne porte aucune donnée personnelle — archétype ou score, et la marque.
  */
 export default defineEventHandler(async (event) => {
-  const jeton = (getRouterParam(event, 'jeton') ?? '').replace(/\.png$/, '')
+  const jeton = (getRouterParam(event, 'jeton') ?? '').replace(/\.(png|jpe?g)$/i, '')
   if (!jeton || jeton.length < 20) throw apiError(event, 'VALIDATION_ERROR', 'Jeton manquant.')
 
   const { rows } = await db().query<{ image: Buffer | null; image_type: string | null }>(
