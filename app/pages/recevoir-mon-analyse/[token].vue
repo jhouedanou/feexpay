@@ -12,6 +12,10 @@ definePageMeta({ layout: 'bare' })
 const route = useRoute()
 const token = route.params.token as string
 
+// La politique de confidentialité s'ouvre par-dessus le formulaire (demande du 10 septembre) :
+// le texte reste celui de L01, la page n'est pas quittée et la saisie est conservée.
+const politiqueOuverte = ref(false)
+
 const { data: resultat } = await useFetch<any>(`/api/public/results/${token}`)
 const type = computed<DiagType>(() => resultat.value?.type ?? 'dirigeant')
 const r = computed(() => resultat.value?.result)
@@ -221,7 +225,11 @@ async function envoyer() {
               <span class="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px]" :class="consent ? 'border-navy-600 bg-navy-600 text-white' : 'border-gray-400 bg-white'" aria-hidden="true"><UiIcon v-if="consent" name="check" :size="16" /></span>
               <span class="text-[13px] leading-[1.55] text-gray-700 lg:text-[15px]">J’accepte le traitement de mes données pour recevoir mon diagnostic. <span class="text-red-600">*</span></span>
             </label>
-            <p class="mb-[18px] pl-[34px] text-xs leading-[1.5] text-gray-500 lg:mb-5 lg:text-[13px]">Voir la <NuxtLink to="/politique-de-confidentialite" target="_blank" class="text-orange-600 hover:underline">politique de confidentialité</NuxtLink>.</p>
+            <p class="mb-[18px] pl-[34px] text-xs leading-[1.5] text-gray-500 lg:mb-5 lg:text-[13px]">
+              Voir la
+              <!-- Ouverte en fenêtre modale : quitter la page ferait perdre la saisie en cours. -->
+              <button type="button" class="text-orange-600 underline-offset-2 hover:underline" @click="politiqueOuverte = true">politique de confidentialité</button>.
+            </p>
             <label class="flex cursor-pointer items-start gap-3">
               <input v-model="contactOk" type="checkbox" class="sr-only" >
               <span class="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px]" :class="contactOk ? 'border-navy-600 bg-navy-600 text-white' : 'border-gray-400 bg-white'" aria-hidden="true"><UiIcon v-if="contactOk" name="check" :size="16" /></span>
@@ -272,5 +280,19 @@ async function envoyer() {
         </aside>
       </div>
     </section>
+
+    <UiModale
+      v-model="politiqueOuverte"
+      titre="Politique de confidentialité"
+      :sous-titre="`Dernière mise à jour : ${MAJ_CONFIDENTIALITE}`"
+    >
+      <LegalConfidentialiteTexte :ancres="false" />
+      <template #pied>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <NuxtLink to="/politique-de-confidentialite" target="_blank" class="text-[13px] text-gray-500 hover:text-navy-600 hover:underline">Ouvrir dans un onglet</NuxtLink>
+          <button type="button" class="btn btn-primary h-11 rounded-[10px] px-6 text-sm" @click="politiqueOuverte = false">J’ai compris</button>
+        </div>
+      </template>
+    </UiModale>
   </div>
 </template>
