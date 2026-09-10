@@ -35,12 +35,14 @@ watch(() => route.fullPath, () => (menu.value = false))
         <div class="hidden items-center gap-6 md:flex lg:hidden">
           <NuxtLink to="/diagnostic" class="text-sm font-medium leading-none text-gray-700 hover:text-navy-600">Le diagnostic</NuxtLink>
           <NuxtLink to="/#fonctionnement" class="text-sm font-medium leading-none text-gray-700 hover:text-navy-600">Fonctionnement</NuxtLink>
+          <UiMenuProfil />
           <NuxtLink to="/diagnostic" class="btn btn-primary h-11 rounded-[10px] px-[18px] text-sm">Commencer</NuxtLink>
         </div>
 
         <!-- Desktop : renvoi vers feexpay.me et bouton long. -->
         <div class="hidden items-center gap-3.5 lg:flex">
           <a href="https://feexpay.me" rel="noopener noreferrer" class="text-[15px] font-medium leading-none text-navy-600 hover:underline">feexpay.me</a>
+          <UiMenuProfil />
           <NuxtLink to="/diagnostic" class="btn btn-primary h-11 rounded-[10px] px-5 text-[15px]">Commencer un diagnostic</NuxtLink>
         </div>
 
@@ -62,6 +64,7 @@ watch(() => route.fullPath, () => (menu.value = false))
         <NuxtLink to="/#fonctionnement" class="block py-3 text-[15px] font-medium text-gray-700">Fonctionnement</NuxtLink>
         <button type="button" class="block py-3 text-[15px] font-medium text-gray-700" @click="ouvrirConfidentialite">Confidentialité</button>
         <NuxtLink to="/diagnostic" class="btn btn-primary mt-2 mb-2 h-[52px] w-full text-base">Commencer un diagnostic</NuxtLink>
+        <div class="border-t border-gray-200 pt-2"><UiMenuProfil /></div>
       </nav>
     </header>
 
