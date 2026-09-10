@@ -8,6 +8,7 @@ const { data, refresh } = await useFetch<{ settings: any[] }>('/api/admin/settin
 const CHAMPS = [
   { key: 'tracking_enabled', label: 'Tracking actif', aide: '« true » ou « false ». À false, aucun script de mesure n’est chargé, quel que soit le consentement.' },
   { key: 'ga4_measurement_id', label: 'GA4 · Measurement ID', aide: 'Chargé après acceptation de la catégorie statistique.' },
+  { key: 'ga4_api_secret', label: 'GA4 · secret d’API (Measurement Protocol)', aide: 'Serveur uniquement. Sans lui, « Rapport généré » et « Rapport envoyé » ne remontent pas dans GA4. Laissez vide pour ne pas modifier.' },
   { key: 'meta_pixel_id', label: 'Meta · Pixel / dataset ID', aide: 'Chargé après acceptation de la catégorie publicitaire.' },
   { key: 'meta_capi_access_token', label: 'Meta · jeton d’accès Conversions API', aide: 'Serveur uniquement, jamais envoyé au navigateur. Laissez vide pour ne pas modifier.' },
   { key: 'meta_capi_test_event_code', label: 'Meta · code d’événement de test', aide: 'Recette seulement. Vider en production.' },

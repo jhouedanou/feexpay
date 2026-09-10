@@ -7,6 +7,7 @@ import {
 } from '@radar/scoring'
 import { envoyerRapport } from '../../utils/email'
 import { envoyerCapi } from '../../utils/capi'
+import { envoyerGa4 } from '../../utils/ga4'
 import { reportByToken } from '../../utils/report'
 
 /**
@@ -223,6 +224,17 @@ export default defineEventHandler(async (event) => {
   }
 
   await envoyerCapi(event, 'Lead', b.eventId, { email: emailNorm, phone: b.phone }, { diagnostic: out.croisement ? 'deux' : 'un' })
+
+  // `report_generated` : GA4 Measurement Protocol seulement (PLAN.md §8). L'identifiant du
+  // rapport sert d'`event_id`, ce qui rend l'envoi idempotent — une soumission rejouée ne
+  // produit pas un second événement.
+  await envoyerGa4(
+    event,
+    'report_generated',
+    out.reportId,
+    { diagnostic: out.croisement ? 'deux' : 'un' },
+    out.reportId,
+  )
 
   setResponseStatus(event, 201)
   return {

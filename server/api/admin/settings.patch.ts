@@ -2,7 +2,9 @@ import { z } from 'zod'
 import { requireAdmin, audit } from '../../utils/admin-auth'
 import { invaliderReglages } from '../../utils/settings'
 
-const CLES = ['tracking_enabled', 'ga4_measurement_id', 'meta_pixel_id', 'meta_capi_access_token', 'meta_capi_test_event_code'] as const
+const CLES = ['tracking_enabled', 'ga4_measurement_id', 'ga4_api_secret', 'meta_pixel_id', 'meta_capi_access_token', 'meta_capi_test_event_code'] as const
+/** Clés masquées à l'affichage et jamais renvoyées au navigateur. */
+const SECRETES = new Set<string>(['ga4_api_secret', 'meta_capi_access_token', 'meta_capi_test_event_code'])
 const Body = z.record(z.enum(CLES), z.string().max(1000)).refine((o) => Object.keys(o).length > 0)
 
 /** Modification des réglages. Une valeur vide efface ; les secrets ne sont journalisés que par leur clé. */
@@ -14,7 +16,7 @@ export default defineEventHandler(async (event) => {
     await db().query(
       `insert into app_setting (key, value, secret, updated_by) values ($1, $2, $3, $4)
        on conflict (key) do update set value = excluded.value, updated_by = excluded.updated_by, updated_at = now()`,
-      [key, value.trim(), key.includes('token') || key.includes('code'), ctx.user.id],
+      [key, value.trim(), SECRETES.has(key), ctx.user.id],
     )
   }
   invaliderReglages()

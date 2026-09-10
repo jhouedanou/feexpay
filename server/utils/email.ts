@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { nomRapport, type RapportPublic } from './report'
 import { nomFichierPdf, rapportPdf } from './pdf'
 import { journalEnvoi } from './rapports'
+import { envoyerGa4 } from './ga4'
 
 /**
  * Envoi du rapport par email (Resend), PDF en pièce jointe. Chaque envoi laisse une ligne
@@ -59,6 +60,10 @@ export async function envoyerRapport(
     )
     await journalEnvoi(notifId, 'accepted')
     await db().query(`update report set status = 'ready', updated_at = now() where id = $1`, [reportId])
+    // `report_sent` : GA4 Measurement Protocol seulement (PLAN.md §8). L'identifiant de la
+    // notification sert d'`event_id` — un renvoi crée une nouvelle notification, donc un
+    // nouvel événement, ce qui est le comportement attendu.
+    await envoyerGa4(null, 'report_sent', notifId, { template }, reportId)
     return { sent: true, to }
   } catch (e) {
     return echec(e instanceof Error ? e.message : String(e))

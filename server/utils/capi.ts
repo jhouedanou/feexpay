@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import type { H3Event } from 'h3'
 import { reglages } from './settings'
+import { journaliserEvenement, marquerEchec, marquerEnvoye } from './outbox'
 
 /**
  * Meta Conversions API (annexe 04 §6) : Lead et quiz_completed, envoyés côté serveur
@@ -8,6 +9,9 @@ import { reglages } from './settings'
  * de confidentialité, pas par un commutateur de cookies ; l'appel n'a lieu que si le
  * navigateur a transmis un `event_id`, c'est-à-dire si le Pixel a pu le poser.
  * Jamais bloquant : une erreur est journalisée, pas remontée.
+ *
+ * L'envoi passe par `tracking_event_outbox` (PLAN.md §8) : un `event_id` déjà journalisé
+ * ne repart pas, ce qui neutralise les doubles soumissions et les rejeux.
  */
 export async function envoyerCapi(
   event: H3Event,
@@ -17,11 +21,14 @@ export async function envoyerCapi(
   custom: Record<string, unknown> = {},
 ) {
   if (!eventId) return
+  const ligne = await journaliserEvenement(nom, eventId, { custom }, ['meta_capi'])
+  if (!ligne) return
   try {
     const r = await reglages()
     const pixel = r.meta_pixel_id
     const token = r.meta_capi_access_token
-    if (r.tracking_enabled !== 'true' || !pixel || !token) return
+    if (r.tracking_enabled !== 'true') return marquerEchec(ligne, 'tracking désactivé')
+    if (!pixel || !token) return marquerEchec(ligne, 'meta_pixel_id ou meta_capi_access_token absent')
     const sha = (v: string) => createHash('sha256').update(v.trim().toLowerCase()).digest('hex')
     const ip = getRequestIP(event, { xForwardedFor: true })
     const ua = getRequestHeader(event, 'user-agent')
@@ -50,8 +57,13 @@ export async function envoyerCapi(
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(4000),
     })
-    if (!res.ok) console.warn('[capi]', nom, res.status, (await res.text()).slice(0, 200))
+    if (res.ok) return marquerEnvoye(ligne)
+    const detail = `${res.status} ${(await res.text()).slice(0, 200)}`
+    console.warn('[capi]', nom, detail)
+    await marquerEchec(ligne, detail)
   } catch (e) {
-    console.warn('[capi]', nom, e instanceof Error ? e.message : e)
+    const message = e instanceof Error ? e.message : String(e)
+    console.warn('[capi]', nom, message)
+    await marquerEchec(ligne, message)
   }
 }
