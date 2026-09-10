@@ -115,7 +115,9 @@ async function envoyer() {
     try {
       localStorage.setItem(
         `radar:rapport:${res.reportToken}`,
-        JSON.stringify({ type: type.value, token, email: form.email.trim(), rapport: rapportNom.value, envoye: res.email?.sent === true }),
+        // `at` sert à retrouver le rapport le plus récent quand plusieurs ont été émis
+        // depuis cet appareil (composable useLectureCroisee).
+        JSON.stringify({ type: type.value, token, email: form.email.trim(), rapport: rapportNom.value, envoye: res.email?.sent === true, at: Date.now() }),
       )
     } catch {}
     await navigateTo(`/confirmation/${res.reportToken}`)

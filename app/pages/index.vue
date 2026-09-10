@@ -11,6 +11,11 @@ useSeoMeta({
   ogImage: '/brand/hero-archetypes-orbit-1040.png',
 })
 
+// La carte « Lecture croisée » change d'état selon l'avancement du visiteur : la résolution
+// dépend de sa session, elle ne peut donc se faire qu'après hydratation.
+const { etat: croisee, resoudre: resoudreCroisee } = useLectureCroisee()
+onMounted(resoudreCroisee)
+
 const stats = [
   { valeur: '8', libelle: 'profils de dirigeant' },
   { valeur: '5', libelle: 'niveaux de rayonnement' },
@@ -108,16 +113,14 @@ const etapes = [
             </p>
             <div class="flex flex-wrap gap-2"><span class="chip">7 questions</span><span class="chip">2 à 4 minutes</span></div>
           </NuxtLink>
-          <!-- Carte lecture croisée : desktop seulement. -->
-          <NuxtLink to="/diagnostic" class="card carte-diag group hidden p-7 lg:block">
-            <span class="tuile mb-[18px] inline-flex h-14 w-14 items-center justify-center rounded-[14px] bg-orange-50 text-navy-600">
+          <!-- Carte lecture croisée : desktop seulement, fond bleu nuit (maquette). -->
+          <NuxtLink :to="croisee.lien" class="carte-diag group hidden rounded-2xl bg-navy-600 p-7 lg:block">
+            <span class="tuile mb-[18px] inline-flex h-14 w-14 items-center justify-center rounded-[14px] text-white" style="background: rgba(255, 255, 255, 0.12)">
               <UiIcon name="vector-intersection" :size="28" />
             </span>
-            <p class="titre mb-2.5 text-[21px] leading-[1.28] font-semibold text-navy-600">Lecture croisée</p>
-            <p class="texte mb-[18px] text-[15px] leading-[1.6] text-gray-600">
-              Quand les deux diagnostics sont terminés, la mise en regard du pilotage et du rayonnement fait apparaître la zone à traiter en premier.
-            </p>
-            <span class="text-[15px] leading-none font-medium text-orange-600 group-hover:text-orange-300">Débloquée automatiquement →</span>
+            <p class="titre mb-2.5 text-[21px] leading-[1.28] font-semibold text-white">Lecture croisée</p>
+            <p class="texte mb-[18px] text-[15px] leading-[1.6] text-navy-200">{{ croisee.texte }}</p>
+            <span class="text-[15px] leading-none font-medium text-orange-300 group-hover:text-white">{{ croisee.action }}</span>
           </NuxtLink>
         </div>
       </div>

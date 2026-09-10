@@ -3,6 +3,9 @@
 // Trois compositions, relevées sur les cadres 390, 834 et 1440 de la maquette.
 const menu = ref(false)
 const { ouvrir: gererCookies, panneau } = useConsent()
+// Le lien « Lecture croisée » du pied de page mène à l'étape qui manque au visiteur.
+const { etat: croisee, resoudre: resoudreCroisee } = useLectureCroisee()
+onMounted(resoudreCroisee)
 const route = useRoute()
 watch(() => route.fullPath, () => (menu.value = false))
 </script>
@@ -104,7 +107,7 @@ watch(() => route.fullPath, () => (menu.value = false))
             <span class="eyebrow text-navy-300">Le diagnostic</span>
             <NuxtLink to="/diagnostic/dirigeant/introduction" class="hover:text-white">Profil du dirigeant</NuxtLink>
             <NuxtLink to="/diagnostic/rayonnement/introduction" class="hover:text-white">Rayonnement de l'entreprise</NuxtLink>
-            <NuxtLink to="/diagnostic" class="hover:text-white">Lecture croisée</NuxtLink>
+            <NuxtLink :to="croisee.lien" class="hover:text-white">Lecture croisée</NuxtLink>
           </div>
           <div class="flex flex-col gap-3">
             <span class="eyebrow text-navy-300">Cadre</span>
