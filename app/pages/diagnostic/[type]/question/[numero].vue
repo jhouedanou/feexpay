@@ -47,29 +47,42 @@ onMounted(async () => {
     // Interdit de sauter une question non répondue.
     const first = questions.value.findIndex((qq) => !answers.value[qq.code]) + 1
     if (first > 0 && numero.value > first) return navigateTo(`/diagnostic/${type}/question/${first}`)
+    // La réponse enregistrée s'affiche dans l'état « validée », pas en sélection orange :
+    // `selected` ne porte que le choix courant de l'internaute.
     dejaRepondue.value = Boolean(answers.value[q.value!.code])
-    selected.value = answers.value[q.value!.code] ?? null
+    selected.value = null
   } catch {
     part.save(null)
     return navigateTo(`/diagnostic/${type}/introduction`)
   }
 })
 watch(numero, () => {
-  selected.value = answers.value[q.value?.code ?? ''] ?? null
+  selected.value = null
   dejaRepondue.value = Boolean(answers.value[q.value?.code ?? ''])
 })
+
+/** Réponse qui partira au serveur : le choix courant, ou celle déjà enregistrée. */
+const reponse = computed(() => selected.value ?? answers.value[q.value?.code ?? ''] ?? null)
 
 const precedent = computed(() =>
   numero.value > 1 ? `/diagnostic/${type}/question/${numero.value - 1}` : `/diagnostic/${type}/introduction`,
 )
 
+/** Envoie le choix courant s'il diffère de ce qui est déjà enregistré. */
+async function enregistrer(): Promise<boolean> {
+  const code = selected.value
+  if (!code || code === answers.value[q.value!.code]) return true
+  await part.answer(q.value!.code, code)
+  answers.value[q.value!.code] = code
+  return true
+}
+
 async function next() {
-  if (!selected.value || saving.value) return
+  if (!reponse.value || saving.value) return
   saving.value = true
   error.value = null
   try {
-    await part.answer(q.value!.code, selected.value)
-    answers.value[q.value!.code] = selected.value
+    await enregistrer()
     if (numero.value < total.value) await navigateTo(`/diagnostic/${type}/question/${numero.value + 1}`)
     else await navigateTo(`/diagnostic/${type}/calcul`)
   } catch {
@@ -77,6 +90,20 @@ async function next() {
   } finally {
     saving.value = false
   }
+}
+
+/** Revenir en arrière ne doit pas perdre une modification en cours. */
+async function allerPrecedent() {
+  if (saving.value) return
+  saving.value = true
+  try {
+    await enregistrer()
+  } catch {
+    // Le réseau manque : la file locale a déjà pris la réponse, on continue.
+  } finally {
+    saving.value = false
+  }
+  await navigateTo(precedent.value)
 }
 </script>
 
@@ -124,9 +151,9 @@ async function next() {
       <!-- Barre compacte, mobile et tablette. -->
       <div class="px-5 pt-3.5 md:px-10 md:pt-4 lg:hidden">
         <div class="mb-3.5 flex items-center gap-3 md:gap-4">
-          <NuxtLink :to="precedent" class="-ml-2.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 md:-ml-3" aria-label="Question précédente">
+          <button type="button" class="-ml-2.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy-600 hover:bg-navy-50 md:-ml-3" aria-label="Question précédente" @click="allerPrecedent">
             <UiIcon name="arrow-left" :size="22" />
-          </NuxtLink>
+          </button>
           <span class="hidden text-sm leading-none font-medium text-navy-600 md:inline">{{ titre }}</span>
           <span class="flex-1 text-[13px] leading-none font-medium text-gray-500 md:hidden">Question {{ numero }} sur {{ total }}</span>
           <span class="text-[13px] leading-none font-medium text-gray-500 md:hidden">{{ pct }} %</span>
@@ -139,11 +166,11 @@ async function next() {
 
       <!-- Barre desktop. -->
       <div class="hidden items-center justify-between border-b border-gray-200 px-10 py-[22px] lg:flex">
-        <NuxtLink :to="precedent" class="inline-flex items-center gap-2.5 text-[15px] leading-none font-medium text-navy-600 hover:underline">
+        <button type="button" class="inline-flex items-center gap-2.5 text-[15px] leading-none font-medium text-navy-600 hover:underline" @click="allerPrecedent">
           <UiIcon name="arrow-left" :size="20" />
           Question précédente
-        </NuxtLink>
-        <span v-if="answers[q!.code]" class="text-sm leading-none text-gray-500">Enregistré · il y a quelques secondes</span>
+        </button>
+        <span v-if="answers[q!.code]" class="text-sm leading-none text-gray-500">Réponse enregistrée</span>
       </div>
 
       <div class="flex flex-1 justify-center px-5 pt-7 pb-5 md:px-10 md:pt-12 md:pb-8 lg:pt-16 lg:pb-10">
@@ -172,8 +199,8 @@ async function next() {
 
       <div class="flex justify-center border-t border-gray-200 px-5 pt-4 pb-6 md:px-10 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8">
         <div class="flex w-full items-center gap-3 md:max-w-[600px] lg:max-w-[640px]">
-          <NuxtLink :to="precedent" class="btn btn-outline h-[52px] w-24 shrink-0 text-[15px] md:w-[120px] lg:w-[130px]">Précédent</NuxtLink>
-          <button type="button" :disabled="!selected || saving" class="btn btn-primary h-[52px] flex-1 text-base" @click="next">
+          <button type="button" class="btn btn-outline h-[52px] w-24 shrink-0 text-[15px] md:w-[120px] lg:w-[130px]" @click="allerPrecedent">Précédent</button>
+          <button type="button" :disabled="!reponse || saving" class="btn btn-primary h-[52px] flex-1 text-base" @click="next">
             {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
             <UiIcon name="arrow-right" :size="18" />
           </button>
