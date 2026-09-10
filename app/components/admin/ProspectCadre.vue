@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Chargement, erreur et introuvable communs aux onglets de la fiche prospect. */
-defineProps<{ fiche: any; error: any; pending: boolean; refresh: () => Promise<unknown> | void }>()
+defineProps<{ fiche: any; error: any; pending: boolean; refresh: () => Promise<unknown> | undefined }>()
 </script>
 
 <template>

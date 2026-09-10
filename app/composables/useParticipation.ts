@@ -47,7 +47,8 @@ function lireFile(type: DiagType): ReponseEnAttente[] {
 
 function ecrireFile(type: DiagType, file: ReponseEnAttente[]) {
   try {
-    file.length ? localStorage.setItem(FILE_KEY(type), JSON.stringify(file)) : localStorage.removeItem(FILE_KEY(type))
+    if (file.length) localStorage.setItem(FILE_KEY(type), JSON.stringify(file))
+    else localStorage.removeItem(FILE_KEY(type))
   } catch {}
 }
 
@@ -116,7 +117,8 @@ export function useParticipation(type: DiagType) {
     token.value = t
     if (!import.meta.client) return
     try {
-      t ? localStorage.setItem(KEY(type), t) : localStorage.removeItem(KEY(type))
+      if (t) localStorage.setItem(KEY(type), t)
+      else localStorage.removeItem(KEY(type))
     } catch {}
   }
 

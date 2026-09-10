@@ -5,7 +5,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   answersFromLetters,
-  buildInsights,
   executerControles,
   crossReading,
   getVersion,
@@ -13,8 +12,6 @@ import {
   scoreDirigeant,
   scoreRayonnement,
   ScoringError,
-  toPublicDirigeant,
-  toPublicRayonnement,
   round2,
   type Answers,
 } from '../src/index'

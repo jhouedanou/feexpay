@@ -32,7 +32,7 @@ async function enregistrer() {
   }
   try {
     if (Object.keys(body).length) await apiAdmin('/api/admin/settings', { method: 'PATCH', body })
-    for (const k of Object.keys(valeurs)) delete valeurs[k]
+    Object.keys(valeurs).forEach((k) => Reflect.deleteProperty(valeurs, k))
     await refresh()
     info.value = 'Réglages enregistrés. Prise en compte dans la minute.'
   } catch (e) {

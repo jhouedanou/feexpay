@@ -64,12 +64,6 @@ export function rapportPdf(r: RapportPublic, baseUrl: string): Buffer {
     y += 2
   }
   const space = (n: number) => (y += n)
-  const rule = () => {
-    need(6)
-    doc.setDrawColor(224, 228, 235)
-    doc.line(M, y, M + W, y)
-    y += 5
-  }
   const barre = (nom: string, score: number, accent: boolean) => {
     need(10)
     doc.setFont('helvetica', accent ? 'bold' : 'normal')

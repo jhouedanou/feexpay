@@ -61,7 +61,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (pixelCharge || !id || window.fbq) return
     pixelCharge = true
     const n: any = (window.fbq = function () {
-      // eslint-disable-next-line prefer-rest-params
+      // Extrait officiel du Pixel Meta, conservé tel quel : `arguments` et `apply` y sont
+      // nécessaires pour relayer un appel de forme inconnue avant le chargement du script.
+      // eslint-disable-next-line prefer-rest-params, prefer-spread, @typescript-eslint/no-unused-expressions
       n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
     })
     window._fbq = n

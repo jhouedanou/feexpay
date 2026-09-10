@@ -27,7 +27,7 @@ const sousTitre = computed(() => {
   const t = data.value?.totaux
   return t ? `${nombre(t.generes)} rapports générés · ${nombre(t.envoyes)} envoyés · ${t.attente} en attente · ${t.echecs} en échec` : undefined
 })
-const delta = (a: number, b: number, unite: 'point' | 'points') => {
+const delta = (a: number, b: number, _unite: 'point' | 'points') => {
   const d = Math.round((a - b) * 10) / 10
   const signe = d > 0 ? '+' : d < 0 ? '−' : ''
   return { texte: `${signe}${Math.abs(d)} point${Math.abs(d) > 1 ? 's' : ''}`, classe: d > 0 ? 'text-green-600' : d < 0 ? 'text-amber-600' : 'text-gray-500' }

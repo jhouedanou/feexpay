@@ -73,7 +73,7 @@ const idempotencyKey = useState(`lead-key-${token}`, () => crypto.randomUUID())
 useSeoMeta({ title: 'Où souhaitez-vous recevoir votre rapport ? — Radar by FeexPay' })
 
 function valider() {
-  for (const k of Object.keys(erreurs)) delete erreurs[k]
+  Object.keys(erreurs).forEach((k) => Reflect.deleteProperty(erreurs, k))
   if (!form.prenom.trim()) erreurs.prenom = 'Champ requis.'
   if (!form.nom.trim()) erreurs.nom = 'Champ requis.'
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim())) erreurs.email = 'Veuillez saisir une adresse email valide.'
