@@ -120,8 +120,9 @@ const SELECTS = computed(() => [
               class="grid w-full grille-prospects border-b border-gray-100 text-left hover:bg-orange-50 focus-visible:bg-orange-50"
               @click="ouvrir(p.id)"
             >
-              <div class="px-4 py-3.5"><p class="text-sm leading-[1.3] font-medium text-navy-600">{{ p.prenom }} {{ p.nom }}</p><p class="mt-0.5 text-xs leading-[1.3] text-gray-500">{{ p.email }}</p></div>
-              <div class="px-4 py-3.5"><p class="text-sm leading-[1.3] text-gray-700">{{ p.entreprise ?? '—' }}</p><p class="mt-0.5 text-xs leading-[1.3] text-gray-500">{{ [p.secteur, p.taille].filter(Boolean).join(' · ') }}</p></div>
+              <!-- Les cellules sont bornées par la grille ; les textes longs (email, entreprise) sont tronqués, le texte complet reste en infobulle. -->
+              <div class="min-w-0 px-4 py-3.5"><p class="truncate text-sm leading-[1.3] font-medium text-navy-600">{{ p.prenom }} {{ p.nom }}</p><p class="mt-0.5 truncate text-xs leading-[1.3] text-gray-500" :title="p.email">{{ p.email }}</p></div>
+              <div class="min-w-0 px-4 py-3.5"><p class="truncate text-sm leading-[1.3] text-gray-700" :title="p.entreprise ?? undefined">{{ p.entreprise ?? '—' }}</p><p class="mt-0.5 truncate text-xs leading-[1.3] text-gray-500">{{ [p.secteur, p.taille].filter(Boolean).join(' · ') }}</p></div>
               <div class="flex items-center px-4 py-3.5">
                 <span v-if="p.profil" class="inline-flex items-center gap-1.5 rounded-full bg-navy-50 py-1 pr-2.5 pl-[5px] text-xs leading-[1.4] font-medium text-navy-600"><img :src="`/brand/emb-${slugArchetype(p.profil)}-64.png`" alt="" class="h-[18px] w-[18px]" >{{ p.profil }}</span>
                 <span v-else class="text-xs text-gray-400">Non réalisé</span>
