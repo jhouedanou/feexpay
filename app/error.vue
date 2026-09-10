@@ -2,6 +2,9 @@
 // Page d'erreur à la charte (état A08 « ce qui est attendu, pourquoi rien ne s'affiche, la
 // seule action qui débloque ») : résultat expiré, rapport introuvable, page absente, panne.
 import type { NuxtError } from '#app'
+// La politique s'ouvre par-dessus la page : quitter l'écran ferait perdre une saisie ou
+// la place dans un parcours.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 const props = defineProps<{ error: NuxtError }>()
 const code = computed(() => props.error.statusCode ?? 500)
 const { horsLigne } = useHorsLigne()
@@ -48,7 +51,7 @@ const refaire = () => clearError({ redirect: '/diagnostic' })
       <div class="wrap flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <img src="/brand/logo-feexpay-white.svg" alt="FeexPay" class="h-5 w-auto" >
         <div class="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-navy-100">
-          <NuxtLink to="/politique-de-confidentialite" class="hover:text-white">Politique de confidentialité</NuxtLink>
+          <button type="button" class="hover:text-white" @click="ouvrirConfidentialite">Politique de confidentialité</button>
           <NuxtLink to="/mentions-legales" class="hover:text-white">Mentions légales</NuxtLink>
         </div>
       </div>

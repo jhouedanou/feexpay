@@ -2,6 +2,9 @@
 // P01 — seule page indexée. Composition et textes relevés sur les cadres 390, 834 et 1440
 // de la maquette (docs/maquette/frames/*-P01.html). Les textes varient par largeur :
 // la version desktop porte une phrase de plus dans le hero et les cartes.
+// La politique s'ouvre par-dessus la page : quitter l'écran ferait perdre une saisie ou
+// la place dans un parcours.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 useSeoMeta({
   title: 'Radar by FeexPay — Diagnostic gratuit du dirigeant et de son entreprise',
   description:
@@ -167,9 +170,9 @@ const etapes = [
             </p>
           </div>
         </div>
-        <NuxtLink to="/politique-de-confidentialite" class="hidden shrink-0 text-sm leading-none font-medium text-orange-600 hover:underline md:block lg:text-[15px]">
+        <button type="button" class="hidden shrink-0 text-sm leading-none font-medium text-orange-600 hover:underline md:block lg:text-[15px]" @click="ouvrirConfidentialite">
           Politique de confidentialité
-        </NuxtLink>
+        </button>
       </div>
     </section>
 

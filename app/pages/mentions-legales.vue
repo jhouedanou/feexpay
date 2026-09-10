@@ -1,6 +1,9 @@
 <script setup lang="ts">
 // L02 — mentions légales (maquette V1.2). Texte provisoire de maquettage : la version
 // validée par FeexPay (annexe 05) remplacera ces contenus. La mise en page est validée.
+// La politique s'ouvre par-dessus la page : quitter l'écran ferait perdre une saisie ou
+// la place dans un parcours.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 useSeoMeta({ title: 'Mentions légales — Radar by FeexPay', robots: 'noindex' })
 </script>
 
@@ -43,7 +46,7 @@ useSeoMeta({ title: 'Mentions légales — Radar by FeexPay', robots: 'noindex' 
         </section>
         <section>
           <h2>Données personnelles</h2>
-          <p>Le traitement des données personnelles est décrit dans la <NuxtLink to="/politique-de-confidentialite">politique de confidentialité</NuxtLink>. Vos choix en matière de cookies sont modifiables à tout moment depuis le lien « Gérer mes cookies » du pied de page.</p>
+          <p>Le traitement des données personnelles est décrit dans la <button type="button" @click="ouvrirConfidentialite">politique de confidentialité</button>. Vos choix en matière de cookies sont modifiables à tout moment depuis le lien « Gérer mes cookies » du pied de page.</p>
         </section>
         <section>
           <h2>Droit applicable</h2>

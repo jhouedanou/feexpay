@@ -12,9 +12,9 @@ definePageMeta({ layout: 'bare' })
 const route = useRoute()
 const token = route.params.token as string
 
-// La politique de confidentialité s'ouvre par-dessus le formulaire (demande du 10 septembre) :
-// le texte reste celui de L01, la page n'est pas quittée et la saisie est conservée.
-const politiqueOuverte = ref(false)
+// La politique s'ouvre par-dessus le formulaire : la page n'est pas quittée et la saisie
+// est conservée. La fenêtre est celle de `app.vue`, commune à tout le produit.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 
 const { data: resultat } = await useFetch<any>(`/api/public/results/${token}`)
 const type = computed<DiagType>(() => resultat.value?.type ?? 'dirigeant')
@@ -230,7 +230,7 @@ async function envoyer() {
             <p class="mb-[18px] pl-[34px] text-xs leading-[1.5] text-gray-500 lg:mb-5 lg:text-[13px]">
               Voir la
               <!-- Ouverte en fenêtre modale : quitter la page ferait perdre la saisie en cours. -->
-              <button type="button" class="text-orange-600 underline-offset-2 hover:underline" @click="politiqueOuverte = true">politique de confidentialité</button>.
+              <button type="button" class="text-orange-600 underline-offset-2 hover:underline" @click="ouvrirConfidentialite">politique de confidentialité</button>.
             </p>
             <label class="flex cursor-pointer items-start gap-3">
               <input v-model="contactOk" type="checkbox" class="sr-only" >
@@ -282,19 +282,5 @@ async function envoyer() {
         </aside>
       </div>
     </section>
-
-    <UiModale
-      v-model="politiqueOuverte"
-      titre="Politique de confidentialité"
-      :sous-titre="`Dernière mise à jour : ${MAJ_CONFIDENTIALITE}`"
-    >
-      <LegalConfidentialiteTexte :ancres="false" />
-      <template #pied>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <NuxtLink to="/politique-de-confidentialite" target="_blank" class="text-[13px] text-gray-500 hover:text-navy-600 hover:underline">Ouvrir dans un onglet</NuxtLink>
-          <button type="button" class="btn btn-primary h-11 rounded-[10px] px-6 text-sm" @click="politiqueOuverte = false">J’ai compris</button>
-        </div>
-      </template>
-    </UiModale>
   </div>
 </template>

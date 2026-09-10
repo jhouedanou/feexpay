@@ -4,6 +4,9 @@
  * 390 et 1440). Ancré en bas d'écran, non bloquant : la page reste lisible et cliquable.
  * Deux actions en C01 ; « Continuer avec les cookies nécessaires uniquement » vit en C02.
  */
+// La politique s'ouvre par-dessus la page : quitter l'écran ferait perdre une saisie ou
+// la place dans un parcours.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 const { choix, panneau, lire, enregistrer } = useConsent()
 const ga = ref(true)
 const meta = ref(true)
@@ -34,7 +37,7 @@ watch(panneau, (p) => {
           <p class="mb-[3px] hidden text-sm leading-[1.35] font-semibold text-navy-600 lg:block">Nous utilisons des cookies</p>
           <p class="text-xs leading-[1.5] text-gray-600 lg:text-[13px]" style="text-wrap: pretty">
             <span class="hidden lg:inline">Les cookies nécessaires font fonctionner le diagnostic. </span>Les cookies analytiques et publicitaires ne sont déposés qu’avec votre accord.
-            <NuxtLink to="/politique-de-confidentialite" class="text-orange-600 hover:underline">En savoir plus</NuxtLink>
+            <button type="button" class="text-orange-600 hover:underline" @click="ouvrirConfidentialite">En savoir plus</button>
           </p>
         </div>
         <div class="flex gap-2 lg:shrink-0 lg:gap-2.5">
@@ -51,7 +54,7 @@ watch(panneau, (p) => {
       >
         <div class="border-b border-gray-100 px-4 pt-3.5 pb-2.5 lg:px-5 lg:pt-4 lg:pb-3">
           <p class="mb-0.5 text-sm leading-[1.3] font-semibold text-navy-600 lg:text-[15px]">Personnaliser mes cookies</p>
-          <p class="text-xs leading-[1.5] text-gray-500">Choix enregistré pour six mois<span class="hidden lg:inline"> · <NuxtLink to="/politique-de-confidentialite" class="text-orange-600 hover:underline">politique de confidentialité</NuxtLink></span>.</p>
+          <p class="text-xs leading-[1.5] text-gray-500">Choix enregistré pour six mois<span class="hidden lg:inline"> · <button type="button" class="text-orange-600 hover:underline" @click="ouvrirConfidentialite">politique de confidentialité</button></span>.</p>
         </div>
         <div class="flex items-center gap-3 border-b border-gray-100 px-4 py-2.5 lg:gap-4 lg:px-5 lg:py-3">
           <div class="min-w-0 flex-1">

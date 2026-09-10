@@ -5,6 +5,8 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <!-- Montée une seule fois : tous les layouts, l'admin et la page d'erreur en héritent. -->
+  <LegalConfidentialiteModale />
 </template>
 
 <style>

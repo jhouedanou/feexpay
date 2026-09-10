@@ -1,6 +1,9 @@
 <script setup lang="ts">
 // Navigation de site et pied de page : réservés à la landing (P01) et aux pages cadres.
 // Trois compositions, relevées sur les cadres 390, 834 et 1440 de la maquette.
+// La politique s'ouvre par-dessus la page : quitter l'écran ferait perdre une saisie ou
+// la place dans un parcours.
+const { ouvrir: ouvrirConfidentialite } = useConfidentialiteModale()
 const menu = ref(false)
 const { ouvrir: gererCookies, panneau } = useConsent()
 // Le lien « Lecture croisée » du pied de page mène à l'étape qui manque au visiteur.
@@ -24,7 +27,7 @@ watch(() => route.fullPath, () => (menu.value = false))
           <nav class="hidden items-center gap-[26px] text-[15px] font-medium leading-none text-gray-700 lg:flex">
             <NuxtLink to="/diagnostic" class="hover:text-navy-600">Le diagnostic</NuxtLink>
             <NuxtLink to="/#fonctionnement" class="hover:text-navy-600">Fonctionnement</NuxtLink>
-            <NuxtLink to="/politique-de-confidentialite" class="hover:text-navy-600">Confidentialité</NuxtLink>
+            <button type="button" class="hover:text-navy-600" @click="ouvrirConfidentialite">Confidentialité</button>
           </nav>
         </div>
 
@@ -57,7 +60,7 @@ watch(() => route.fullPath, () => (menu.value = false))
       <nav v-show="menu" id="menu-mobile" class="border-t border-gray-200 bg-white px-5 py-3 md:hidden">
         <NuxtLink to="/diagnostic" class="block py-3 text-[15px] font-medium text-gray-700">Le diagnostic</NuxtLink>
         <NuxtLink to="/#fonctionnement" class="block py-3 text-[15px] font-medium text-gray-700">Fonctionnement</NuxtLink>
-        <NuxtLink to="/politique-de-confidentialite" class="block py-3 text-[15px] font-medium text-gray-700">Confidentialité</NuxtLink>
+        <button type="button" class="block py-3 text-[15px] font-medium text-gray-700" @click="ouvrirConfidentialite">Confidentialité</button>
         <NuxtLink to="/diagnostic" class="btn btn-primary mt-2 mb-2 h-[52px] w-full text-base">Commencer un diagnostic</NuxtLink>
       </nav>
     </header>
@@ -70,7 +73,7 @@ watch(() => route.fullPath, () => (menu.value = false))
       <div class="px-5 py-7 md:hidden">
         <img src="/brand/logo-feexpay-white.svg" alt="FeexPay" class="mb-[18px] h-[22px] w-auto" >
         <div class="mb-5 flex flex-col gap-2.5 text-sm leading-[1.4] text-navy-100">
-          <NuxtLink to="/politique-de-confidentialite" class="hover:text-white">Politique de confidentialité</NuxtLink>
+          <button type="button" class="hover:text-white" @click="ouvrirConfidentialite">Politique de confidentialité</button>
           <NuxtLink to="/mentions-legales" class="hover:text-white">Mentions légales</NuxtLink>
           <a href="mailto:contact.ci@feexpay.me" class="hover:text-white">Nous écrire</a>
           <button type="button" class="self-start border-b border-dotted border-white/50 pb-0.5 text-left hover:text-white" @click="gererCookies">Gérer mes cookies</button>
@@ -86,7 +89,7 @@ watch(() => route.fullPath, () => (menu.value = false))
         </div>
         <div class="flex gap-10 text-sm leading-[1.4] text-navy-100">
           <div class="flex flex-col gap-2.5">
-            <NuxtLink to="/politique-de-confidentialite" class="hover:text-white">Politique de confidentialité</NuxtLink>
+            <button type="button" class="hover:text-white" @click="ouvrirConfidentialite">Politique de confidentialité</button>
             <NuxtLink to="/mentions-legales" class="hover:text-white">Mentions légales</NuxtLink>
           </div>
           <div class="flex flex-col gap-2.5">
@@ -111,7 +114,7 @@ watch(() => route.fullPath, () => (menu.value = false))
           </div>
           <div class="flex flex-col gap-3">
             <span class="eyebrow text-navy-300">Cadre</span>
-            <NuxtLink to="/politique-de-confidentialite" class="hover:text-white">Politique de confidentialité</NuxtLink>
+            <button type="button" class="hover:text-white" @click="ouvrirConfidentialite">Politique de confidentialité</button>
             <NuxtLink to="/mentions-legales" class="hover:text-white">Mentions légales</NuxtLink>
             <button type="button" class="self-start border-b border-dotted border-white/50 pb-0.5 text-left hover:text-white" @click="gererCookies">Gérer mes cookies</button>
           </div>
