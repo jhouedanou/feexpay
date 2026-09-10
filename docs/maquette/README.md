@@ -8,6 +8,12 @@ Le dossier `frames/` contient, en plus, chaque cadre d’écran en page HTML aut
 et servi depuis la racine du projet pour le contrôle visuel. C’est la référence à ouvrir
 à côté de l’application : l’extraction texte ci-dessous ne suffit pas pour la fidélité.
 
+**Les fiches `.md` sont incomplètes par construction** : elles ne reprennent que les blocs de
+texte. Les boutons portant une icône, les actions et les fonds n'y figurent pas. Le cas de P11
+l'a montré en recette — sa fiche s'arrête sur « les trois actions restent distinctes » sans
+jamais nommer les trois boutons, qui figurent bien dans le cadre HTML. **En cas de doute, c'est
+`frames/` qui fait foi**, jamais l'extraction texte.
+
 Les textes sont repris **sans modification**. Les commentaires HTML en fin de ligne
 portent la spécification de police du bloc d’origine (graisse, taille, interligne, couleur),
 qui donne la hiérarchie à respecter.

@@ -86,8 +86,10 @@ Sur téléphone, tablette et ordinateur :
 2. Depuis le résultat, « Faire le second diagnostic » → 7 questions → résultat Rayonnement
    avec météo, puis lecture croisée.
 3. « Recevoir mon analyse complète » → formulaire P10 (case obligatoire de traitement, case
-   facultative de contact) → confirmation → email reçu avec PDF joint → lien « Consulter mon
-   rapport » → P12 → « Partager » → cartes P13/P14.
+   facultative de contact) → confirmation P11. **Le rapport se consulte d'abord depuis P11** :
+   les trois boutons « Consulter mon rapport », « Télécharger le PDF » et « Partager » y mènent
+   au rapport en ligne (P12), à son PDF et aux cartes P13/P14. L'email reçu porte le même lien,
+   pour retrouver le rapport plus tard — c'est un second chemin, pas le seul.
 4. Admin : connexion `amedeel@feexpay.me`, enrôlement 2FA, invitation des neuf autres
    comptes (A10 → Nouveau compte), attribution des rôles, réglages tracking, leviers FeexPay.
 5. Admin : dashboard, liste des prospects (filtres, export CSV), fiche du contact créé à

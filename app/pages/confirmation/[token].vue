@@ -29,10 +29,13 @@ const autreType = computed<DiagType>(() => (r.value.dirigeant ? 'rayonnement' : 
 // parcours menés depuis son émission, il faut interroger la session (comme P08/P09).
 const { etat: autre, charger: chargerAutre } = useAutreDiagnostic(r.value.dirigeant ? 'dirigeant' : 'rayonnement')
 onMounted(chargerAutre)
+// Le rapport ci-dessus est figé au moment de son émission : il ne s'enrichira pas du second
+// diagnostic. La lecture croisée arrive avec un nouveau rapport, et l'écran doit le dire —
+// sans quoi l'internaute revient sur son ancien lien et conclut qu'il ne s'est rien passé.
 const second = computed(() =>
   autreType.value === 'rayonnement'
-    ? { titre: 'Ajoutez la lecture du rayonnement', texte: 'Sept questions supplémentaires suffisent pour comparer vos fondations internes et ce que votre marché perçoit.' }
-    : { titre: 'Ajoutez la lecture de votre pilotage', texte: 'Quatorze questions supplémentaires suffisent pour comparer ce que votre marché perçoit et vos fondations internes.' },
+    ? { titre: 'Ajoutez la lecture du rayonnement', texte: 'Sept questions supplémentaires suffisent pour comparer vos fondations internes et ce que votre marché perçoit. Votre lecture croisée vous sera remise avec un nouveau rapport.' }
+    : { titre: 'Ajoutez la lecture de votre pilotage', texte: 'Quatorze questions supplémentaires suffisent pour comparer ce que votre marché perçoit et vos fondations internes. Votre lecture croisée vous sera remise avec un nouveau rapport.' },
 )
 const partage = computed(() => `/partager/${r.value.dirigeant ? 'dirigeant' : 'rayonnement'}/${token}?rapport=1`)
 const pdf = `/api/public/reports/${token}/pdf`
@@ -56,7 +59,7 @@ useSeoMeta({ title: 'Votre analyse est prête — Radar by FeexPay' })
         </span>
         <h1 class="mb-3 text-[28px] leading-[1.22] font-semibold tracking-[-0.015em] text-navy-600 lg:mb-4 lg:text-[44px] lg:leading-[1.1] lg:tracking-[-0.025em]">Votre analyse est prête</h1>
         <p class="text-base leading-[1.6] text-gray-600 lg:mb-8 lg:text-lg lg:leading-[1.65]" style="text-wrap: pretty">
-          {{ rapport }} est disponible dès maintenant et reste accessible depuis {{ envoye ? 'le lien reçu par email' : 'ce lien' }}.
+          {{ rapport }} est disponible dès maintenant, ici même.{{ envoye ? ' Le lien vous a aussi été envoyé par email, pour le retrouver plus tard.' : ' Conservez ce lien : il reste valable.' }}
         </p>
 
         <div class="mt-5 hidden lg:block">
