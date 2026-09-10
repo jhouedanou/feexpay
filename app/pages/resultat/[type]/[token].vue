@@ -37,7 +37,14 @@ const dimsRayonnement = computed(() => (r.value?.dimensions ?? []) as { nom: str
 const meteoIcone = computed(() => METEO_ICONE[r.value?.meteo] ?? 'weather-cloudy')
 const autreType: DiagType = type === 'dirigeant' ? 'rayonnement' : 'dirigeant'
 const partager = `/partager/${type}/${token}`
-const recevoir = `/recevoir-mon-analyse/${token}`
+const recevoirLien = `/recevoir-mon-analyse/${token}`
+
+// Une analyse déjà reçue se consulte : inutile de repasser par le formulaire. Le jeton du
+// rapport est celui que P10 a posé dans le navigateur, retrouvé par `useLectureCroisee`.
+const { etat: croisee, resoudre: resoudreCroisee } = useLectureCroisee()
+onMounted(resoudreCroisee)
+const recevoir = computed(() => (croisee.value.rapportToken ? `/rapport/${croisee.value.rapportToken}` : recevoirLien))
+const libelleAnalyse = computed(() => (croisee.value.rapportToken ? 'Voir mon analyse complète' : 'Recevoir mon analyse complète'))
 
 useSeoMeta({
   title: () =>
@@ -58,7 +65,7 @@ useSeoMeta({
             <UiIcon name="share-variant-outline" :size="17" />
             {{ type === 'dirigeant' ? 'Partager mon profil' : 'Partager mon résultat' }}
           </NuxtLink>
-          <NuxtLink :to="recevoir" class="btn btn-primary h-11 rounded-[10px] px-[18px] text-sm">Recevoir mon analyse complète</NuxtLink>
+          <NuxtLink :to="recevoir" class="btn btn-primary h-11 rounded-[10px] px-[18px] text-sm">{{ libelleAnalyse }}</NuxtLink>
         </div>
       </div>
     </header>
@@ -137,7 +144,7 @@ useSeoMeta({
                   }}
                 </p>
               </div>
-              <NuxtLink v-if="autre.termine" :to="recevoir" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
+              <NuxtLink v-if="autre.termine" :to="croisee.rapportToken ? `/rapport/${croisee.rapportToken}#croisee` : recevoirLien" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
             </div>
           </div>
 
@@ -145,7 +152,7 @@ useSeoMeta({
           <aside class="mt-[18px] border-t border-gray-200 bg-navy-50 px-5 py-[26px] md:flex md:gap-8 md:px-10 md:py-9 lg:sticky lg:top-6 lg:mt-0 lg:block lg:w-[360px] lg:shrink-0 lg:rounded-[14px] lg:border lg:bg-white lg:p-7" style="box-shadow: var(--shadow-sm)">
             <div class="md:flex-1">
               <h2 class="mb-2 text-[22px] leading-[1.3] font-semibold text-navy-600 md:text-2xl md:leading-[1.28] lg:mb-3 lg:text-[22px]">Votre analyse complète</h2>
-              <p class="mb-4 text-[15px] leading-[1.6] text-gray-600 md:max-w-[520px] lg:mb-5">Envoyée par email, disponible en ligne et en PDF.</p>
+              <p class="mb-4 text-[15px] leading-[1.6] text-gray-600 md:max-w-[520px] lg:mb-5">{{ croisee.rapportToken ? 'Déjà envoyée par email, et consultable ici en ligne comme en PDF.' : 'Envoyée par email, disponible en ligne et en PDF.' }}</p>
               <ul class="mb-5 flex flex-col gap-2 md:mb-0 lg:mb-6 lg:gap-2.5">
                 <li v-for="p in ['Le détail de vos huit dimensions de direction', 'Ce que votre profil implique au quotidien', 'La lecture croisée si vous réalisez aussi le diagnostic Rayonnement']" :key="p" class="flex items-start gap-2.5">
                   <UiIcon name="check" :size="18" class="shrink-0 text-orange-600" />
@@ -154,7 +161,7 @@ useSeoMeta({
               </ul>
             </div>
             <div class="flex flex-col gap-2.5 md:w-[300px] md:shrink-0 md:justify-center md:gap-2 lg:w-auto">
-              <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">Recevoir mon analyse complète</NuxtLink>
+              <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">{{ libelleAnalyse }}</NuxtLink>
               <NuxtLink v-if="!autre.termine" :to="`/diagnostic/${autreType}/introduction`" class="btn btn-outline h-[52px] text-base"><UiIcon name="broadcast" :size="18" />Faire le second diagnostic</NuxtLink>
               <NuxtLink :to="partager" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon profil</NuxtLink>
             </div>
@@ -242,14 +249,14 @@ useSeoMeta({
                   }}
                 </p>
               </div>
-              <NuxtLink v-if="autre.termine" :to="recevoir" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
+              <NuxtLink v-if="autre.termine" :to="croisee.rapportToken ? `/rapport/${croisee.rapportToken}#croisee` : recevoirLien" class="btn btn-primary mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0">Voir ma lecture croisée</NuxtLink>
               <NuxtLink v-else :to="`/diagnostic/${autreType}/introduction`" class="btn btn-white mt-4 h-[52px] shrink-0 px-6 text-[15px] lg:mt-0"><UiIcon name="compass-outline" :size="18" />Faire le second diagnostic</NuxtLink>
             </div>
           </div>
         </div>
         <div class="mt-[18px] border-t border-gray-200 bg-navy-50 px-5 py-[26px] md:px-10 lg:hidden">
           <div class="flex flex-col gap-2.5 md:mx-auto md:max-w-[520px]">
-            <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">Recevoir mon analyse complète</NuxtLink>
+            <NuxtLink :to="recevoir" class="btn btn-primary h-[52px] text-base">{{ libelleAnalyse }}</NuxtLink>
             <NuxtLink :to="partager" class="btn btn-outline h-[52px] text-base"><UiIcon name="share-variant-outline" :size="18" />Partager mon résultat</NuxtLink>
           </div>
         </div>

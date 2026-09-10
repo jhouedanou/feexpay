@@ -4,6 +4,9 @@
  * n'avait aucun repère : ni indication qu'il est connecté, ni moyen de rejoindre
  * l'administration, de changer son mot de passe ou de se déconnecter.
  *
+ * Rien n'est affiché à un visiteur : le site public ne propose pas de connexion, l'espace
+ * interne se rejoint par son adresse.
+ *
  * L'état de session est demandé après hydratation seulement. L'accueil est la seule page
  * indexée du produit : elle ne doit pas payer une requête d'authentification au premier octet,
  * ni voir son rendu serveur dépendre d'un cookie.
@@ -70,13 +73,4 @@ watch(() => route.fullPath, () => (ouvert.value = false))
       </button>
     </div>
   </div>
-
-  <!-- Personne de connecté : un accès discret, sans concurrencer l'appel à l'action. -->
-  <NuxtLink
-    v-else-if="charge"
-    to="/admin/connexion"
-    class="text-[15px] leading-none font-medium text-gray-500 hover:text-navy-600"
-  >
-    Connexion
-  </NuxtLink>
 </template>

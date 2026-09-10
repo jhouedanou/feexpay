@@ -17,6 +17,8 @@ export type EtatCroisee = 'vierge' | 'un' | 'prete' | 'disponible'
 export interface LectureCroisee {
   charge: boolean
   etat: EtatCroisee
+  /** Jeton du dernier rapport émis sur cet appareil, s'il y en a un. */
+  rapportToken: string | null
   /** Destination du lien, toujours utilisable. */
   lien: string
   /** Libellé de l'action, aligné sur l'état. */
@@ -28,6 +30,7 @@ export interface LectureCroisee {
 const NEUTRE: LectureCroisee = {
   charge: false,
   etat: 'vierge',
+  rapportToken: null,
   lien: '/diagnostic',
   action: 'Débloquée automatiquement →',
   texte:
@@ -83,6 +86,7 @@ export function useLectureCroisee() {
         ? {
             charge: true,
             etat: 'disponible',
+            rapportToken: rapport,
             lien: `/rapport/${rapport}#croisee`,
             action: 'Voir ma lecture croisée →',
             texte:
@@ -91,6 +95,7 @@ export function useLectureCroisee() {
         : {
             charge: true,
             etat: 'prete',
+            rapportToken: null,
             // Le formulaire de P10 est ce qui produit la lecture croisée.
             lien: `/recevoir-mon-analyse/${ray.token ?? dir.token}`,
             action: 'Recevoir ma lecture croisée →',
@@ -105,6 +110,7 @@ export function useLectureCroisee() {
       etat.value = {
         charge: true,
         etat: 'un',
+        rapportToken: dernierRapport(),
         lien: `/diagnostic/${manquant}/introduction`,
         action: manquant === 'rayonnement' ? 'Faire le diagnostic Rayonnement →' : 'Faire le diagnostic Dirigeant →',
         texte:
@@ -115,7 +121,7 @@ export function useLectureCroisee() {
       return
     }
 
-    etat.value = { ...NEUTRE, charge: true }
+    etat.value = { ...NEUTRE, charge: true, rapportToken: dernierRapport() }
   }
 
   return { etat, resoudre }
