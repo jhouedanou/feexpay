@@ -12,3 +12,4 @@ dist
 .agents/
 .claude/
 skills-lock.json
+/MarketingBS/*
