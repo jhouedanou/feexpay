@@ -74,6 +74,10 @@ export default defineNuxtConfig({
   routeRules: {
     '/**': { headers: { ...ENTETES_SECURITE, 'X-Robots-Tag': 'noindex, nofollow' } },
     '/': { headers: { ...ENTETES_SECURITE, 'X-Robots-Tag': 'index, follow' } },
+    // Les cartes partagées sont faites pour être suivies : un `noindex` empêcherait les
+    // robots d'aperçu de WhatsApp et de LinkedIn d'en tirer quoi que ce soit. Elles ne
+    // portent aucune donnée personnelle.
+    '/carte/**': { headers: { ...ENTETES_SECURITE, 'X-Robots-Tag': 'index, follow' } },
   },
 
   css: ['~/assets/css/main.css'],

@@ -66,9 +66,15 @@ const texteLibre = computed(() =>
     ? `Mon profil de dirigeant : ${r.value?.archetype?.code}. ${r.value?.archetype?.forces}.`
     : `Rayonnement de mon entreprise : ${r.value?.score} / 100, ${r.value?.niveauAffiche}.`,
 )
-const message = computed(() => `${texteLibre.value} Faites le test avec Radar by FeexPay : ${lien}`)
+/**
+ * Adresse partagée. WhatsApp et LinkedIn ne savent recevoir qu'une URL et vont y lire un
+ * aperçu : ce doit donc être la carte publique, qui porte l'image, et non la page d'accueil.
+ * Tant qu'elle n'est pas prête, on retombe sur la page d'accueil — un lien qui marche.
+ */
+const adresse = computed(() => (jetonCarte.value ? `${lien}/carte/${jetonCarte.value}` : lien))
+const message = computed(() => `${texteLibre.value} Faites le test avec Radar by FeexPay : ${adresse.value}`)
 const whatsapp = computed(() => `https://wa.me/?text=${encodeURIComponent(message.value)}`)
-const linkedin = computed(() => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(lien)}`)
+const linkedin = computed(() => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(adresse.value)}`)
 
 const { $track } = useNuxtApp()
 const info = ref<string | null>(null)
@@ -82,23 +88,42 @@ function signaler(t: string) {
 async function copier() {
   $track('share', { canal: 'lien', diagnostic: type })
   try {
-    await navigator.clipboard.writeText(lien)
+    await navigator.clipboard.writeText(await lienPartage())
     signaler('Lien copié')
   } catch {
     signaler('Copie impossible sur ce navigateur')
   }
 }
 
+/**
+ * Partage natif. L'image au format choisi part avec, quand l'appareil sait recevoir un
+ * fichier : c'est le seul chemin par lequel la carte elle-même atteint WhatsApp ou LinkedIn.
+ * Sinon, texte et lien, comme avant.
+ */
 async function partagerNatif() {
   $track('share', { canal: 'natif', diagnostic: type })
+  const f = FORMATS[format.value]!
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'Radar by FeexPay', text: texteLibre.value, url: lien })
+      const blob = await dessiner(f).catch(() => null)
+      const fichier = blob ? new File([blob], nomFichier(f), { type: 'image/png' }) : null
+      if (fichier && navigator.canShare?.({ files: [fichier] })) {
+        await navigator.share({ files: [fichier], title: 'Radar by FeexPay', text: texteLibre.value })
+        void publier(f, f.w === 1200 && f.h === 630 ? blob : null)
+        return
+      }
+      await navigator.share({ title: 'Radar by FeexPay', text: texteLibre.value, url: await lienPartage() })
       return
     } catch {}
   }
   window.open(whatsapp.value, '_blank', 'noopener')
 }
+
+// La carte publique est préparée dès l'arrivée : les liens WhatsApp et LinkedIn sont des
+// ancres, ils ne peuvent pas attendre un aller-retour au moment du clic.
+onMounted(() => {
+  void assurerCartePublique()
+})
 
 function image(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -109,10 +134,8 @@ function image(src: string) {
   })
 }
 
-/** Dessine la carte au format choisi et déclenche l'enregistrement. */
-async function telecharger() {
-  $track('share', { canal: 'image', diagnostic: type })
-  const f = FORMATS[format.value]!
+/** Dessine la carte au format demandé et rend l'image. */
+async function dessiner(f: (typeof FORMATS)[number]): Promise<Blob> {
   const canvas = document.createElement('canvas')
   canvas.width = f.w
   canvas.height = f.h
@@ -188,23 +211,67 @@ async function telecharger() {
   c.font = `500 ${14 * s}px Poppins, sans-serif`
   c.fillText('Powered by FeexPay', m, f.h - m - 6 * s)
 
-  canvas.toBlob((blob) => {
-    if (!blob) return signaler('Génération impossible')
-    const nomFichier = `radar-feexpay-${dirigeant ? slugArchetype(r.value.archetype.code) : 'rayonnement'}-${f.w}x${f.h}.png`
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = nomFichier
-    a.click()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  return await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('canvas vide'))), 'image/png'),
+  )
+}
 
-    // Trace de la carte produite (`share_asset`). L'image ne quitte pas l'appareil :
-    // un échec ici n'empêche pas l'enregistrement, il n'est donc pas signalé.
-    $fetch(`/api/public/shares/${token}`, {
-      method: 'POST',
-      body: { format: `${f.w}x${f.h}`, diagnostic: type, rapport: depuisRapport, objectKey: nomFichier },
-    }).catch(() => {})
-  }, 'image/png')
+const nomFichier = (f: (typeof FORMATS)[number]) =>
+  `radar-feexpay-${dirigeant ? slugArchetype(r.value.archetype.code) : 'rayonnement'}-${f.w}x${f.h}.png`
+
+/**
+ * Enregistre la carte côté serveur et rend son jeton public. La bannière 1200 × 630 part avec
+ * l'image : c'est elle qui sert d'aperçu à WhatsApp et à LinkedIn, qui ne savent recevoir
+ * qu'une URL. Les autres formats ne laissent qu'une trace.
+ */
+async function publier(f: (typeof FORMATS)[number], blob: Blob | null): Promise<string | null> {
+  try {
+    const corps = new FormData()
+    corps.set('format', `${f.w}x${f.h}`)
+    corps.set('diagnostic', type)
+    corps.set('rapport', depuisRapport ? '1' : '0')
+    corps.set('objectKey', nomFichier(f))
+    if (blob) corps.set('image', blob, nomFichier(f))
+    const r = await $fetch<{ jeton: string }>(`/api/public/shares/${token}`, { method: 'POST', body: corps })
+    return r.jeton
+  } catch {
+    // La carte reste téléchargeable et partageable en texte : un échec ici n'arrête rien.
+    return null
+  }
+}
+
+/** Jeton de la carte publique, obtenu à la première demande puis conservé. */
+const jetonCarte = ref<string | null>(null)
+async function assurerCartePublique(): Promise<string | null> {
+  if (jetonCarte.value) return jetonCarte.value
+  const banniere = FORMATS.find((x) => x.w === 1200 && x.h === 630)!
+  jetonCarte.value = await publier(banniere, await dessiner(banniere).catch(() => null))
+  return jetonCarte.value
+}
+
+/** L'adresse à partager : la carte publique si elle existe, la landing sinon. */
+async function lienPartage(): Promise<string> {
+  const j = await assurerCartePublique()
+  return j ? `${lien}/carte/${j}` : lien
+}
+
+async function telecharger() {
+  $track('share', { canal: 'image', diagnostic: type })
+  const f = FORMATS[format.value]!
+  let blob: Blob
+  try {
+    blob = await dessiner(f)
+  } catch {
+    return signaler('Génération impossible')
+  }
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = nomFichier(f)
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  await publier(f, f.w === 1200 && f.h === 630 ? blob : null)
+  void assurerCartePublique()
 }
 
 function lignes(c: CanvasRenderingContext2D, texte: string, x: number, y: number, largeur: number, interligne: number) {
