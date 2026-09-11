@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import pg from 'pg'
+import { chargerEnv, optionsTls } from './env'
 
 const VERSION = process.argv[2] ?? '2.2'
 
@@ -30,26 +31,9 @@ type Option = { code: string; questionCode: string; lettre: string; texte: strin
   unknown
 >
 
-/** Charge .env sans dépendance : le repo n'embarque pas dotenv. */
-function loadEnv(): Record<string, string> {
-  const raw = readFileSync(join(here, '..', '.env'), 'utf8')
-  const out: Record<string, string> = {}
-  for (const line of raw.split('\n')) {
-    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(line)
-    if (!m) continue
-    const [, key, rest] = m
-    let value = rest.trim()
-    if (value.startsWith('"')) value = value.slice(1, value.indexOf('"', 1))
-    else if (value.startsWith("'")) value = value.slice(1, value.indexOf("'", 1))
-    else value = value.split('#')[0]!.trim()
-    out[key!] = value
-  }
-  return out
-}
-
 async function main() {
-  const env = { ...loadEnv(), ...process.env }
-  if (!env.DATABASE_URL) throw new Error('DATABASE_URL manquant (.env)')
+  const env = chargerEnv()
+  if (!env.DATABASE_URL) throw new Error('DATABASE_URL manquant (.env ou environnement)')
 
   const checksum = readJson<{ sha256: string }>('checksum.json').sha256
   const questions = readJson<Question[]>('questions.json')
@@ -57,7 +41,7 @@ async function main() {
 
   const client = new pg.Client({
     connectionString: env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    ...optionsTls(env.DATABASE_URL),
   })
   await client.connect()
 

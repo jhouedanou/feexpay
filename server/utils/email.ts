@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import { expedier, transportIndisponible } from './mailer'
 import { nomRapport, type RapportPublic } from './report'
 import { nomFichierPdf, rapportPdf } from './pdf'
 import { journalEnvoi } from './rapports'
@@ -54,24 +54,23 @@ export async function envoyerRapport(
     return { sent: false, to, error: 'Modèle désactivé' }
   }
 
-  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+  const indisponible = transportIndisponible()
+  if (indisponible) return echec(indisponible)
 
   try {
     const pdf = rapportPdf(rapport, base)
     const { champs } = modele
-    const resend = new Resend(config.resendApiKey)
-    const { data, error } = await resend.emails.send({
-      from: config.resendFrom,
+    const envoi = await expedier({
       to,
       subject: rendreTexte(champs.sujet, variablesDuRapport(rapport, lien)),
       html: htmlRapport(rapport, lien, champs),
       text: texteRapport(rapport, lien, champs),
-      attachments: [{ filename: nomFichierPdf(rapport), content: pdf.toString('base64') }],
+      attachments: [{ filename: nomFichierPdf(rapport), contenu: pdf }],
     })
-    if (error) return echec(`${error.name}: ${error.message}`)
+    if (envoi.error) return echec(envoi.error)
     await db().query(
       `update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`,
-      [notifId, data?.id ?? null],
+      [notifId, envoi.id],
     )
     await journalEnvoi(notifId, 'accepted')
     await db().query(`update report set status = 'ready', updated_at = now() where id = $1`, [reportId])
@@ -122,19 +121,18 @@ export async function envoyerRelance(rapport: RapportPublic, reportId: string): 
     await journalEnvoi(notifId, 'failed', message.slice(0, 200))
     return { sent: false, to, error: message }
   }
-  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+  const indisponible = transportIndisponible()
+  if (indisponible) return echec(indisponible)
 
   try {
-    const resend = new Resend(config.resendApiKey)
-    const { data, error } = await resend.emails.send({
-      from: config.resendFrom,
+    const envoi = await expedier({
       to,
       subject: rendreTexte(champs.sujet, variablesDuRapport(rapport, lien)),
       html: htmlRapport(rapport, lien, champs),
       text: texteRapport(rapport, lien, champs),
     })
-    if (error) return echec(`${error.name}: ${error.message}`)
-    await db().query(`update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`, [notifId, data?.id ?? null])
+    if (envoi.error) return echec(envoi.error)
+    await db().query(`update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`, [notifId, envoi.id])
     await journalEnvoi(notifId, 'accepted')
     await envoyerGa4(null, 'relance_sent', notifId, { template: 'relance' }, reportId)
     return { sent: true, to }

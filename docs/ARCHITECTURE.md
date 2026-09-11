@@ -222,8 +222,13 @@ Une tâche planifiée quotidienne (`vercel.json`) appelle `/api/cron/abandon` à
 Variables d'environnement attendues : voir `.env.example`. `CRON_SECRET` doit être défini
 côté Vercel, sans quoi la route de clôture refuse tout appel.
 
-Un passage à Docker (application et base réunies dans une pile auto-contenue) est à l'étude
-et fera l'objet d'une révision de ce document.
+Une seconde façon d'exécuter le même code existe sur la branche `docker-backend` : une pile
+de conteneurs qui remplace Supabase par Postgres, GoTrue et PostgREST, Vercel Cron par un
+`crond`, et Resend par Mailpit. Elle sert au travail hors ligne et à l'hébergement sur une
+machine louée ; elle ne remplace pas le déploiement décrit ci-dessus. Montage, limites et
+écarts : [DOCKER.md](DOCKER.md). Les trois adaptations qu'elle a demandées dans le code
+(TLS Postgres optionnel, transport email interchangeable, configuration lue à l'exécution)
+sont sans effet sur le déploiement Vercel.
 
 ---
 

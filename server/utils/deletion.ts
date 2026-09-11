@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import { expedier, transportIndisponible } from './mailer'
 import type { H3Event } from 'h3'
 
 /**
@@ -181,7 +181,6 @@ export async function rejeterSuppression(event: H3Event, demandeId: string, moti
 // --- Email -------------------------------------------------------------------
 
 async function envoyerConfirmation(demandeId: string, email: string, prenom: string, lien: string) {
-  const config = useRuntimeConfig()
   const notif = await db().query<{ id: string }>(
     `insert into notification (deletion_request_id, template, recipient, status, attempts)
      values ($1, 'suppression-donnees', $2, 'queued', 1) returning id`,
@@ -194,11 +193,11 @@ async function envoyerConfirmation(demandeId: string, email: string, prenom: str
       [nid, m.slice(0, 500)],
     )
   }
-  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+  const indisponible = transportIndisponible()
+  if (indisponible) return echec(indisponible)
 
   try {
-    const r = await new Resend(config.resendApiKey).emails.send({
-      from: config.resendFrom,
+    const r = await expedier({
       to: email,
       subject: 'Confirmez votre demande de suppression — Radar by FeexPay',
       text: [
@@ -217,10 +216,10 @@ async function envoyerConfirmation(demandeId: string, email: string, prenom: str
         `Pour toute question : ${ADRESSE_DONNEES}`,
       ].join('\n'),
     })
-    if (r.error) return echec(`${r.error.name}: ${r.error.message}`)
+    if (r.error) return echec(r.error)
     await db().query(
       `update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`,
-      [nid, r.data?.id ?? null],
+      [nid, r.id],
     )
   } catch (e) {
     await echec(e instanceof Error ? e.message : String(e))

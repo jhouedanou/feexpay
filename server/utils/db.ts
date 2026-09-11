@@ -5,6 +5,11 @@ let pool: pg.Pool | undefined
 /**
  * Pool Postgres partagé. Accès serveur uniquement, via la connexion directe :
  * les tables métier sont en RLS deny-all, aucun accès client direct (CDC F.1).
+ *
+ * TLS par défaut, sans vérification du certificat : c'est ce qu'exige Supabase, dont le
+ * certificat n'est pas dans le magasin de Node. Un Postgres de conteneur écoute en clair
+ * et rejette la poignée de main TLS ; `sslmode=disable` dans l'URL coupe donc TLS. Même
+ * règle dans les scripts (scripts/env.ts).
  */
 export function db(): pg.Pool {
   if (pool) return pool
@@ -12,7 +17,7 @@ export function db(): pg.Pool {
   if (!databaseUrl) throw new Error('DATABASE_URL manquant')
   pool = new pg.Pool({
     connectionString: databaseUrl,
-    ssl: { rejectUnauthorized: false },
+    ...(/[?&]sslmode=disable(&|$)/.test(databaseUrl) ? {} : { ssl: { rejectUnauthorized: false } }),
     max: 5,
     idleTimeoutMillis: 30_000,
   })

@@ -100,6 +100,11 @@ export default defineNuxtConfig({
     cronSecret: process.env.CRON_SECRET ?? '',
     // Sans accès DNS : onboarding@resend.dev ne délivre qu'au titulaire du compte Resend.
     resendFrom: process.env.RESEND_FROM ?? 'Radar by FeexPay <onboarding@resend.dev>',
+    // Transport email : `resend` en production, `smtp` pour la pile Docker (Mailpit).
+    mailTransport: process.env.MAIL_TRANSPORT ?? 'resend',
+    smtpUrl: process.env.SMTP_URL ?? '',
+    // Expéditeur commun aux deux transports ; à défaut, celui de Resend.
+    mailFrom: process.env.MAIL_FROM ?? '',
     public: {
       appBaseUrl: process.env.APP_BASE_URL ?? 'http://localhost:3000',
       supabaseUrl: process.env.SUPABASE_URL ?? '',

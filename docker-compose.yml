@@ -1,0 +1,241 @@
+# Radar by FeexPay — pile complète en conteneurs, sans compte hébergé.
+#
+# Ce que remplace chaque service par rapport au déploiement Vercel + Supabase :
+#
+#   app      Nuxt/Nitro, pages et API                 ← fonctions Vercel
+#   db       Postgres 17, schéma de supabase/         ← Supabase Postgres
+#   auth     GoTrue : mots de passe, sessions, TOTP   ← Supabase Auth
+#   rest     PostgREST, lu par /api/public/health     ← Supabase REST
+#   gateway  nginx, une origine pour auth + rest      ← passerelle Supabase (Kong)
+#   migrer   applique supabase/migrations, puis sort  ← migrations passées à la main
+#   cron     appelle /api/cron/{abandon,relance}      ← Vercel Cron (vercel.json)
+#   mail     Mailpit, reçoit tout, ne délivre rien    ← Resend
+#   outils   seeds et tests HTTP, profil « outils »   ← pnpm sur le poste
+#
+# Démarrage :
+#   node docker/scripts/generer-secrets.mjs >> docker/.env   (après copie de l'exemple)
+#   docker compose --env-file docker/.env up -d --build
+#
+# `--env-file` est obligatoire : sans lui, Compose lirait le `.env` du dépôt, qui vise le
+# projet Supabase en ligne. Les variables exigées y étant absentes, il s'arrête plutôt que
+# de démarrer avec les mauvaises valeurs. Détail dans docs/DOCKER.md.
+
+name: radar
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?mot de passe Postgres manquant}
+      POSTGRES_DB: ${POSTGRES_DB:-radar}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - donnees-db:/var/lib/postgresql/data
+      # Rôles, extensions et schéma `auth` : joués une seule fois, à la création du volume.
+      - ./docker/db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB:-radar}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  auth:
+    image: supabase/gotrue:v2.196.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${SUPABASE_URL_PUBLIC:-http://localhost:8000}
+      GOTRUE_DB_DRIVER: postgres
+      # GoTrue crée et tient lui-même le schéma `auth`, avec son propre rôle.
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}?sslmode=disable
+      GOTRUE_SITE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      GOTRUE_URI_ALLOW_LIST: ${APP_BASE_URL:-http://localhost:3000}/**
+      # Les comptes sont créés par l'invitation maison, jamais par inscription publique
+      # (README, « Comptes admin »).
+      GOTRUE_DISABLE_SIGNUP: "true"
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      # Même secret que PostgREST : c'est ce qui rend les clés `anon` et `service`
+      # valables des deux côtés.
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:?secret JWT manquant}
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_EXP: "3600"
+      # Politique de mot de passe du CDC E.1. Le contrôle HIBP, lui, reste côté application.
+      GOTRUE_PASSWORD_MIN_LENGTH: "12"
+      # TOTP : obligatoire pour les rôles Analyste et Administrateur (aal2 exigé par
+      # server/utils/admin-auth.ts).
+      GOTRUE_MFA_TOTP_ENROLL_ENABLED: "true"
+      GOTRUE_MFA_TOTP_VERIFY_ENABLED: "true"
+      GOTRUE_MFA_MAX_ENROLLED_FACTORS: "10"
+      # Rien ne doit sortir de la pile : le peu de courrier que GoTrue enverrait va à Mailpit.
+      GOTRUE_SMTP_HOST: mail
+      GOTRUE_SMTP_PORT: "1025"
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-radar@radar.local}
+      GOTRUE_SMTP_SENDER_NAME: Radar by FeexPay
+      GOTRUE_LOG_LEVEL: ${GOTRUE_LOG_LEVEL:-info}
+      TZ: ${TZ:-UTC}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrer:
+    image: postgres:17-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+      # La première migration référence auth.users : GoTrue doit être passé avant.
+      auth:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD:?mot de passe Postgres manquant}
+      PGDATABASE: ${POSTGRES_DB:-radar}
+    volumes:
+      - ./supabase/migrations:/migrations:ro
+      - ./docker/db/migrer.sh:/usr/local/bin/migrer:ro
+    entrypoint: ["/bin/bash", "/usr/local/bin/migrer"]
+
+  rest:
+    image: postgrest/postgrest:v14.17
+    restart: unless-stopped
+    depends_on:
+      migrer:
+        condition: service_completed_successfully
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:?secret JWT manquant}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      # Serveur d'administration : c'est lui qu'interroge `postgrest --ready`, la sonde.
+      PGRST_ADMIN_SERVER_HOST: localhost
+      PGRST_ADMIN_SERVER_PORT: "3001"
+      TZ: ${TZ:-UTC}
+    healthcheck:
+      test: ["CMD", "postgrest", "--ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  gateway:
+    image: nginx:1.31-alpine
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+      rest:
+        condition: service_healthy
+    volumes:
+      - ./docker/gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "${GATEWAY_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/sante"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: runtime
+    image: radar-app:local
+    restart: unless-stopped
+    # Node en PID 1 ne relaie pas les signaux : `init` place un tini devant, et
+    # `docker compose down` s'arrête en une seconde au lieu de dix.
+    init: true
+    depends_on:
+      migrer:
+        condition: service_completed_successfully
+      gateway:
+        condition: service_healthy
+    environment:
+      # L'application se connecte en superutilisateur : toutes les tables métier sont en
+      # RLS forcée sans policy, et c'est aussi ce que fait la connexion directe Supabase.
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}?sslmode=disable
+      SUPABASE_URL: http://gateway:8000
+      SUPABASE_KEY: ${SUPABASE_KEY:?clé anon manquante}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?clé service manquante}
+      # Le navigateur ne joint jamais cette origine ; autant lui donner l'URL publique
+      # plutôt que le nom du réseau interne. Le point d'entrée respecte les NUXT_ déjà posées.
+      NUXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL_PUBLIC:-http://localhost:8000}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      MAIL_TRANSPORT: ${MAIL_TRANSPORT:-smtp}
+      SMTP_URL: ${SMTP_URL:-smtp://mail:1025}
+      MAIL_FROM: ${MAIL_FROM:-Radar by FeexPay <radar@radar.local>}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-}
+      CRON_SECRET: ${CRON_SECRET:?jeton de tâches planifiées manquant}
+      TRACKING_ENABLED: ${TRACKING_ENABLED:-false}
+      PUBLIC_GA4_MEASUREMENT_ID: ${PUBLIC_GA4_MEASUREMENT_ID:-}
+      PUBLIC_META_PIXEL_ID: ${PUBLIC_META_PIXEL_ID:-}
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+  cron:
+    build:
+      context: ./docker/cron
+    image: radar-cron:local
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      APP_URL: http://app:3000
+      CRON_SECRET: ${CRON_SECRET:?jeton de tâches planifiées manquant}
+      # Horaires de vercel.json, exprimés dans le fuseau ci-dessous.
+      CRON_ABANDON: ${CRON_ABANDON:-0 3 * * *}
+      CRON_RELANCE: ${CRON_RELANCE:-0 8 * * *}
+      TZ: ${TZ:-UTC}
+
+  mail:
+    image: axllent/mailpit:v1.31.1
+    restart: unless-stopped
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+      TZ: ${TZ:-UTC}
+    ports:
+      # Boîte de réception : tout ce que l'application envoie s'y lit.
+      - "${MAILPIT_PORT:-8025}:8025"
+
+  # Seeds et tests HTTP. Pas démarré avec la pile : `docker compose ... run --rm outils …`.
+  outils:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: outils
+    image: radar-outils:local
+    profiles: ["outils"]
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}?sslmode=disable
+      SUPABASE_URL: http://gateway:8000
+      SUPABASE_KEY: ${SUPABASE_KEY:-}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      TZ: ${TZ:-UTC}
+    command: ["pnpm", "seed:scoring"]
+
+volumes:
+  donnees-db:

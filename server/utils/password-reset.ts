@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import { expedier, transportIndisponible } from './mailer'
 import type { H3Event } from 'h3'
 import { supabaseAdmin } from './supabase'
 import { audit, verifierMotDePasse } from './admin-auth'
@@ -115,7 +115,6 @@ export async function appliquerReinitialisation(event: H3Event, token: string, p
 // --- Emails ------------------------------------------------------------------
 
 async function envoyerLienReset(resetId: string, email: string, prenom: string, lien: string) {
-  const config = useRuntimeConfig()
   const notif = await db().query<{ id: string }>(
     `insert into notification (admin_password_reset_id, template, recipient, status, attempts)
      values ($1, 'reinitialisation-admin', $2, 'queued', 1) returning id`,
@@ -128,11 +127,11 @@ async function envoyerLienReset(resetId: string, email: string, prenom: string, 
       [nid, m.slice(0, 500)],
     )
   }
-  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+  const indisponible = transportIndisponible()
+  if (indisponible) return echec(indisponible)
 
   try {
-    const r = await new Resend(config.resendApiKey).emails.send({
-      from: config.resendFrom,
+    const r = await expedier({
       to: email,
       subject: 'Votre accès à l’administration Radar by FeexPay',
       text: [
@@ -148,10 +147,10 @@ async function envoyerLienReset(resetId: string, email: string, prenom: string, 
         'Si vous n’êtes pas à l’origine de cette demande, ignorez ce message : votre mot de passe actuel reste valable.',
       ].join('\n'),
     })
-    if (r.error) return echec(`${r.error.name}: ${r.error.message}`)
+    if (r.error) return echec(r.error)
     await db().query(
       `update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`,
-      [nid, r.data?.id ?? null],
+      [nid, r.id],
     )
   } catch (e) {
     await echec(e instanceof Error ? e.message : String(e))
@@ -164,11 +163,9 @@ async function envoyerLienReset(resetId: string, email: string, prenom: string, 
  * réinitialisation, et la demande est close à ce stade. La trace vit dans `audit_log`.
  */
 async function envoyerAlerteSecurite(email: string, prenom: string) {
-  const config = useRuntimeConfig()
-  if (!config.resendApiKey) return
+  if (transportIndisponible()) return
   try {
-    await new Resend(config.resendApiKey).emails.send({
-      from: config.resendFrom,
+    await expedier({
       to: email,
       subject: 'Votre mot de passe a été modifié — administration Radar by FeexPay',
       text: [

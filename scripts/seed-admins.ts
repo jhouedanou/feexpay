@@ -11,14 +11,10 @@
  *
  *   nvm use 22 && pnpm tsx scripts/seed-admins.ts
  */
-import { readFileSync } from 'node:fs'
 import { createHash, randomBytes } from 'node:crypto'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import pg from 'pg'
 import { createClient } from '@supabase/supabase-js'
-
-const here = dirname(fileURLToPath(import.meta.url))
+import { chargerEnv, optionsTls } from './env'
 
 const PRINCIPAL = { email: 'amedeel@feexpay.me', prenom: 'Amédée', nom: 'L.', role: 'admin' }
 const AUTRES = [
@@ -33,24 +29,11 @@ const AUTRES = [
   'jessicae@feexpay.me',
 ]
 
-function loadEnv(): Record<string, string> {
-  const out: Record<string, string> = {}
-  for (const line of readFileSync(join(here, '..', '.env'), 'utf8').split('\n')) {
-    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(line)
-    if (!m) continue
-    let v = m[2]!.trim()
-    const q = /^(["'])(.*?)\1/.exec(v)
-    v = q ? q[2]! : v.replace(/\s+#.*$/, '')
-    out[m[1]!] = v.trim()
-  }
-  return out
-}
-
 async function main() {
-const env = loadEnv()
+const env = chargerEnv()
 const base = env.APP_BASE_URL ?? 'http://localhost:3000'
 const sb = createClient(env.SUPABASE_URL!, env.SUPABASE_SERVICE_KEY!, { auth: { persistSession: false } })
-const client = new pg.Client({ connectionString: env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+const client = new pg.Client({ connectionString: env.DATABASE_URL!, ...optionsTls(env.DATABASE_URL!) })
 await client.connect()
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')

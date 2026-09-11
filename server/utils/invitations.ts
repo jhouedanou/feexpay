@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import { expedier, transportIndisponible } from './mailer'
 import type { H3Event } from 'h3'
 import { supabaseAdmin } from './supabase'
 import { ROLE_LABEL, type AdminRole, audit } from './admin-auth'
@@ -46,7 +46,6 @@ export async function creerInvitation(event: H3Event, input: InvitationInput, in
 }
 
 async function envoyerInvitation(invitationId: string, input: InvitationInput, lien: string, inviterId: string) {
-  const config = useRuntimeConfig()
   const notif = await db().query<{ id: string }>(
     `insert into notification (admin_invitation_id, template, recipient, status, attempts)
      values ($1, 'invitation-admin', $2, 'queued', 1) returning id`,
@@ -57,12 +56,12 @@ async function envoyerInvitation(invitationId: string, input: InvitationInput, l
     await db().query(`update notification set status = 'failed', last_error = $2, updated_at = now() where id = $1`, [nid, m.slice(0, 500)])
     return { sent: false, error: m }
   }
-  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+  const indisponible = transportIndisponible()
+  if (indisponible) return echec(indisponible)
   const { rows } = await db().query<{ prenom: string; nom: string }>(`select prenom, nom from admin_user where id = $1`, [inviterId])
   const invitant = rows[0] ? `${rows[0].prenom} ${rows[0].nom}` : 'FeexPay'
   try {
-    const r = await new Resend(config.resendApiKey).emails.send({
-      from: config.resendFrom,
+    const r = await expedier({
       to: input.email,
       subject: 'Votre accès à l’administration Radar by FeexPay',
       text: [
@@ -76,8 +75,8 @@ async function envoyerInvitation(invitationId: string, input: InvitationInput, l
         'Si vous n’attendiez pas cet accès, ignorez ce message.',
       ].join('\n'),
     })
-    if (r.error) return echec(`${r.error.name}: ${r.error.message}`)
-    await db().query(`update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`, [nid, r.data?.id ?? null])
+    if (r.error) return echec(r.error)
+    await db().query(`update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`, [nid, r.id])
     return { sent: true }
   } catch (e) {
     return echec(e instanceof Error ? e.message : String(e))

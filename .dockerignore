@@ -1,0 +1,30 @@
+# Contexte de build : uniquement ce qui sert à compiler et à exécuter le serveur.
+.git
+.gitignore
+node_modules
+**/node_modules
+.nuxt
+.output
+dist
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# Outillage agents, sources normatives et livrables : hors application.
+.agents
+.claude
+skills-lock.json
+MarketingBS
+Pack_Handoff_Developpement_Radar_by_FeexPay_V1.1
+docs/maquette
+openapi.json
+
+# Documentation et plan : rien de tout ceci n'est lu par le serveur. `docker/` reste dans
+# le contexte, le Dockerfile y prend le point d'entrée.
+docker-compose.yml
+README.md
+PLAN.md
+AGENTS.md
+CLAUDE.md

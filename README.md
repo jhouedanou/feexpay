@@ -22,6 +22,8 @@ Les écarts par rapport à la stack annoncée au PLAN.md §2 — pas de Drizzle,
 - [docs/RUNBOOK.md](docs/RUNBOOK.md) — exploitation courante et incidents.
 - [docs/MANUEL_ADMIN.md](docs/MANUEL_ADMIN.md) — manuel de l'espace interne.
 - [docs/RECETTE.md](docs/RECETTE.md) — recette technique et restes avant mise en ligne.
+- [docs/DOCKER.md](docs/DOCKER.md) — pile de conteneurs : l'application et tout ce dont elle
+  dépend, sans compte hébergé.
 - `openapi.json` — contrat des 55 routes, régénéré par `pnpm openapi`.
 
 ## Arborescence
@@ -63,6 +65,17 @@ nvm use 22
 pnpm install
 pnpm dev
 ```
+
+Tout en conteneurs, sans projet Supabase ni clé Resend — base, authentification, tâches
+planifiées et boîte de réception comprises :
+
+```bash
+cp docker/.env.example docker/.env
+node docker/scripts/generer-secrets.mjs >> docker/.env
+docker compose --env-file docker/.env up -d --build
+```
+
+Montage, amorçage et limites : [docs/DOCKER.md](docs/DOCKER.md).
 
 Env : copier `.env.example` → `.env`. En local, `DATABASE_URL` utilise la connexion directe
 Supabase (port 5432). Sur Vercel, elle doit pointer le **pooler Supavisor en mode session** :
