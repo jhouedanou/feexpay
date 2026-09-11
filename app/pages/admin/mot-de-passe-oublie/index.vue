@@ -5,6 +5,8 @@
 definePageMeta({ layout: false })
 useSeoMeta({ title: 'Mot de passe oublié — Administration Radar by FeexPay', robots: 'noindex' })
 
+/** Venu de « Première connexion ? » sur A01 : même mécanique, textes adaptés. */
+const premiere = computed(() => useRoute().query.premiere === '1')
 const email = ref('')
 const envoi = ref(false)
 const envoye = ref(false)
@@ -41,20 +43,20 @@ async function demander() {
       <div v-if="envoye" class="w-full max-w-[380px]">
         <span class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600"><UiIcon name="email-check-outline" :size="24" /></span>
         <h1 class="mb-2 text-[28px] leading-[1.2] font-semibold tracking-[-0.015em] text-navy-600">Vérifiez votre boîte mail</h1>
-        <p class="mb-7 text-[15px] leading-[1.55] text-gray-500">Si un compte correspond à cette adresse, un lien de réinitialisation vient d’être envoyé. Il est valable une heure et ne sert qu’une fois.</p>
+        <p class="mb-7 text-[15px] leading-[1.55] text-gray-500">Si un compte correspond à cette adresse, un lien pour choisir votre mot de passe vient d’être envoyé. Il est valable une heure et ne sert qu’une fois.</p>
         <NuxtLink to="/admin/connexion" class="btn btn-outline h-11 w-full rounded-[10px] text-[15px]">Retour à la connexion</NuxtLink>
       </div>
 
       <form v-else class="w-full max-w-[380px]" novalidate @submit.prevent="demander">
         <img src="/brand/logo-feexpay.svg" alt="FeexPay" class="mb-8 h-6 w-auto lg:hidden" >
-        <h1 class="mb-2 text-[28px] leading-[1.2] font-semibold tracking-[-0.015em] text-navy-600">Mot de passe oublié</h1>
-        <p class="mb-7 text-[15px] leading-[1.55] text-gray-500">Indiquez votre adresse professionnelle FeexPay : vous recevrez un lien pour choisir un nouveau mot de passe.</p>
+        <h1 class="mb-2 text-[28px] leading-[1.2] font-semibold tracking-[-0.015em] text-navy-600">{{ premiere ? 'Recevoir mon accès' : 'Mot de passe oublié' }}</h1>
+        <p class="mb-7 text-[15px] leading-[1.55] text-gray-500">{{ premiere ? 'Indiquez votre adresse professionnelle : si un compte vous a été ouvert, vous recevez un lien pour choisir votre mot de passe et entrer dans l’administration.' : 'Indiquez votre adresse professionnelle FeexPay : vous recevrez un lien pour choisir un nouveau mot de passe.' }}</p>
         <div class="mb-6">
           <label for="email" class="mb-2 block text-sm leading-[1.3] font-semibold text-navy-600">Adresse email</label>
           <input id="email" v-model="email" type="email" autocomplete="username" placeholder="prenom.nom@feexpay.me" class="field h-11 text-[15px]" :class="{ 'field-error': erreur }" required >
           <p v-if="erreur" class="mt-2 text-[13px] leading-[1.4] text-red-600" role="alert">{{ erreur }}</p>
         </div>
-        <button type="submit" :disabled="envoi" class="btn btn-primary mb-[18px] h-11 w-full rounded-[10px] text-[15px]">{{ envoi ? 'Envoi…' : 'Envoyer le lien' }}</button>
+        <button type="submit" :disabled="envoi" class="btn btn-primary mb-[18px] h-11 w-full rounded-[10px] text-[15px]">{{ envoi ? 'Envoi…' : (premiere ? 'Recevoir mon accès' : 'Envoyer le lien') }}</button>
         <p class="text-center text-[13px] leading-[1.5] text-gray-500"><NuxtLink to="/admin/connexion" class="text-orange-600 hover:underline">Retour à la connexion</NuxtLink></p>
       </form>
     </main>

@@ -67,6 +67,7 @@ async function connecter() {
         </div>
         <button type="submit" :disabled="envoi" class="btn btn-primary mb-[18px] h-11 w-full rounded-[10px] text-[15px]">{{ envoi ? 'Connexion…' : 'Se connecter' }}</button>
         <p class="mb-2.5 text-center text-[13px] leading-[1.5] text-gray-500"><NuxtLink to="/admin/mot-de-passe-oublie" class="text-orange-600 hover:underline">Mot de passe oublié ?</NuxtLink></p>
+        <p class="mb-2.5 text-center text-[13px] leading-[1.5] text-gray-500">Première connexion ? <NuxtLink to="/admin/mot-de-passe-oublie?premiere=1" class="text-orange-600 hover:underline">Recevez votre accès par email</NuxtLink></p>
         <p class="text-center text-[13px] leading-[1.5] text-gray-500">Accès révoqué ou compte introuvable ? <a href="mailto:amedeel@feexpay.me" class="text-orange-600 hover:underline">Contactez l’administrateur</a></p>
       </form>
     </main>

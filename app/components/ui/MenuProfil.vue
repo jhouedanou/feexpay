@@ -47,7 +47,7 @@ watch(() => route.fullPath, () => (ouvert.value = false))
       @click="ouvert = !ouvert"
     >
       <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-600 text-[13px] font-semibold text-white">{{ initiales }}</span>
-      <span class="hidden xl:inline">{{ me.user.prenom }}</span>
+      <span class="hidden lg:inline">{{ me.user.prenom }}</span>
       <UiIcon name="chevron-down" :size="18" class="text-gray-500" />
     </button>
 

@@ -134,11 +134,11 @@ async function envoyerLienReset(resetId: string, email: string, prenom: string, 
     const r = await new Resend(config.resendApiKey).emails.send({
       from: config.resendFrom,
       to: email,
-      subject: 'Réinitialiser votre mot de passe — administration Radar by FeexPay',
+      subject: 'Votre accès à l’administration Radar by FeexPay',
       text: [
         `Bonjour ${prenom},`,
         '',
-        'Une réinitialisation de mot de passe a été demandée pour votre accès à l’administration Radar by FeexPay.',
+        'Vous avez demandé à choisir votre mot de passe pour l’administration Radar by FeexPay.',
         `Ce lien est à usage unique et expire dans ${RESET_MINUTES} minutes :`,
         lien,
         '',
