@@ -91,24 +91,28 @@ export interface ModeleCharge {
   champs: ChampsModele
   /** Au moins un champ réécrit en base. */
   personnalise: boolean
+  /** Faux : aucun email ne part pour cette forme de rapport, le rapport reste lisible en ligne. */
+  actif: boolean
   modifieLe: Date | null
   modifiePar: string | null
 }
 
 /** Modèle tel qu'il sera envoyé : les réécritures en base par-dessus l'origine. */
 export async function chargerModele(cle: CleModele): Promise<ModeleCharge> {
-  const { rows } = await db().query<{ champs: unknown; updated_at: Date; prenom: string | null; nom: string | null }>(
-    `select t.champs, t.updated_at, a.prenom, a.nom
+  const { rows } = await db().query<{ champs: unknown; actif: boolean; updated_at: Date; prenom: string | null; nom: string | null }>(
+    `select t.champs, t.actif, t.updated_at, a.prenom, a.nom
        from email_template t left join admin_user a on a.id = t.updated_by
       where t.cle = $1`,
     [cle],
   )
   const row = rows[0]
-  if (!row) return { cle, champs: { ...DEFAUTS_MODELES[cle] }, personnalise: false, modifieLe: null, modifiePar: null }
+  if (!row) return { cle, champs: { ...DEFAUTS_MODELES[cle] }, personnalise: false, actif: true, modifieLe: null, modifiePar: null }
+  const reecrits = row.champs && typeof row.champs === 'object' ? Object.keys(row.champs as object).length : 0
   return {
     cle,
     champs: completerChamps(cle, row.champs),
-    personnalise: true,
+    personnalise: reecrits > 0,
+    actif: row.actif,
     modifieLe: row.updated_at,
     modifiePar: row.prenom ? `${row.prenom} ${row.nom ?? ''}`.trim() : null,
   }

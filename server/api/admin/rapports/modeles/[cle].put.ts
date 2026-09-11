@@ -21,7 +21,7 @@ const Body = z
  *
  * Seuls les champs qui diffèrent de l'origine sont conservés en base ; un modèle ramené
  * champ par champ à son texte d'origine redevient « non personnalisé » sans passer par la
- * route DELETE. Le contenu enregistré est journalisé, pour savoir qui a écrit quoi.
+ * route DELETE. L'état actif ou non du modèle n'est pas touché. Le contenu enregistré est journalisé, pour savoir qui a écrit quoi.
  */
 export default defineEventHandler(async (event) => {
   const ctx = await requireAdmin(event, 'admin')
@@ -36,17 +36,17 @@ export default defineEventHandler(async (event) => {
     if (parsed.data[champ] !== defauts[champ]) reecrits[champ] = parsed.data[champ]
   }
 
+  // La ligne porte aussi la désactivation : elle n'est supprimée que si elle ne dit plus rien.
+  await db().query(
+    `insert into email_template (cle, champs, updated_at, updated_by) values ($1, $2, now(), $3)
+     on conflict (cle) do update set champs = excluded.champs, updated_at = now(), updated_by = excluded.updated_by`,
+    [cle, JSON.stringify(reecrits), ctx.user.id],
+  )
   if (Object.keys(reecrits).length === 0) {
-    await db().query(`delete from email_template where cle = $1`, [cle])
-  } else {
-    await db().query(
-      `insert into email_template (cle, champs, updated_at, updated_by) values ($1, $2, now(), $3)
-       on conflict (cle) do update set champs = excluded.champs, updated_at = now(), updated_by = excluded.updated_by`,
-      [cle, JSON.stringify(reecrits), ctx.user.id],
-    )
+    await db().query(`delete from email_template where cle = $1 and actif`, [cle])
   }
   await audit(event, 'email_template.updated', 'email_template', cle, { champs: reecrits })
 
   const m = await chargerModele(cle)
-  return { cle, champs: m.champs, personnalise: m.personnalise, modifieLe: m.modifieLe, modifiePar: m.modifiePar, correlation_id: event.context.correlationId }
+  return { cle, champs: m.champs, personnalise: m.personnalise, actif: m.actif, modifieLe: m.modifieLe, modifiePar: m.modifiePar, correlation_id: event.context.correlationId }
 })

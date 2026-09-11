@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
         champs: m.champs,
         defauts: DEFAUTS_MODELES[cle],
         personnalise: m.personnalise,
+        actif: m.actif,
         modifieLe: m.modifieLe,
         modifiePar: m.modifiePar,
       }

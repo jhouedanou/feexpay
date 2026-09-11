@@ -41,12 +41,24 @@ export async function envoyerRapport(
     return { sent: false, to, error: message }
   }
 
+  // Textes du modèle, réécrits ou non depuis l'admin ; les variables sont remplacées plus bas.
+  const modele = await chargerModele(cleDuRapport(rapport))
+  if (!modele.actif) {
+    // Modèle désactivé depuis l'admin : le rapport existe et se lit en ligne, l'email ne part pas.
+    await db().query(`update notification set status = 'cancelled', last_error = $2, updated_at = now() where id = $1`, [
+      notifId,
+      'Modèle désactivé',
+    ])
+    await journalEnvoi(notifId, 'cancelled', 'Modèle désactivé depuis l’admin')
+    await db().query(`update report set status = 'ready', updated_at = now() where id = $1`, [reportId])
+    return { sent: false, to, error: 'Modèle désactivé' }
+  }
+
   if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
 
   try {
     const pdf = rapportPdf(rapport, base)
-    // Textes du modèle, réécrits ou non depuis l'admin ; les variables sont remplacées ici.
-    const { champs } = await chargerModele(cleDuRapport(rapport))
+    const { champs } = modele
     const resend = new Resend(config.resendApiKey)
     const { data, error } = await resend.emails.send({
       from: config.resendFrom,

@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin', role: 'commercial', secti
 useSeoMeta({ title: 'Rapports et emails — Administration Radar by FeexPay', robots: 'noindex' })
 
 const route = useRoute()
+const { peut } = useAdmin()
 const filtres = reactive({ statut: String(route.query.statut ?? ''), modele: String(route.query.modele ?? ''), jours: Number(route.query.jours ?? 7) || 7 })
 const page = ref(1)
 watch(filtres, () => (page.value = 1))
@@ -85,14 +86,30 @@ async function relancer() {
   }
 }
 const MODELES = [
-  { cle: 'dirigeant', nom: 'Rapport Dirigeant', detail: '8 variantes d’archétype', icone: 'compass-outline', actif: true },
-  { cle: 'rayonnement', nom: 'Rapport Rayonnement', detail: '5 niveaux', icone: 'chart-box-outline', actif: true },
-  { cle: 'croise', nom: 'Rapport croisé complet', detail: '4 lectures croisées', icone: 'vector-intersection', actif: true },
-  { cle: 'relance', nom: 'Relance à 7 jours', detail: 'Désactivé · en attente de validation', icone: 'email-sync-outline', actif: false },
+  { cle: 'dirigeant', nom: 'Rapport Dirigeant', detail: '8 variantes d’archétype', icone: 'compass-outline' },
+  { cle: 'rayonnement', nom: 'Rapport Rayonnement', detail: '5 niveaux', icone: 'chart-box-outline' },
+  { cle: 'croise', nom: 'Rapport croisé complet', detail: '4 lectures croisées', icone: 'vector-intersection' },
 ]
-// Modèles modifiés depuis l'admin : la carte le signale, l'éditeur porte le détail.
-const { data: modeles, refresh: rafraichirModeles } = await useFetch<{ modeles: { cle: string; personnalise: boolean }[] }>('/api/admin/rapports/modeles', { headers: useRequestHeaders(['cookie']) })
+// Modèles modifiés ou désactivés depuis l'admin : la carte le signale, l'éditeur porte le détail.
+const { data: modeles, refresh: rafraichirModeles } = await useFetch<{ modeles: { cle: string; personnalise: boolean; actif: boolean }[] }>('/api/admin/rapports/modeles', { headers: useRequestHeaders(['cookie']) })
 const personnalise = (cle: string) => modeles.value?.modeles.find((m) => m.cle === cle)?.personnalise ?? false
+const actif = (cle: string) => modeles.value?.modeles.find((m) => m.cle === cle)?.actif ?? true
+/** Activer ou désactiver un modèle : rôle Administrateur, un modèle désactivé n'envoie plus d'email. */
+const bascule = ref<string | null>(null)
+async function basculer(cle: string) {
+  if (bascule.value) return
+  bascule.value = cle
+  message.value = null
+  try {
+    const r = await apiAdmin<{ actif: boolean }>(`/api/admin/rapports/modeles/${cle}/actif`, { method: 'POST', body: { actif: !actif(cle) } })
+    await rafraichirModeles()
+    message.value = { texte: r.actif ? 'Modèle activé : les emails de cette forme de rapport partent à nouveau.' : 'Modèle désactivé : les rapports de cette forme restent lisibles en ligne, aucun email ne part.', erreur: false }
+  } catch (e) {
+    message.value = { texte: messageErreur(e), erreur: true }
+  } finally {
+    bascule.value = null
+  }
+}
 /** Modèle ouvert dans l'éditeur, qui porte aussi l'aperçu. */
 const edition = ref<string | null>(null)
 </script>
@@ -176,25 +193,47 @@ const edition = ref<string | null>(null)
             <div class="card p-6">
               <p class="mb-4 text-xs leading-none font-semibold tracking-[0.08em] text-gray-500 uppercase">Modèles actifs</p>
               <div class="flex flex-col gap-3">
-                <!-- Modèle actif : ouvre l'éditeur, qui porte l'aperçu. Modèle désactivé : simple carte, sans action. -->
-                <button
+                <!-- Chaque modèle : l'interrupteur active ou coupe les envois, le crayon ouvre l'éditeur avec l'aperçu. -->
+                <div
                   v-for="m in MODELES"
                   :key="m.cle"
-                  type="button"
-                  class="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-left"
-                  :class="m.actif ? 'hover:bg-gray-50' : 'cursor-default bg-gray-50'"
-                  :disabled="!m.actif"
-                  @click="edition = m.cle"
+                  class="flex items-start gap-3 rounded-xl border border-gray-200 p-4"
+                  :class="actif(m.cle) ? '' : 'bg-gray-50'"
                 >
-                  <UiIcon :name="m.icone" :size="20" class="shrink-0" :class="m.actif ? 'text-navy-600' : 'text-gray-400'" />
-                  <div class="flex-1">
-                    <p class="mb-0.5 text-sm leading-[1.35] font-medium" :class="m.actif ? 'text-navy-600' : 'text-gray-500'">{{ m.nom }}</p>
-                    <p class="text-xs leading-[1.4]" :class="m.actif ? 'text-gray-500' : 'text-gray-400'">{{ m.detail }}<template v-if="personnalise(m.cle)"> · <span class="font-semibold text-orange-600">texte modifié</span></template></p>
+                  <UiIcon :name="m.icone" :size="20" class="shrink-0" :class="actif(m.cle) ? 'text-navy-600' : 'text-gray-400'" />
+                  <div class="min-w-0 flex-1">
+                    <p class="mb-0.5 text-sm leading-[1.35] font-medium" :class="actif(m.cle) ? 'text-navy-600' : 'text-gray-500'">{{ m.nom }}</p>
+                    <p class="text-xs leading-[1.4]" :class="actif(m.cle) ? 'text-gray-500' : 'text-gray-400'">
+                      {{ m.detail }}<template v-if="!actif(m.cle)"> · <span class="font-semibold text-gray-500">désactivé</span></template><template v-if="personnalise(m.cle)"> · <span class="font-semibold text-orange-600">texte modifié</span></template>
+                    </p>
                   </div>
-                  <span class="inline-flex h-5 w-[34px] shrink-0 items-center rounded-full px-[3px]" :class="m.actif ? 'justify-end bg-green-600' : 'bg-gray-300'" aria-hidden="true"><span class="h-3.5 w-3.5 rounded-full bg-white" /></span>
-                </button>
+                  <button type="button" class="shrink-0 rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-navy-600" :aria-label="`Modifier ${m.nom}`" :title="`Modifier ${m.nom}`" @click="edition = m.cle">
+                    <UiIcon name="pencil-outline" :size="18" />
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="actif(m.cle)"
+                    :aria-label="`${actif(m.cle) ? 'Désactiver' : 'Activer'} ${m.nom}`"
+                    :title="peut('admin') ? (actif(m.cle) ? 'Désactiver les envois' : 'Activer les envois') : 'Réservé au rôle Administrateur'"
+                    :disabled="!peut('admin') || bascule === m.cle"
+                    class="mt-0.5 inline-flex h-5 w-[34px] shrink-0 items-center rounded-full px-[3px] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                    :class="actif(m.cle) ? 'justify-end bg-green-600' : 'bg-gray-300'"
+                    @click="basculer(m.cle)"
+                  >
+                    <span class="h-3.5 w-3.5 rounded-full bg-white" />
+                  </button>
+                </div>
+                <div class="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <UiIcon name="email-sync-outline" :size="20" class="shrink-0 text-gray-400" />
+                  <div class="flex-1">
+                    <p class="mb-0.5 text-sm leading-[1.35] font-medium text-gray-500">Relance à 7 jours</p>
+                    <p class="text-xs leading-[1.4] text-gray-400">Désactivé · en attente de validation</p>
+                  </div>
+                  <span class="mt-0.5 inline-flex h-5 w-[34px] shrink-0 items-center rounded-full bg-gray-300 px-[3px] opacity-60" aria-hidden="true"><span class="h-3.5 w-3.5 rounded-full bg-white" /></span>
+                </div>
               </div>
-              <p class="mt-3 text-xs leading-[1.4] text-gray-500">Cliquer un modèle ouvre son texte et son aperçu. La modification est réservée au rôle Administrateur ; les textes d’origine restent versionnés avec le code.</p>
+              <p class="mt-3 text-xs leading-[1.4] text-gray-500">Le crayon ouvre le texte et l’aperçu d’un modèle ; l’interrupteur coupe ou rétablit ses envois. Modifier et activer sont réservés au rôle Administrateur ; les textes d’origine restent versionnés avec le code.</p>
             </div>
             <div class="card p-6">
               <p class="mb-4 text-xs leading-none font-semibold tracking-[0.08em] text-gray-500 uppercase">Journal du dernier envoi</p>

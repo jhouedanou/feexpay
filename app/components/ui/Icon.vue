@@ -84,6 +84,9 @@ import {
   mdiCellphone,
   mdiCookieOutline,
   mdiGavel,
+  mdiPencilOutline,
+  mdiChevronDoubleLeft,
+  mdiChevronDoubleRight,
 } from '@mdi/js'
 
 const ICONS: Record<string, string> = {
@@ -165,6 +168,9 @@ const ICONS: Record<string, string> = {
   'plus': mdiPlus,
   'delete-outline': mdiDeleteOutline,
   'link': mdiLink,
+  'pencil-outline': mdiPencilOutline,
+  'chevron-double-left': mdiChevronDoubleLeft,
+  'chevron-double-right': mdiChevronDoubleRight,
 }
 
 const props = withDefaults(defineProps<{ name: string; size?: number; label?: string }>(), {
