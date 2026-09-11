@@ -26,6 +26,7 @@ l'ensemble sur une machine louée.
 | `rest` | `postgrest/postgrest:v14.17` | Supabase REST | Lu par `/api/public/health` |
 | `gateway` | `nginx:1.31-alpine` | Passerelle Supabase | Une origine pour `/auth/v1` et `/rest/v1` |
 | `migrer` | `postgres:17-alpine` | Migrations à la main | Applique le SQL du dépôt, puis s'arrête |
+| `amorcer` | construite ici | Seeds lancés à la main | Publie le moteur, crée les invitations, puis s'arrête |
 | `cron` | construite ici | Vercel Cron | Appelle `/api/cron/abandon` et `/api/cron/relance` |
 | `mail` | `axllent/mailpit:v1.31.1` | Resend | Reçoit tout le courrier, n'en délivre aucun |
 | `outils` | construite ici | `pnpm` sur le poste | Seeds et tests HTTP, profil `outils` |
@@ -58,8 +59,11 @@ L'application écoute sur <http://localhost:3000>, la boîte de réception sur
 <http://localhost:8025>, la passerelle sur <http://localhost:8000>.
 
 Le premier démarrage enchaîne : création de la base et des rôles, migration de GoTrue,
-application du schéma métier par `migrer`, démarrage de PostgREST puis de l'application. Les
-dépendances sont déclarées dans `docker-compose.yml`, il n'y a rien à ordonner à la main.
+application du schéma métier par `migrer`, démarrage de PostgREST et de la passerelle, puis en
+parallèle l'application et l'amorçage des données. Les dépendances sont déclarées dans
+`docker-compose.yml`, il n'y a rien à ordonner à la main.
+
+Les liens d'invitation à l'espace admin sont imprimés par le service `amorcer` : §3.
 
 ### Les secrets
 
@@ -71,18 +75,47 @@ C'est exactement la mécanique de Supabase hébergé, d'où des clés de même f
 
 Changer `JWT_SECRET` invalide les deux clés : les régénérer ensemble.
 
-## 3. Amorçer les données
+## 3. Amorçage des données
 
-Comme sur Supabase, une base vide ne suffit pas : il faut la version du moteur publiée et au
-moins un compte admin.
+Le service `amorcer` part au démarrage, une fois le schéma posé, et fait deux choses :
+
+- `pnpm seed:scoring` publie la version 2.2 du moteur. Sans elle, le parcours n'a aucune
+  question : les 21 énoncés sont lus en base.
+- `pnpm exec tsx scripts/seed-admins.ts --si-vide` crée l'administrateur principal comme
+  utilisateur GoTrue sans mot de passe, puis une invitation de sept jours pour lui et pour
+  chacune des neuf autres adresses de la liste du 8 septembre.
+
+**Aucun email ne part à cette étape.** Les liens d'invitation, à usage unique, sont imprimés
+dans le journal du service :
 
 ```bash
-docker compose --env-file docker/.env --profile outils run --rm outils pnpm seed:scoring
-docker compose --env-file docker/.env --profile outils run --rm outils pnpm tsx scripts/seed-admins.ts
+docker compose --env-file docker/.env logs amorcer
 ```
 
-Le second imprime les liens d'invitation à usage unique. Sur cette pile, les emails partent
-aussi : ils sont lisibles dans Mailpit, les liens n'ont pas besoin d'être recopiés à la main.
+Les comptes sont au statut `invited` : personne ne peut encore se connecter. Ouvrir un lien
+(`http://localhost:3000/admin/invitation/…`) fait saisir prénom, nom et mot de passe de
+12 caractères, active le compte et ouvre la session. Les rôles Analyste et Administrateur
+doivent ensuite enrôler leur TOTP, sans quoi l'API répond `MFA_REQUIRED`.
+
+Hors ligne, le contrôle du mot de passe contre les fuites connues (HIBP) échoue en silence et
+seule la longueur est vérifiée : c'est le comportement prévu par `verifierMotDePasse`.
+
+`--si-vide` fait sortir le second script dès qu'un compte existe, quel que soit son statut. Un
+`up` répété ne touche donc à rien et les liens déjà transmis restent valables ; le journal le
+dit (« compte(s) déjà en base, rien à faire »).
+
+**Liens perdus, ou expirés au bout de sept jours.** Relancer le script sans le drapeau :
+
+```bash
+docker compose --env-file docker/.env --profile outils run --rm outils \
+  pnpm exec tsx scripts/seed-admins.ts
+```
+
+Ce passage-là révoque les invitations encore en attente et en émet de nouvelles : les liens
+précédents cessent de fonctionner. Les comptes déjà actifs ne sont pas touchés.
+
+Mailpit sert pour la suite : les invitations émises depuis l'espace admin (A09), les
+réinitialisations de mot de passe et les rapports y arrivent, eux, en tant qu'emails.
 
 ## 4. Exploitation
 

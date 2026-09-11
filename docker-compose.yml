@@ -8,6 +8,7 @@
 #   rest     PostgREST, lu par /api/public/health     ← Supabase REST
 #   gateway  nginx, une origine pour auth + rest      ← passerelle Supabase (Kong)
 #   migrer   applique supabase/migrations, puis sort  ← migrations passées à la main
+#   amorcer  publie le moteur et crée les invitations ← seeds lancés à la main
 #   cron     appelle /api/cron/{abandon,relance}      ← Vercel Cron (vercel.json)
 #   mail     Mailpit, reçoit tout, ne délivre rien    ← Resend
 #   outils   seeds et tests HTTP, profil « outils »   ← pnpm sur le poste
@@ -21,6 +22,16 @@
 # de démarrer avec les mauvaises valeurs. Détail dans docs/DOCKER.md.
 
 name: radar
+
+# Environnement des deux services qui portent les scripts du dépôt (`amorcer` et `outils`).
+# Ils n'ont besoin ni des clés email ni du jeton de tâches planifiées.
+x-env-outils: &env-outils
+  DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}?sslmode=disable
+  SUPABASE_URL: http://gateway:8000
+  SUPABASE_KEY: ${SUPABASE_KEY:-}
+  SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-}
+  APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+  TZ: ${TZ:-UTC}
 
 services:
   db:
@@ -151,6 +162,28 @@ services:
       timeout: 5s
       retries: 5
 
+  # Publie la version du moteur — sans quoi le parcours n'a aucune question — puis crée
+  # l'administrateur principal et les invitations. `--si-vide` fait sortir le second script
+  # dès qu'un compte existe : rejoué à chaque `up`, il ne révoque aucune invitation en cours.
+  amorcer:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: outils
+    image: radar-outils:local
+    restart: "no"
+    depends_on:
+      migrer:
+        condition: service_completed_successfully
+      # Création de l'utilisateur principal par GoTrue, joint à travers la passerelle.
+      gateway:
+        condition: service_healthy
+    environment: *env-outils
+    command:
+      - sh
+      - -c
+      - pnpm seed:scoring && pnpm exec tsx scripts/seed-admins.ts --si-vide
+
   app:
     build:
       context: .
@@ -228,13 +261,7 @@ services:
     depends_on:
       app:
         condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-radar}?sslmode=disable
-      SUPABASE_URL: http://gateway:8000
-      SUPABASE_KEY: ${SUPABASE_KEY:-}
-      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-}
-      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
-      TZ: ${TZ:-UTC}
+    environment: *env-outils
     command: ["pnpm", "seed:scoring"]
 
 volumes:

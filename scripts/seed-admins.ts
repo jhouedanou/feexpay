@@ -9,7 +9,10 @@
  * Les liens d'invitation sont imprimés en sortie : sans domaine d'envoi vérifié, Resend ne
  * délivre qu'au titulaire du compte, il faut donc les transmettre à la main.
  *
- *   nvm use 22 && pnpm tsx scripts/seed-admins.ts
+ * `--si-vide` ne fait rien dès qu'un compte existe, quel que soit son statut : c'est le mode
+ * que joue la pile Docker à chaque démarrage, pour ne pas révoquer des invitations en cours.
+ *
+ *   nvm use 22 && pnpm tsx scripts/seed-admins.ts [--si-vide]
  */
 import { createHash, randomBytes } from 'node:crypto'
 import pg from 'pg'
@@ -35,6 +38,19 @@ const base = env.APP_BASE_URL ?? 'http://localhost:3000'
 const sb = createClient(env.SUPABASE_URL!, env.SUPABASE_SERVICE_KEY!, { auth: { persistSession: false } })
 const client = new pg.Client({ connectionString: env.DATABASE_URL!, ...optionsTls(env.DATABASE_URL!) })
 await client.connect()
+
+// Garde du mode `--si-vide`, avant la moindre écriture et avant tout appel à Supabase :
+// sans elle, un second passage révoquerait les invitations en attente et invaliderait les
+// liens déjà transmis.
+if (process.argv.includes('--si-vide')) {
+  const { rows } = await client.query<{ n: string }>(`select count(*)::text as n from admin_user`)
+  if (rows[0]!.n !== '0') {
+    console.log(`· ${rows[0]!.n} compte(s) déjà en base, rien à faire.`)
+    console.log('  Pour réémettre les invitations en attente : relancer sans --si-vide.')
+    await client.end()
+    return
+  }
+}
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
 const prenomDepuisEmail = (e: string) => {

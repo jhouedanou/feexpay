@@ -75,7 +75,10 @@ node docker/scripts/generer-secrets.mjs >> docker/.env
 docker compose --env-file docker/.env up -d --build
 ```
 
-Montage, amorçage et limites : [docs/DOCKER.md](docs/DOCKER.md).
+La pile s'amorce seule : version du moteur publiée, administrateur principal et invitations
+créés au premier démarrage. Les liens d'invitation sont imprimés par le service `amorcer`
+(`docker compose --env-file docker/.env logs amorcer`) ; aucun email n'est envoyé à cette
+étape. Montage, exploitation et limites : [docs/DOCKER.md](docs/DOCKER.md).
 
 Env : copier `.env.example` → `.env`. En local, `DATABASE_URL` utilise la connexion directe
 Supabase (port 5432). Sur Vercel, elle doit pointer le **pooler Supavisor en mode session** :
