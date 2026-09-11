@@ -224,14 +224,6 @@ const edition = ref<string | null>(null)
                     <span class="h-3.5 w-3.5 rounded-full bg-white" />
                   </button>
                 </div>
-                <div class="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                  <UiIcon name="email-sync-outline" :size="20" class="shrink-0 text-gray-400" />
-                  <div class="flex-1">
-                    <p class="mb-0.5 text-sm leading-[1.35] font-medium text-gray-500">Relance à 7 jours</p>
-                    <p class="text-xs leading-[1.4] text-gray-400">Désactivé · en attente de validation</p>
-                  </div>
-                  <span class="mt-0.5 inline-flex h-5 w-[34px] shrink-0 items-center rounded-full bg-gray-300 px-[3px] opacity-60" aria-hidden="true"><span class="h-3.5 w-3.5 rounded-full bg-white" /></span>
-                </div>
               </div>
               <p class="mt-3 text-xs leading-[1.4] text-gray-500">Le crayon ouvre le texte et l’aperçu d’un modèle ; l’interrupteur coupe ou rétablit ses envois. Modifier et activer sont réservés au rôle Administrateur ; les textes d’origine restent versionnés avec le code.</p>
             </div>
