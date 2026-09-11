@@ -65,12 +65,30 @@ watch(numero, () => {
 const reponse = computed(() => selected.value ?? answers.value[q.value?.code ?? ''] ?? null)
 
 /**
- * « Suivant » ne devient cliquable qu'une fois la réponse partie de l'appareil, quand l'indicateur
+ * La réponse compte comme enregistrée quand elle est partie de l'appareil et que l'indicateur
  * affiche « Enregistré ». Un choix encore en attente ou en cours d'envoi ne suffit pas. Une
  * réponse venue du serveur au chargement compte comme enregistrée, de même qu'une réponse
  * mise en file hors ligne : l'internaute ne doit pas rester bloqué sans réseau.
  */
 const enregistree = computed(() => Boolean(reponse.value) && !saving.value && answers.value[q.value?.code ?? ''] === reponse.value)
+
+/**
+ * Le bouton reste cliquable pendant l'enregistrement : `next()` attend la réponse avant de
+ * changer d'écran. L'état « en cours » (atténuation, indicateur) n'est montré que s'il dure
+ * plus de 300 ms, sinon il ne fait que clignoter entre le choix et l'enregistrement.
+ */
+const attenteVisible = ref(false)
+let attenteTimer: ReturnType<typeof setTimeout> | undefined
+watch(
+  enregistree,
+  (ok) => {
+    clearTimeout(attenteTimer)
+    if (ok || !reponse.value) attenteVisible.value = false
+    else attenteTimer = setTimeout(() => (attenteVisible.value = !enregistree.value), 300)
+  },
+  { immediate: true },
+)
+onUnmounted(() => clearTimeout(attenteTimer))
 
 const precedent = computed(() =>
   numero.value > 1 ? `/diagnostic/${type}/question/${numero.value - 1}` : `/diagnostic/${type}/introduction`,
@@ -112,26 +130,34 @@ let differe: ReturnType<typeof setTimeout> | undefined
 function choisir(code: string) {
   selected.value = code
   clearTimeout(differe)
-  differe = setTimeout(() => void enregistrer().catch(() => {}), 400)
+  differe = setTimeout(() => void enregistrer().catch(() => {}), 150)
 }
 onUnmounted(() => clearTimeout(differe))
 
+/** Envoi en cours, pour qu'un clic sur « Suivant » l'attende au lieu d'en lancer un second. */
+let envoiEnCours: Promise<boolean> | null = null
+
 /** Envoie le choix courant s'il diffère de ce qui est déjà enregistré. */
-async function enregistrer(): Promise<boolean> {
+function enregistrer(): Promise<boolean> {
+  if (envoiEnCours) return envoiEnCours.then(() => enregistrer())
   const code = selected.value
-  if (!code || code === answers.value[q.value!.code]) return true
+  if (!code || code === answers.value[q.value!.code]) return Promise.resolve(true)
   saving.value = true
   error.value = null
-  try {
-    const r = (await part.answer(q.value!.code, code)) as { differee?: boolean } | undefined
-    answers.value[q.value!.code] = code
-    differee.value = r?.differee === true
-    enregistreLe.value = differee.value ? null : Date.now()
-    maintenant.value = Date.now()
-    return true
-  } finally {
-    saving.value = false
-  }
+  envoiEnCours = (async () => {
+    try {
+      const r = (await part.answer(q.value!.code, code)) as { differee?: boolean } | undefined
+      answers.value[q.value!.code] = code
+      differee.value = r?.differee === true
+      enregistreLe.value = differee.value ? null : Date.now()
+      maintenant.value = Date.now()
+      return true
+    } finally {
+      saving.value = false
+      envoiEnCours = null
+    }
+  })()
+  return envoiEnCours
 }
 
 async function next() {
@@ -252,17 +278,17 @@ async function allerPrecedent() {
       <div class="flex justify-center border-t border-gray-200 px-5 pt-4 pb-6 md:px-10 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8">
         <div class="flex w-full items-center gap-3 md:max-w-[600px] lg:max-w-[640px]">
           <button type="button" class="btn btn-outline h-[52px] w-24 shrink-0 text-[15px] md:w-[120px] lg:w-[130px]" @click="allerPrecedent">Précédent</button>
-          <!-- Visible dès qu'une réponse existe, cliquable une fois enregistrée (voir `enregistree`). -->
+          <!-- Visible et cliquable dès qu'une réponse existe : `next()` attend l'enregistrement. -->
           <button
             v-if="reponse"
             type="button"
-            class="btn btn-primary h-[52px] flex-1 text-base transition-opacity"
-            :disabled="!enregistree"
-            :aria-busy="!enregistree"
+            class="btn btn-primary h-[52px] flex-1 text-base transition-opacity duration-200"
+            :class="{ 'opacity-60': attenteVisible }"
+            :aria-busy="attenteVisible"
             @click="next"
           >
             {{ numero < total ? 'Suivant' : 'Voir mon résultat' }}
-            <span v-if="!enregistree" class="h-[18px] w-[18px] shrink-0 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+            <span v-if="attenteVisible" class="h-[18px] w-[18px] shrink-0 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
             <UiIcon v-else name="arrow-right" :size="18" />
           </button>
         </div>
