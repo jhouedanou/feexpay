@@ -5,7 +5,8 @@ import { reportByToken } from './report'
 import { hashToken, newToken } from './tokens'
 
 /** Libellé du modèle d'email selon les diagnostics du rapport (A07). */
-export function libelleModele(types: string[] | null | undefined): string {
+export function libelleModele(types: string[] | null | undefined, template?: string): string {
+  if (template === 'relance') return 'Relance à 7 jours'
   const t = new Set(types ?? [])
   if (t.has('dirigeant') && t.has('rayonnement')) return 'Rapport croisé complet'
   if (t.has('rayonnement')) return 'Rapport Rayonnement'

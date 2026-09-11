@@ -118,7 +118,7 @@ onUnmounted(() => clearInterval(timer))
         </div>
 
         <div class="mb-6 rounded-[14px] border border-orange-200 bg-orange-50 px-5 py-4 text-sm leading-[1.55] text-gray-600">
-          Adresse de test : <a :href="data.adresse" target="_blank" rel="noopener" class="font-mono text-navy-600 hover:underline">{{ data.adresse }}</a>. Le domaine radar.feexpay.me ne répond pas encore. Un contrôle se marque OK, KO ou Passé ; cliquer à nouveau efface votre résultat. Un KO attend une note : ce qui s’est passé, l’appareil, l’heure.
+          Adresse de test : <a :href="data.adresse" target="_blank" rel="noopener" class="font-mono text-navy-600 hover:underline">{{ data.adresse }}</a>, administration sur <a :href="`${data.adresse}/admin`" target="_blank" rel="noopener" class="font-mono text-navy-600 hover:underline">{{ data.adresse }}/admin</a>. Un contrôle se marque OK, KO ou Passé ; cliquer à nouveau efface votre résultat. Un KO attend une note : ce qui s’est passé, l’appareil, l’heure.
         </div>
 
         <section v-for="s in data.sections" :key="s.num" class="mb-8">

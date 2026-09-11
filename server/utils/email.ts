@@ -85,6 +85,64 @@ export async function envoyerRapport(
   }
 }
 
+const NOMS_DIAGNOSTICS = { dirigeant: 'Profil du dirigeant', rayonnement: 'Rayonnement de l’entreprise' } as const
+
+/**
+ * Relance à 7 jours (décision FeexPay du 11 septembre 2026, hors cahier des charges) : sept
+ * jours après un rapport à un seul diagnostic, un email invite à faire le second pour obtenir
+ * la lecture croisée. Textes figés ici, pas de modèle modifiable ni d'interrupteur dans A07.
+ * Même gabarit HTML que le rapport ; le bouton mène au diagnostic manquant. Une ligne
+ * `notification` au gabarit « relance », rattachée au rapport, pour le journal A07 et pour
+ * garantir une seule relance par contact.
+ */
+export async function envoyerRelance(rapport: RapportPublic, reportId: string): Promise<{ sent: boolean; to: string; error?: string }> {
+  const config = useRuntimeConfig()
+  const to = rapport.contact.email
+  const manquant: 'dirigeant' | 'rayonnement' | null = !rapport.dirigeant ? 'dirigeant' : !rapport.rayonnement ? 'rayonnement' : null
+  if (!manquant) return { sent: false, to, error: 'Rapport complet, rien à relancer' }
+  const base = config.public.appBaseUrl
+  const lien = `${base}/diagnostic/${manquant}/introduction`
+  const champs: ChampsModele = {
+    sujet: 'Il vous manque un diagnostic pour votre lecture croisée — Radar by FeexPay',
+    titre: 'Votre lecture croisée vous attend',
+    salutation: 'Bonjour {{prenom}},',
+    introduction: `Il y a une semaine, vous avez reçu votre rapport Radar. Le diagnostic « ${NOMS_DIAGNOSTICS[manquant]} » n’a pas encore été fait : il prend quelques minutes et débloque la lecture croisée, qui met en regard votre pilotage et votre rayonnement pour faire apparaître la zone à traiter en premier.`,
+    bouton: 'Terminer mon diagnostic',
+    mention: `Vous recevez ce message parce que vous avez demandé votre rapport Radar. C’est notre seule relance. Pour ne plus recevoir d’email et faire supprimer vos données : ${base}/supprimer-mes-donnees`,
+    pied: 'Radar by FeexPay · Powered by FeexPay',
+  }
+
+  const notif = await db().query<{ id: string }>(
+    `insert into notification (report_id, template, recipient, status, attempts) values ($1, 'relance', $2, 'queued', 1) returning id`,
+    [reportId, to],
+  )
+  const notifId = notif.rows[0]!.id
+  const echec = async (message: string) => {
+    await db().query(`update notification set status = 'failed', last_error = $2, updated_at = now() where id = $1`, [notifId, message.slice(0, 500)])
+    await journalEnvoi(notifId, 'failed', message.slice(0, 200))
+    return { sent: false, to, error: message }
+  }
+  if (!config.resendApiKey) return echec('RESEND_API_KEY absente')
+
+  try {
+    const resend = new Resend(config.resendApiKey)
+    const { data, error } = await resend.emails.send({
+      from: config.resendFrom,
+      to,
+      subject: rendreTexte(champs.sujet, variablesDuRapport(rapport, lien)),
+      html: htmlRapport(rapport, lien, champs),
+      text: texteRapport(rapport, lien, champs),
+    })
+    if (error) return echec(`${error.name}: ${error.message}`)
+    await db().query(`update notification set status = 'accepted', provider_id = $2, updated_at = now() where id = $1`, [notifId, data?.id ?? null])
+    await journalEnvoi(notifId, 'accepted')
+    await envoyerGa4(null, 'relance_sent', notifId, { template: 'relance' }, reportId)
+    return { sent: true, to }
+  } catch (e) {
+    return echec(e instanceof Error ? e.message : String(e))
+  }
+}
+
 function lignesResume(r: RapportPublic): string[] {
   return [
     r.dirigeant ? `Profil de dirigeant : ${r.dirigeant.archetype.code}` : null,

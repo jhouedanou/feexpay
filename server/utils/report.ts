@@ -41,6 +41,17 @@ export interface RapportPublic {
  * `prioriteFeexpay` ne sort jamais : aucune recommandation produit côté public (CDC).
  */
 export async function reportByToken(event: H3Event, token: string): Promise<RapportPublic> {
+  const r = await reportById(null, hashToken(token))
+  if (!r) throw apiError(event, 'NOT_FOUND', 'Rapport introuvable.')
+  return r
+}
+
+/**
+ * Charge un rapport par son identifiant, ou par l'empreinte de son jeton quand `id` est null.
+ * Null si le rapport n'existe pas ou est révoqué. Sans requête HTTP : la relance planifiée
+ * s'en sert.
+ */
+export async function reportById(id: string | null, tokenHash?: string): Promise<RapportPublic | null> {
   const { rows } = await db().query<{
     id: string
     status: 'pending' | 'ready' | 'revoked'
@@ -55,11 +66,11 @@ export async function reportByToken(event: H3Event, token: string): Promise<Rapp
     `select r.id, r.status, r.created_at, r.editorial_version, r.snapshot_refs,
             c.prenom, c.nom, c.email_norm::text, c.entreprise
        from report r join contact c on c.id = r.contact_id
-      where r.token_hash = $1`,
-    [hashToken(token)],
+      where ($1::uuid is not null and r.id = $1::uuid) or ($1::uuid is null and r.token_hash = $2)`,
+    [id, tokenHash ?? null],
   )
   const r = rows[0]
-  if (!r || r.status === 'revoked') throw apiError(event, 'NOT_FOUND', 'Rapport introuvable.')
+  if (!r || r.status === 'revoked') return null
 
   const ids = r.snapshot_refs?.score_snapshot_ids ?? []
   const parts = ids.length

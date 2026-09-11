@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     where.push(`n.created_at >= $${params.length}`)
   }
   const { rows } = await db().query<Record<string, any>>(
-    `select n.id, n.report_id, n.recipient::text, n.status, n.attempts, n.last_error, n.created_at, n.updated_at, n.events,
+    `select n.id, n.report_id, n.template, n.recipient::text, n.status, n.attempts, n.last_error, n.created_at, n.updated_at, n.events,
             r.opened_at, r.status as report_status, r.editorial_version,
             c.id as contact_id, c.prenom, c.nom,
             (select array_agg(p.diagnostic_type::text) from score_snapshot sc join participation p on p.id = sc.participation_id
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
       reportId: r.report_id,
       contact: { id: r.contact_id, prenom: r.prenom, nom: r.nom },
       destinataire: r.recipient,
-      modele: libelleModele(r.types),
+      modele: libelleModele(r.types, r.template),
       version: r.version,
       envoyeLe: r.created_at,
       majLe: r.updated_at,
