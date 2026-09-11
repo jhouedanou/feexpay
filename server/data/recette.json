@@ -1,0 +1,227 @@
+{
+ "version": "2026-09-11",
+ "adresse": "https://feexpay.onrender.com",
+ "sections": [
+  {
+   "num": "1",
+   "titre": "Parcours public",
+   "contexte": "téléphone, navigation privée",
+   "controles": [
+    {
+     "k": "1.1",
+     "etape": "Ouvrir l'adresse de test. Refuser les cookies non essentiels dans le bandeau.",
+     "attendu": "La page d'accueil s'affiche, le bandeau disparaît, « Gérer mes cookies » reste accessible en pied de page."
+    },
+    {
+     "k": "1.2",
+     "etape": "Survoler ou toucher les trois cartes « Deux diagnostics, deux lectures ».",
+     "attendu": "Les trois cartes sont blanches au repos et passent au bleu nuit de la même façon, y compris « Lecture croisée »."
+    },
+    {
+     "k": "1.3",
+     "etape": "Lancer « Profil du dirigeant ». Lire l'introduction, démarrer.",
+     "attendu": "Question 1 sur 14, barre de progression, bouton « Précédent » seul tant qu'aucune réponse n'est choisie."
+    },
+    {
+     "k": "1.4",
+     "etape": "Choisir une réponse et observer le bouton « Suivant ».",
+     "attendu": "Il apparaît aussitôt, plein, sans clignoter. L'indicateur en haut passe à « Enregistré · à l'instant »."
+    },
+    {
+     "k": "1.5",
+     "etape": "Changer de réponse sur la même question, puis « Suivant ».",
+     "attendu": "La nouvelle réponse est marquée « Modification d'une réponse déjà donnée », puis enregistrée. Passage à la question 2."
+    },
+    {
+     "k": "1.6",
+     "etape": "Répondre jusqu'à la question 6, fermer l'onglet, rouvrir l'adresse de test et relancer « Profil du dirigeant ».",
+     "attendu": "L'introduction propose « Reprendre à la question 7 » et « Recommencer »."
+    },
+    {
+     "k": "1.7",
+     "etape": "Reprendre et terminer les 14 questions. Sur la dernière, cliquer « Voir mon résultat ».",
+     "attendu": "Écran de calcul court, puis le résultat : archétype, emblème, texte de lecture."
+    },
+    {
+     "k": "1.8",
+     "etape": "Depuis le résultat, lancer « Rayonnement de l'entreprise » et répondre aux 7 questions.",
+     "attendu": "Score sur 100 et niveau de rayonnement. La lecture croisée est annoncée comme débloquée."
+    },
+    {
+     "k": "1.9",
+     "etape": "Ouvrir la lecture croisée.",
+     "attendu": "Pilotage et rayonnement mis en regard, zone à traiter en premier nommée. Aucune recommandation de produit FeexPay."
+    },
+    {
+     "k": "1.10",
+     "etape": "« Recevoir mon analyse » : remplir le formulaire avec une adresse inconnue, cocher le consentement de traitement, laisser le consentement contact décoché.",
+     "attendu": "Confirmation d'envoi. La politique de confidentialité s'ouvre en fenêtre sans quitter la page."
+    },
+    {
+     "k": "1.11",
+     "etape": "Ouvrir l'email reçu (adresse du compte Resend tant que RESEND_FROM n'est pas posé).",
+     "attendu": "Sujet « Votre rapport … — Radar by FeexPay », PDF joint, bouton « Consulter mon rapport » qui ouvre le rapport en ligne."
+    },
+    {
+     "k": "1.12",
+     "etape": "Sur le rapport en ligne, utiliser « Partager » vers WhatsApp.",
+     "attendu": "Le message WhatsApp porte le lien de la carte. L'aperçu montre l'image de la carte, pas un lien nu."
+    },
+    {
+     "k": "1.13",
+     "etape": "Refaire le formulaire de contact avec la même adresse email mais un autre nom et le consentement contact coché.",
+     "attendu": "Confirmation identique. Dans l'admin, la fiche garde le nom d'origine, le consentement contact reste « non », un écart est signalé sur la fiche."
+    },
+    {
+     "k": "1.14",
+     "etape": "Pied de page, « Supprimer mes données » : saisir l'adresse utilisée, valider.",
+     "attendu": "Message identique que l'adresse existe ou non. Un email de confirmation arrive avec un lien à usage unique."
+    },
+    {
+     "k": "1.15",
+     "etape": "Refaire les étapes 1.1 à 1.4 sur ordinateur, fenêtre large.",
+     "attendu": "Même contenu, mise en page à trois colonnes sur l'accueil, en-tête avec « Commencer un diagnostic »."
+    }
+   ]
+  },
+  {
+   "num": "2",
+   "titre": "Accès à l'administration",
+   "contexte": "ordinateur",
+   "controles": [
+    {
+     "k": "2.1",
+     "etape": "Ouvrir `/admin`.",
+     "attendu": "Redirection vers l'écran de connexion. Trois liens sous le bouton : mot de passe oublié, première connexion, contacter l'administrateur."
+    },
+    {
+     "k": "2.2",
+     "etape": "« Première connexion ? Recevez votre accès par email » : saisir jeanluc@bigfiveabidjan.com.",
+     "attendu": "Écran « Vérifiez votre boîte mail ». Email « Votre accès à l'administration Radar by FeexPay » avec un lien valable une heure."
+    },
+    {
+     "k": "2.3",
+     "etape": "Recommencer 2.2 avec une adresse qui n'a pas de compte.",
+     "attendu": "Exactement le même écran. Aucun email."
+    },
+    {
+     "k": "2.4",
+     "etape": "Ouvrir le lien reçu, choisir un mot de passe de 8 caractères.",
+     "attendu": "Refus : 12 caractères minimum. Un mot de passe connu des fuites (« motdepasse12 ») est refusé aussi."
+    },
+    {
+     "k": "2.5",
+     "etape": "Choisir un mot de passe valide, se connecter.",
+     "attendu": "Écran « Activer votre second facteur » avec QR code et clé manuelle. Un lien « Se déconnecter » en bas."
+    },
+    {
+     "k": "2.6",
+     "etape": "Scanner le QR code, saisir le code à six chiffres.",
+     "attendu": "Dix codes de récupération affichés une seule fois. « J'ai enregistré mes codes » mène au tableau de bord."
+    },
+    {
+     "k": "2.7",
+     "etape": "Se déconnecter, se reconnecter avec un mauvais mot de passe, cinq fois.",
+     "attendu": "Chaque fois « Email ou mot de passe incorrect. », sans compteur. Au sixième essai, même message même avec le bon mot de passe : compte verrouillé quinze minutes."
+    },
+    {
+     "k": "2.8",
+     "etape": "Ouvrir le lien d'accès une seconde fois.",
+     "attendu": "Refus : lien déjà utilisé ou expiré."
+    },
+    {
+     "k": "2.9",
+     "etape": "Se connecter avec un compte Commercial, par exemple jessicae@feexpay.me, après lui avoir fait le parcours 2.2 à 2.5.",
+     "attendu": "Pas de second facteur demandé. Le menu latéral ne montre ni Comptes admin, ni Versions, ni Suppressions, ni Réglages."
+    },
+    {
+     "k": "2.10",
+     "etape": "Avec ce compte Commercial, taper directement `/admin/comptes` dans la barre d'adresse.",
+     "attendu": "Écran « Accès refusé », la page ne se charge pas."
+    }
+   ]
+  },
+  {
+   "num": "3",
+   "titre": "Écrans de l'administration",
+   "contexte": "compte Administrateur",
+   "controles": [
+    {
+     "k": "3.1",
+     "etape": "Tableau de bord : changer la période avec le sélecteur.",
+     "attendu": "Les indicateurs et la comparaison avec la période précédente se recalculent. Le parcours fait en 1.x apparaît dans les participations."
+    },
+    {
+     "k": "3.2",
+     "etape": "Replier le menu latéral avec le chevron en haut, recharger la page.",
+     "attendu": "Le menu reste replié en icônes, chaque icône a une infobulle. Le chevron le déplie."
+    },
+    {
+     "k": "3.3",
+     "etape": "Prospects : rechercher le nom saisi en 1.10, ouvrir la fiche.",
+     "attendu": "Cinq onglets. Synthèse avec identité et résultats. L'écart signalé en 1.13 est visible."
+    },
+    {
+     "k": "3.4",
+     "etape": "Onglet Diagnostic commercial.",
+     "attendu": "Constats triés par gravité, six au plus, avec forces, signaux et leviers FeexPay."
+    },
+    {
+     "k": "3.5",
+     "etape": "Onglet Rapports et emails de la fiche, « Renvoyer le rapport ».",
+     "attendu": "Un nouvel envoi apparaît, l'ancien lien du rapport ne fonctionne plus, le nouveau oui."
+    },
+    {
+     "k": "3.6",
+     "etape": "Rapports et emails : désactiver le modèle « Rapport Rayonnement » avec l'interrupteur, puis le réactiver.",
+     "attendu": "Message de confirmation à chaque bascule, carte grisée et mention « désactivé » entre les deux."
+    },
+    {
+     "k": "3.7",
+     "etape": "Crayon du modèle « Rapport Dirigeant » : modifier l'introduction, enregistrer.",
+     "attendu": "L'aperçu à droite change en direct. La carte porte « texte modifié ». « Rétablir l'origine » remet le texte initial."
+    },
+    {
+     "k": "3.8",
+     "etape": "Comptes admin : inviter une adresse @feexpay.me au rôle Lecture seule, puis annuler l'invitation.",
+     "attendu": "L'invitation apparaît en attente avec un lien copiable, puis disparaît. Une adresse hors des deux domaines est refusée."
+    },
+    {
+     "k": "3.9",
+     "etape": "Comptes admin : suspendre le compte Commercial utilisé en 2.9, puis tenter de s'y connecter dans une autre fenêtre.",
+     "attendu": "« Ce compte est suspendu ou révoqué ». Le réactiver rétablit l'accès."
+    },
+    {
+     "k": "3.10",
+     "etape": "Comptes admin : tenter de rétrograder son propre compte.",
+     "attendu": "Refus. Un Administrateur ne peut pas se retirer ses droits lui-même."
+    },
+    {
+     "k": "3.11",
+     "etape": "Suppressions : la demande faite en 1.14, après clic sur le lien de confirmation, la traiter.",
+     "attendu": "La fiche prospect devient anonyme, les liens de rapport de ce contact ne fonctionnent plus."
+    },
+    {
+     "k": "3.12",
+     "etape": "Versions : ouvrir la version 2.2 publiée.",
+     "attendu": "Contrôles automatiques verts, empreinte identique à celle du moteur déployé."
+    },
+    {
+     "k": "3.13",
+     "etape": "Menu de compte en haut à droite, « Changer mon mot de passe », avec un mot de passe actuel faux.",
+     "attendu": "Refus. Avec le bon, confirmation et email « Votre mot de passe a été modifié »."
+    },
+    {
+     "k": "3.14",
+     "etape": "Retourner sur l'accueil public en restant connecté.",
+     "attendu": "L'en-tête montre vos initiales et votre prénom, avec un accès au rapport et au menu de compte."
+    },
+    {
+     "k": "3.15",
+     "etape": "Se déconnecter depuis le menu latéral.",
+     "attendu": "Retour à l'écran de connexion. Le bouton Précédent du navigateur ne rouvre pas une page admin."
+    }
+   ]
+  }
+ ]
+}

@@ -87,6 +87,7 @@ import {
   mdiPencilOutline,
   mdiChevronDoubleLeft,
   mdiChevronDoubleRight,
+  mdiClipboardCheckOutline,
 } from '@mdi/js'
 
 const ICONS: Record<string, string> = {
@@ -171,6 +172,7 @@ const ICONS: Record<string, string> = {
   'pencil-outline': mdiPencilOutline,
   'chevron-double-left': mdiChevronDoubleLeft,
   'chevron-double-right': mdiChevronDoubleRight,
+  'clipboard-check-outline': mdiClipboardCheckOutline,
 }
 
 const props = withDefaults(defineProps<{ name: string; size?: number; label?: string }>(), {

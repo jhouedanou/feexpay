@@ -17,6 +17,7 @@ const entrees = computed(() =>
     { to: '/admin/versions', label: 'Versions', icone: 'source-branch', role: 'analyste' as const },
     { to: '/admin/suppressions', label: 'Suppressions', icone: 'delete-outline', role: 'admin' as const },
     { to: '/admin/reglages', label: 'Réglages', icone: 'cog-outline', role: 'admin' as const },
+    { to: '/admin/recette', label: 'Recette', icone: 'clipboard-check-outline', role: 'lecture' as const },
   ].filter((e) => peut(e.role)),
 )
 const actif = (to: string) => (to === '/admin' ? route.path === '/admin' : route.path.startsWith(to))
