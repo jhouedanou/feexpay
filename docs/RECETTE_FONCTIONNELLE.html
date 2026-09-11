@@ -1,0 +1,199 @@
+<title>Recette Radar by FeexPay</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --navy: #112c56; --navy-2: #23477e; --navy-soft: #dde5f0;
+    --orange: #d45d00; --orange-soft: #fdebde;
+    --ink: #1c2433; --ink-2: #4c5665; --ink-3: #7b8595;
+    --ground: #f6f7f9; --paper: #ffffff; --line: #e0e4eb;
+    --ok: #1e7a4a; --ok-soft: #dff3e7;
+    --warn: #8e3e00; --warn-soft: #fff6f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy: #b5c5dc; --navy-2: #7e97bf; --navy-soft: #16294a;
+      --orange: #f6b684; --orange-soft: #3a2413;
+      --ink: #e8ecf3; --ink-2: #b5bfcf; --ink-3: #8a94a6;
+      --ground: #0a1426; --paper: #0f1c33; --line: #23334f;
+      --ok: #7fd3a3; --ok-soft: #10301f;
+      --warn: #f6b684; --warn-soft: #2a1a0c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --navy: #b5c5dc; --navy-2: #7e97bf; --navy-soft: #16294a;
+    --orange: #f6b684; --orange-soft: #3a2413;
+    --ink: #e8ecf3; --ink-2: #b5bfcf; --ink-3: #8a94a6;
+    --ground: #0a1426; --paper: #0f1c33; --line: #23334f;
+    --ok: #7fd3a3; --ok-soft: #10301f;
+    --warn: #f6b684; --warn-soft: #2a1a0c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 400 15px/1.6 Poppins, "Segoe UI", system-ui, sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { border-bottom: 2px solid var(--navy); padding-bottom: 20px; margin-bottom: 28px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); margin: 0 0 8px; }
+  h1 { font-size: 32px; line-height: 1.15; font-weight: 600; color: var(--navy); margin: 0 0 10px; letter-spacing: -.02em; text-wrap: balance; }
+  h2 { font-size: 20px; font-weight: 600; color: var(--navy); margin: 40px 0 6px; letter-spacing: -.01em; }
+  h2 small { font-weight: 400; color: var(--ink-3); font-size: 14px; margin-left: 8px; }
+  p { margin: 0 0 12px; max-width: 68ch; }
+  .lead { color: var(--ink-2); font-size: 16px; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 24px; margin: 20px 0 0; padding: 16px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+  .meta div { font-size: 14px; }
+  .meta b { display: block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 13.5px; }
+  code { background: var(--navy-soft); color: var(--navy); padding: 1px 6px; border-radius: 5px; }
+  .note { background: var(--warn-soft); border-left: 3px solid var(--orange); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 16px 0 0; font-size: 14px; color: var(--ink-2); }
+  .prep { margin: 12px 0 0; padding: 0 0 0 20px; color: var(--ink-2); }
+  .prep li { margin-bottom: 6px; }
+  .section-intro { color: var(--ink-2); font-size: 14px; margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 14px; }
+  .tablewrap { overflow-x: auto; }
+  th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 10px 14px; background: var(--navy-soft); }
+  td { padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: top; }
+  td.n { width: 44px; font-family: "JetBrains Mono", monospace; color: var(--ink-3); font-size: 13px; padding-top: 14px; }
+  td.step { width: 52%; }
+  td.exp { color: var(--ink-2); }
+  td.ok { width: 60px; text-align: center; }
+  td.ok input { width: 18px; height: 18px; accent-color: var(--orange); cursor: pointer; }
+  tr.done td { color: var(--ink-3); }
+  tr.done td.step { text-decoration: line-through; text-decoration-color: var(--line); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--navy-soft); color: var(--navy); margin-left: 6px; vertical-align: middle; }
+  .pill.admin { background: var(--orange-soft); color: var(--warn); }
+  .progress { position: sticky; top: 0; z-index: 2; background: var(--ground); padding: 10px 0; margin: 0 0 8px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-2); border-bottom: 1px solid var(--line); }
+  .bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--ok); transition: width .2s; }
+  .progress b { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .anomalie { margin-top: 44px; padding: 20px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+  .anomalie h2 { margin-top: 0; }
+  .anomalie ol { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: 14px; }
+  footer { margin-top: 40px; font-size: 13px; color: var(--ink-3); }
+  input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Recette fonctionnelle · version du 11 septembre 2026</p>
+    <h1>Recette Radar by FeexPay</h1>
+    <p class="lead">Quarante contrôles à dérouler dans l'ordre, sur téléphone puis sur ordinateur. Cochez chaque ligne ; l'avancement reste enregistré dans votre navigateur.</p>
+    <div class="meta">
+      <div><b>Adresse de test</b><span class="mono">https://feexpay.onrender.com</span></div>
+      <div><b>Administration</b><span class="mono">https://feexpay.onrender.com/admin</span></div>
+      <div><b>Comptes</b>amedeel@feexpay.me, jeanluc@bigfiveabidjan.com (Administrateur), neuf comptes Commercial</div>
+      <div><b>Durée</b>45 à 60 minutes</div>
+    </div>
+    <div class="note">Le domaine <span class="mono">radar.feexpay.me</span> ne répond pas encore : les enregistrements DNS du dossier <span class="mono">docs/DNS_radar.feexpay.me.md</span> ne sont pas posés. Toute la recette se fait sur l'adresse Render. Les emails ne partent vers d'autres adresses que celle du compte Resend qu'une fois la variable <span class="mono">RESEND_FROM</span> renseignée sur Render avec une adresse du domaine vérifié.</div>
+  </header>
+
+  <div class="progress"><span>Avancement</span><div class="bar"><span id="fill"></span></div><b id="count">0 / 0</b></div>
+
+  <h2>Avant de commencer</h2>
+  <ul class="prep">
+    <li>Un téléphone (largeur 390 environ) et un ordinateur. Le parcours public se teste d'abord sur téléphone.</li>
+    <li>Une adresse email que vous pouvez consulter, pour recevoir le rapport. Tant que RESEND_FROM n'est pas posé, seule l'adresse analyticsbigfive@gmail.com reçoit les emails.</li>
+    <li>Une application d'authentification (Google Authenticator, Authy, 1Password) pour les comptes Administrateur.</li>
+    <li>Navigation privée conseillée pour le parcours public, afin de partir d'une session vierge.</li>
+  </ul>
+
+  <h2>1. Parcours public <small>téléphone, navigation privée</small></h2>
+  <p class="section-intro">Ce que vit un dirigeant qui découvre Radar depuis un lien partagé.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Étape</th><th>Résultat attendu</th><th>Fait</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1.1</td><td class="step">Ouvrir l'adresse de test. Refuser les cookies non essentiels dans le bandeau.</td><td class="exp">La page d'accueil s'affiche, le bandeau disparaît, « Gérer mes cookies » reste accessible en pied de page.</td><td class="ok"><input type="checkbox" data-k="1.1"></td></tr>
+      <tr><td class="n">1.2</td><td class="step">Survoler ou toucher les trois cartes « Deux diagnostics, deux lectures ».</td><td class="exp">Les trois cartes sont blanches au repos et passent au bleu nuit de la même façon, y compris « Lecture croisée ».</td><td class="ok"><input type="checkbox" data-k="1.2"></td></tr>
+      <tr><td class="n">1.3</td><td class="step">Lancer « Profil du dirigeant ». Lire l'introduction, démarrer.</td><td class="exp">Question 1 sur 14, barre de progression, bouton « Précédent » seul tant qu'aucune réponse n'est choisie.</td><td class="ok"><input type="checkbox" data-k="1.3"></td></tr>
+      <tr><td class="n">1.4</td><td class="step">Choisir une réponse et observer le bouton « Suivant ».</td><td class="exp">Il apparaît aussitôt, plein, sans clignoter. L'indicateur en haut passe à « Enregistré · à l'instant ».</td><td class="ok"><input type="checkbox" data-k="1.4"></td></tr>
+      <tr><td class="n">1.5</td><td class="step">Changer de réponse sur la même question, puis « Suivant ».</td><td class="exp">La nouvelle réponse est marquée « Modification d'une réponse déjà donnée », puis enregistrée. Passage à la question 2.</td><td class="ok"><input type="checkbox" data-k="1.5"></td></tr>
+      <tr><td class="n">1.6</td><td class="step">Répondre jusqu'à la question 6, fermer l'onglet, rouvrir l'adresse de test et relancer « Profil du dirigeant ».</td><td class="exp">L'introduction propose « Reprendre à la question 7 » et « Recommencer ».</td><td class="ok"><input type="checkbox" data-k="1.6"></td></tr>
+      <tr><td class="n">1.7</td><td class="step">Reprendre et terminer les 14 questions. Sur la dernière, cliquer « Voir mon résultat ».</td><td class="exp">Écran de calcul court, puis le résultat : archétype, emblème, texte de lecture.</td><td class="ok"><input type="checkbox" data-k="1.7"></td></tr>
+      <tr><td class="n">1.8</td><td class="step">Depuis le résultat, lancer « Rayonnement de l'entreprise » et répondre aux 7 questions.</td><td class="exp">Score sur 100 et niveau de rayonnement. La lecture croisée est annoncée comme débloquée.</td><td class="ok"><input type="checkbox" data-k="1.8"></td></tr>
+      <tr><td class="n">1.9</td><td class="step">Ouvrir la lecture croisée.</td><td class="exp">Pilotage et rayonnement mis en regard, zone à traiter en premier nommée. Aucune recommandation de produit FeexPay.</td><td class="ok"><input type="checkbox" data-k="1.9"></td></tr>
+      <tr><td class="n">1.10</td><td class="step">« Recevoir mon analyse » : remplir le formulaire avec une adresse inconnue, cocher le consentement de traitement, laisser le consentement contact décoché.</td><td class="exp">Confirmation d'envoi. La politique de confidentialité s'ouvre en fenêtre sans quitter la page.</td><td class="ok"><input type="checkbox" data-k="1.10"></td></tr>
+      <tr><td class="n">1.11</td><td class="step">Ouvrir l'email reçu (adresse du compte Resend tant que RESEND_FROM n'est pas posé).</td><td class="exp">Sujet « Votre rapport … — Radar by FeexPay », PDF joint, bouton « Consulter mon rapport » qui ouvre le rapport en ligne.</td><td class="ok"><input type="checkbox" data-k="1.11"></td></tr>
+      <tr><td class="n">1.12</td><td class="step">Sur le rapport en ligne, utiliser « Partager » vers WhatsApp.</td><td class="exp">Le message WhatsApp porte le lien de la carte. L'aperçu montre l'image de la carte, pas un lien nu.</td><td class="ok"><input type="checkbox" data-k="1.12"></td></tr>
+      <tr><td class="n">1.13</td><td class="step">Refaire le formulaire de contact avec la même adresse email mais un autre nom et le consentement contact coché.</td><td class="exp">Confirmation identique. Dans l'admin, la fiche garde le nom d'origine, le consentement contact reste « non », un écart est signalé sur la fiche.</td><td class="ok"><input type="checkbox" data-k="1.13"></td></tr>
+      <tr><td class="n">1.14</td><td class="step">Pied de page, « Supprimer mes données » : saisir l'adresse utilisée, valider.</td><td class="exp">Message identique que l'adresse existe ou non. Un email de confirmation arrive avec un lien à usage unique.</td><td class="ok"><input type="checkbox" data-k="1.14"></td></tr>
+      <tr><td class="n">1.15</td><td class="step">Refaire les étapes 1.1 à 1.4 sur ordinateur, fenêtre large.</td><td class="exp">Même contenu, mise en page à trois colonnes sur l'accueil, en-tête avec « Commencer un diagnostic ».</td><td class="ok"><input type="checkbox" data-k="1.15"></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>2. Accès à l'administration <small>ordinateur</small></h2>
+  <p class="section-intro">Première connexion d'un compte Administrateur, puis d'un compte Commercial.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Étape</th><th>Résultat attendu</th><th>Fait</th></tr></thead>
+    <tbody>
+      <tr><td class="n">2.1</td><td class="step">Ouvrir <span class="mono">/admin</span>.</td><td class="exp">Redirection vers l'écran de connexion. Trois liens sous le bouton : mot de passe oublié, première connexion, contacter l'administrateur.</td><td class="ok"><input type="checkbox" data-k="2.1"></td></tr>
+      <tr><td class="n">2.2</td><td class="step">« Première connexion ? Recevez votre accès par email » : saisir jeanluc@bigfiveabidjan.com.</td><td class="exp">Écran « Vérifiez votre boîte mail ». Email « Votre accès à l'administration Radar by FeexPay » avec un lien valable une heure.</td><td class="ok"><input type="checkbox" data-k="2.2"></td></tr>
+      <tr><td class="n">2.3</td><td class="step">Recommencer 2.2 avec une adresse qui n'a pas de compte.</td><td class="exp">Exactement le même écran. Aucun email.</td><td class="ok"><input type="checkbox" data-k="2.3"></td></tr>
+      <tr><td class="n">2.4</td><td class="step">Ouvrir le lien reçu, choisir un mot de passe de 8 caractères.</td><td class="exp">Refus : 12 caractères minimum. Un mot de passe connu des fuites (« motdepasse12 ») est refusé aussi.</td><td class="ok"><input type="checkbox" data-k="2.4"></td></tr>
+      <tr><td class="n">2.5</td><td class="step">Choisir un mot de passe valide, se connecter.</td><td class="exp">Écran « Activer votre second facteur » avec QR code et clé manuelle. Un lien « Se déconnecter » en bas.</td><td class="ok"><input type="checkbox" data-k="2.5"></td></tr>
+      <tr><td class="n">2.6</td><td class="step">Scanner le QR code, saisir le code à six chiffres.</td><td class="exp">Dix codes de récupération affichés une seule fois. « J'ai enregistré mes codes » mène au tableau de bord.</td><td class="ok"><input type="checkbox" data-k="2.6"></td></tr>
+      <tr><td class="n">2.7</td><td class="step">Se déconnecter, se reconnecter avec un mauvais mot de passe, cinq fois.</td><td class="exp">Chaque fois « Email ou mot de passe incorrect. », sans compteur. Au sixième essai, même message même avec le bon mot de passe : compte verrouillé quinze minutes.</td><td class="ok"><input type="checkbox" data-k="2.7"></td></tr>
+      <tr><td class="n">2.8</td><td class="step">Ouvrir le lien d'accès une seconde fois.</td><td class="exp">Refus : lien déjà utilisé ou expiré.</td><td class="ok"><input type="checkbox" data-k="2.8"></td></tr>
+      <tr><td class="n">2.9</td><td class="step">Se connecter avec un compte Commercial, par exemple jessicae@feexpay.me, après lui avoir fait le parcours 2.2 à 2.5.</td><td class="exp">Pas de second facteur demandé. Le menu latéral ne montre ni Comptes admin, ni Versions, ni Suppressions, ni Réglages.</td><td class="ok"><input type="checkbox" data-k="2.9"></td></tr>
+      <tr><td class="n">2.10</td><td class="step">Avec ce compte Commercial, taper directement <span class="mono">/admin/comptes</span> dans la barre d'adresse.</td><td class="exp">Écran « Accès refusé », la page ne se charge pas.</td><td class="ok"><input type="checkbox" data-k="2.10"></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>3. Écrans de l'administration <small>compte Administrateur</small></h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Étape</th><th>Résultat attendu</th><th>Fait</th></tr></thead>
+    <tbody>
+      <tr><td class="n">3.1</td><td class="step">Tableau de bord : changer la période avec le sélecteur.</td><td class="exp">Les indicateurs et la comparaison avec la période précédente se recalculent. Le parcours fait en 1.x apparaît dans les participations.</td><td class="ok"><input type="checkbox" data-k="3.1"></td></tr>
+      <tr><td class="n">3.2</td><td class="step">Replier le menu latéral avec le chevron en haut, recharger la page.</td><td class="exp">Le menu reste replié en icônes, chaque icône a une infobulle. Le chevron le déplie.</td><td class="ok"><input type="checkbox" data-k="3.2"></td></tr>
+      <tr><td class="n">3.3</td><td class="step">Prospects : rechercher le nom saisi en 1.10, ouvrir la fiche.</td><td class="exp">Cinq onglets. Synthèse avec identité et résultats. L'écart signalé en 1.13 est visible.</td><td class="ok"><input type="checkbox" data-k="3.3"></td></tr>
+      <tr><td class="n">3.4</td><td class="step">Onglet Diagnostic commercial.</td><td class="exp">Constats triés par gravité, six au plus, avec forces, signaux et leviers FeexPay.</td><td class="ok"><input type="checkbox" data-k="3.4"></td></tr>
+      <tr><td class="n">3.5</td><td class="step">Onglet Rapports et emails de la fiche, « Renvoyer le rapport ».</td><td class="exp">Un nouvel envoi apparaît, l'ancien lien du rapport ne fonctionne plus, le nouveau oui.</td><td class="ok"><input type="checkbox" data-k="3.5"></td></tr>
+      <tr><td class="n">3.6</td><td class="step">Rapports et emails : désactiver le modèle « Rapport Rayonnement » avec l'interrupteur, puis le réactiver.</td><td class="exp">Message de confirmation à chaque bascule, carte grisée et mention « désactivé » entre les deux.</td><td class="ok"><input type="checkbox" data-k="3.6"></td></tr>
+      <tr><td class="n">3.7</td><td class="step">Crayon du modèle « Rapport Dirigeant » : modifier l'introduction, enregistrer.</td><td class="exp">L'aperçu à droite change en direct. La carte porte « texte modifié ». « Rétablir l'origine » remet le texte initial.</td><td class="ok"><input type="checkbox" data-k="3.7"></td></tr>
+      <tr><td class="n">3.8</td><td class="step">Comptes admin : inviter une adresse @feexpay.me au rôle Lecture seule, puis annuler l'invitation.</td><td class="exp">L'invitation apparaît en attente avec un lien copiable, puis disparaît. Une adresse hors des deux domaines est refusée.</td><td class="ok"><input type="checkbox" data-k="3.8"></td></tr>
+      <tr><td class="n">3.9</td><td class="step">Comptes admin : suspendre le compte Commercial utilisé en 2.9, puis tenter de s'y connecter dans une autre fenêtre.</td><td class="exp">« Ce compte est suspendu ou révoqué ». Le réactiver rétablit l'accès.</td><td class="ok"><input type="checkbox" data-k="3.9"></td></tr>
+      <tr><td class="n">3.10</td><td class="step">Comptes admin : tenter de rétrograder son propre compte.</td><td class="exp">Refus. Un Administrateur ne peut pas se retirer ses droits lui-même.</td><td class="ok"><input type="checkbox" data-k="3.10"></td></tr>
+      <tr><td class="n">3.11</td><td class="step">Suppressions : la demande faite en 1.14, après clic sur le lien de confirmation, la traiter.</td><td class="exp">La fiche prospect devient anonyme, les liens de rapport de ce contact ne fonctionnent plus.</td><td class="ok"><input type="checkbox" data-k="3.11"></td></tr>
+      <tr><td class="n">3.12</td><td class="step">Versions : ouvrir la version 2.2 publiée.</td><td class="exp">Contrôles automatiques verts, empreinte identique à celle du moteur déployé.</td><td class="ok"><input type="checkbox" data-k="3.12"></td></tr>
+      <tr><td class="n">3.13</td><td class="step">Menu de compte en haut à droite, « Changer mon mot de passe », avec un mot de passe actuel faux.</td><td class="exp">Refus. Avec le bon, confirmation et email « Votre mot de passe a été modifié ».</td><td class="ok"><input type="checkbox" data-k="3.13"></td></tr>
+      <tr><td class="n">3.14</td><td class="step">Retourner sur l'accueil public en restant connecté.</td><td class="exp">L'en-tête montre vos initiales et votre prénom, avec un accès au rapport et au menu de compte.</td><td class="ok"><input type="checkbox" data-k="3.14"></td></tr>
+      <tr><td class="n">3.15</td><td class="step">Se déconnecter depuis le menu latéral.</td><td class="exp">Retour à l'écran de connexion. Le bouton Précédent du navigateur ne rouvre pas une page admin.</td><td class="ok"><input type="checkbox" data-k="3.15"></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="anomalie">
+    <h2>Signaler une anomalie</h2>
+    <ol>
+      <li>Le numéro du contrôle, par exemple 2.7.</li>
+      <li>L'appareil et le navigateur.</li>
+      <li>Ce qui s'est passé, en une phrase, et une capture d'écran.</li>
+      <li>L'heure, pour retrouver la trace dans le journal d'audit.</li>
+    </ol>
+  </div>
+
+  <footer>Radar by FeexPay · recette préparée par Big Five Abidjan · 11 septembre 2026. Les cases cochées sont mémorisées dans ce navigateur uniquement.</footer>
+</div>
+
+<script>
+  (function () {
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+    var fill = document.getElementById('fill'), count = document.getElementById('count');
+    var KEY = 'recette-radar-2026-09-11';
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+    function paint() {
+      var done = 0;
+      boxes.forEach(function (b) {
+        var row = b.closest('tr');
+        if (b.checked) { done++; row.classList.add('done'); } else { row.classList.remove('done'); }
+      });
+      fill.style.width = (boxes.length ? Math.round(done / boxes.length * 100) : 0) + '%';
+      count.textContent = done + ' / ' + boxes.length;
+    }
+    boxes.forEach(function (b) {
+      b.checked = !!state[b.dataset.k];
+      b.addEventListener('change', function () {
+        state[b.dataset.k] = b.checked;
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+        paint();
+      });
+    });
+    paint();
+  })();
+</script>
