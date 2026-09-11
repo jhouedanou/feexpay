@@ -59,7 +59,7 @@
     },
     {
      "k": "1.11",
-     "etape": "Ouvrir l'email reçu (adresse du compte Resend tant que RESEND_FROM n'est pas posé).",
+     "etape": "Ouvrir l'email reçu.",
      "attendu": "Sujet « Votre rapport … — Radar by FeexPay », PDF joint, bouton « Consulter mon rapport » qui ouvre le rapport en ligne."
     },
     {

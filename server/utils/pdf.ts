@@ -420,3 +420,113 @@ export function angleEntretien(d: Pick<FicheData, 'constats' | 'leviers' | 'diri
   ]
   return [citation, ...points]
 }
+
+// --- Rapport de recette personnel (/admin/recette) ---------------------------------------
+
+export interface RecettePdfData {
+  testeur: string
+  version: string
+  adresse: string
+  etabliLe: Date
+  sections: { num: string; titre: string; controles: { k: string; etape: string; resultat: { statut: 'ok' | 'ko' | 'passe'; note: string; at: Date } | null }[] }[]
+}
+
+/** Rapport de recette d'un testeur : ses résultats contrôle par contrôle, ses anomalies en premier. */
+export function recettePdf(d: RecettePdfData): Buffer {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  let y = M
+  const need = (h: number) => {
+    if (y + h > A4.h - M - 8) {
+      doc.addPage()
+      y = M
+    }
+  }
+  const text = (s: string, size: number, color: [number, number, number], opts: { bold?: boolean; lh?: number; width?: number; x?: number } = {}) => {
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal')
+    doc.setFontSize(size)
+    doc.setTextColor(...color)
+    const lines = doc.splitTextToSize(s, opts.width ?? W) as string[]
+    const lh = (opts.lh ?? 1.45) * size * 0.3528
+    need(lines.length * lh)
+    doc.text(lines, opts.x ?? M, y + size * 0.3528 * 0.8)
+    y += lines.length * lh
+  }
+  const tous = d.sections.flatMap((s) => s.controles)
+  const n = (st: string) => tous.filter((c) => c.resultat?.statut === st).length
+  const faits = tous.filter((c) => c.resultat).length
+  const date = d.etabliLe.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const LIB: Record<string, string> = { ok: 'OK', ko: 'KO', passe: 'Passé' }
+  const COL: Record<string, [number, number, number]> = { ok: [30, 122, 74], ko: [180, 35, 24], passe: [124, 133, 149] }
+
+  text('RADAR BY FEEXPAY · RECETTE FONCTIONNELLE', 8, ORANGE, { bold: true, lh: 1.2 })
+  y += 1.5
+  text(`Rapport de ${d.testeur}`, 22, NAVY, { bold: true, lh: 1.15 })
+  text(`Version de la recette du ${d.version} · établi le ${date} · ${d.adresse}`, 9.5, GRAY, { lh: 1.4 })
+  y += 4
+
+  // Quatre compteurs sur une ligne.
+  const tuiles: [string, number, [number, number, number]][] = [['Contrôles faits', faits, NAVY], ['OK', n('ok'), COL.ok!], ['KO', n('ko'), COL.ko!], ['Passés', n('passe'), COL.passe!]]
+  const tw = (W - 3 * 4) / 4
+  need(22)
+  tuiles.forEach(([lib, val, col], i) => {
+    const x = M + i * (tw + 4)
+    doc.setFillColor(...NAVY_50)
+    doc.roundedRect(x, y, tw, 18, 2, 2, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(16)
+    doc.setTextColor(...col)
+    doc.text(`${val}${lib === 'Contrôles faits' ? ` / ${tous.length}` : ''}`, x + 4, y + 9)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7.5)
+    doc.setTextColor(...GRAY)
+    doc.text(lib.toUpperCase(), x + 4, y + 14.5)
+  })
+  y += 26
+
+  const anomalies = tous.filter((c) => c.resultat?.statut === 'ko')
+  text('Anomalies signalées', 14, NAVY, { bold: true, lh: 1.2 })
+  y += 1
+  if (!anomalies.length) text('Aucune.', 10.5, GRAY)
+  for (const c of anomalies) {
+    need(14)
+    text(`${c.k} · ${c.etape}`, 10, NAVY, { bold: true, lh: 1.4 })
+    text(c.resultat!.note || 'Sans détail.', 10, GRAY, { lh: 1.45, x: M + 6, width: W - 6 })
+    y += 2
+  }
+  y += 4
+
+  for (const s of d.sections) {
+    need(20)
+    y += 2
+    text(`${s.num}. ${s.titre}`, 13, NAVY, { bold: true, lh: 1.2 })
+    y += 1.5
+    for (const c of s.controles) {
+      need(9)
+      const st = c.resultat?.statut
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(8.5)
+      const cs: [number, number, number] = st ? COL[st]! : [180, 187, 198]
+      doc.setTextColor(...cs)
+      doc.text(st ? LIB[st]! : '—', M, y + 3.2)
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8)
+      doc.setTextColor(152, 163, 180)
+      doc.text(c.k, M + 12, y + 3.2)
+      doc.setFontSize(9.5)
+      const ct: [number, number, number] = st ? GRAY : [152, 163, 180]
+      doc.setTextColor(...ct)
+      const lines = doc.splitTextToSize(c.etape, W - 24) as string[]
+      doc.text(lines, M + 24, y + 3.2)
+      y += Math.max(1, lines.length) * 4.6 + 1.5
+      if (c.resultat?.note && st !== 'ko') {
+        text(c.resultat.note, 8.5, GRAY, { x: M + 24, width: W - 24, lh: 1.4 })
+        y += 1
+      }
+    }
+  }
+
+  doc.setFontSize(8)
+  doc.setTextColor(152, 163, 180)
+  doc.text('Radar by FeexPay · Powered by FeexPay', M, A4.h - 10)
+  return Buffer.from(doc.output('arraybuffer'))
+}

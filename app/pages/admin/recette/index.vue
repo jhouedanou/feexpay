@@ -9,7 +9,24 @@ interface Section { num: string; titre: string; contexte: string; controles: Con
 interface Resultat { controle: string; testeur_id: string; testeur: string; statut: 'ok' | 'ko' | 'passe'; note: string; updated_at: string }
 interface Recette { version: string; adresse: string; sections: Section[]; resultats: Resultat[] }
 
+import { telecharger } from '~/composables/useAdminMetier'
 const { me } = useAdmin()
+const erreur = ref<string | null>(null)
+/** Vue : tous les résultats, ou seulement les miens (les pastilles des autres disparaissent). */
+const vue = ref<'equipe' | 'moi'>('equipe')
+const exportEnCours = ref(false)
+async function exporter() {
+  if (exportEnCours.value) return
+  exportEnCours.value = true
+  erreur.value = null
+  try {
+    await telecharger('/api/admin/recette/rapport')
+  } catch (e) {
+    erreur.value = messageErreur(e)
+  } finally {
+    exportEnCours.value = false
+  }
+}
 const { data, refresh, error } = await useFetch<Recette>('/api/admin/recette', { headers: useRequestHeaders(['cookie']) })
 
 const controles = computed(() => data.value?.sections.flatMap((s) => s.controles) ?? [])
@@ -19,7 +36,7 @@ const parControle = computed(() => {
   return m
 })
 const mien = (k: string) => parControle.value[k]?.find((r) => r.testeur_id === me.value?.user.id) ?? null
-const autres = (k: string) => (parControle.value[k] ?? []).filter((r) => r.testeur_id !== me.value?.user.id)
+const autres = (k: string) => (vue.value === 'moi' ? [] : (parControle.value[k] ?? []).filter((r) => r.testeur_id !== me.value?.user.id))
 
 const faits = computed(() => controles.value.filter((c) => mien(c.k)).length)
 const totaux = computed(() => {
@@ -30,14 +47,13 @@ const totaux = computed(() => {
   }
   return t
 })
-const anomalies = computed(() => (data.value?.resultats ?? []).filter((r) => r.statut === 'ko'))
+const anomalies = computed(() => (data.value?.resultats ?? []).filter((r) => r.statut === 'ko' && (vue.value === 'equipe' || r.testeur_id === me.value?.user.id)))
 
 const LIBELLE: Record<string, string> = { ok: 'OK', ko: 'KO', passe: 'Passé' }
 const CLASSE: Record<string, string> = { ok: 'bg-green-100 text-green-600', ko: 'bg-red-100 text-red-600', passe: 'bg-gray-100 text-gray-500' }
 
 const notes = reactive<Record<string, string>>({})
 const occupe = ref<string | null>(null)
-const erreur = ref<string | null>(null)
 
 async function marquer(k: string, statut: 'ok' | 'ko' | 'passe') {
   if (occupe.value) return
@@ -76,7 +92,13 @@ onUnmounted(() => clearInterval(timer))
 
 <template>
   <div>
-    <AdminHeader titre="Recette fonctionnelle" :sous-titre="data ? `Version du ${data.version} · ${controles.length} contrôles · ${totaux.testeurs.size} testeur${totaux.testeurs.size > 1 ? 's' : ''}` : 'Chargement'" />
+    <AdminHeader titre="Recette fonctionnelle" :sous-titre="data ? `Version du ${data.version} · ${controles.length} contrôles · ${totaux.testeurs.size} testeur${totaux.testeurs.size > 1 ? 's' : ''}` : 'Chargement'">
+      <div class="inline-flex overflow-hidden rounded-[10px] border border-gray-200 text-sm" role="group" aria-label="Vue">
+        <button type="button" class="h-10 px-3.5 font-medium" :class="vue === 'equipe' ? 'bg-navy-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'" @click="vue = 'equipe'">Toute l’équipe</button>
+        <button type="button" class="h-10 border-l border-gray-200 px-3.5 font-medium" :class="vue === 'moi' ? 'bg-navy-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'" @click="vue = 'moi'">Mes résultats</button>
+      </div>
+      <button type="button" class="btn btn-outline h-10 gap-2 rounded-[10px] px-3.5 text-sm" :disabled="exportEnCours" @click="exporter"><UiIcon name="file-pdf-box" :size="18" class="text-gray-500" />{{ exportEnCours ? 'Préparation…' : 'Mon rapport PDF' }}</button>
+    </AdminHeader>
     <div class="px-8 pt-7 pb-9">
       <AdminVide v-if="error" erreur titre="La recette n’a pas pu être chargée" texte="Réessayez dans un instant.">
         <button type="button" class="btn btn-navy h-10 gap-2 rounded-[10px] px-4 text-sm" @click="refresh()"><UiIcon name="refresh" :size="18" />Réessayer</button>
