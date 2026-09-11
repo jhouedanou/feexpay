@@ -4,7 +4,7 @@
 definePageMeta({ layout: false, middleware: 'admin' })
 useSeoMeta({ title: 'Double authentification — Administration Radar by FeexPay', robots: 'noindex' })
 
-const { me, charger } = useAdmin()
+const { me, charger, deconnecter } = useAdmin()
 const mode = ref<'verifier' | 'enroler' | 'recuperation' | 'codes'>('verifier')
 const enrolement = ref<{ factorId: string; secret: string; qr: string } | null>(null)
 const code = ref('')
@@ -133,6 +133,10 @@ async function recuperer() {
           </form>
           <p class="text-center text-[13px] leading-[1.5] text-gray-500">Application indisponible ? <button type="button" class="text-orange-600 hover:underline" @click="mode = 'recuperation'">Utiliser un code de récupération</button></p>
         </template>
+
+        <p v-if="mode !== 'codes'" class="mt-8 text-center text-[13px] leading-[1.5] text-gray-500">
+          <button type="button" class="text-gray-500 hover:text-navy-600 hover:underline" @click="deconnecter">Se déconnecter</button>
+        </p>
       </div>
     </main>
   </div>
