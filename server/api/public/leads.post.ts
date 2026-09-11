@@ -73,23 +73,33 @@ export default defineEventHandler(async (event) => {
     let conflit: Record<string, unknown> | null = null
 
     if (byEmail.rowCount) {
+      // Email déjà connu, sans preuve que l'internaute en est le titulaire (audit du
+      // 11 septembre 2026) : la fiche existante n'est pas réécrite et le consentement
+      // contact n'est pas relevé. Seuls les champs vides sont complétés ; ce qui diffère est
+      // consigné dans match_conflict pour arbitrage dans l'admin.
       contactId = byEmail.rows[0]!.id
-      const connu = byEmail.rows[0]!.phone_e164
-      if (connu && connu !== b.phone) {
-        conflit = { phone_seen: connu, phone_submitted: b.phone, at: new Date().toISOString() }
+      const existant = byEmail.rows[0]!
+      const ecarts: Record<string, unknown> = {}
+      if (existant.phone_e164 && existant.phone_e164 !== b.phone) {
+        ecarts.phone_seen = existant.phone_e164
+        ecarts.phone_submitted = b.phone
       }
+      const fiche = await c.query<{ prenom: string; nom: string; entreprise: string | null }>(
+        `select prenom, nom, entreprise from contact where id = $1`,
+        [contactId],
+      )
+      const f = fiche.rows[0]!
+      if (f.prenom !== b.prenom || f.nom !== b.nom) ecarts.identity_submitted = `${b.prenom} ${b.nom}`
+      if (f.entreprise && b.entreprise && f.entreprise !== b.entreprise) ecarts.entreprise_submitted = b.entreprise
+      if (b.consentContact) ecarts.contact_consent_submitted = true
+      if (Object.keys(ecarts).length) conflit = { reason: 'email_matches_existing_contact', ...ecarts, at: new Date().toISOString() }
       await c.query(
-        `update contact set prenom = $2, nom = $3, entreprise = $4, secteur = $5,
-                            secteur_autre = $6, taille = $7,
-                            phone_e164 = coalesce(phone_e164, $8),
-                            match_conflict = coalesce($9::jsonb, match_conflict),
-                            contact_allowed = contact_allowed or $10
+        `update contact set entreprise = coalesce(entreprise, $2), secteur = coalesce(secteur, $3),
+                            secteur_autre = coalesce(secteur_autre, $4), taille = coalesce(taille, $5),
+                            phone_e164 = coalesce(phone_e164, $6),
+                            match_conflict = coalesce($7::jsonb, match_conflict)
           where id = $1`,
-        [
-          contactId, b.prenom, b.nom, b.entreprise, b.secteur,
-          b.secteurAutre ?? null, b.taille, b.phone,
-          conflit ? JSON.stringify(conflit) : null, b.consentContact,
-        ]
+        [contactId, b.entreprise, b.secteur, b.secteurAutre ?? null, b.taille, b.phone, conflit ? JSON.stringify(conflit) : null],
       )
     } else {
       // Email inconnu : le téléphone peut appartenir à un contact existant.

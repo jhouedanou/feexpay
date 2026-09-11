@@ -29,7 +29,7 @@ Vous recevez un email d'invitation valable sept jours, avec un lien à usage uni
 | Téléphone (second facteur) | Un code de récupération sur l'écran de vérification. Il retire le facteur : vous le ré-enrôlerez à la connexion suivante. |
 | Les deux | Contactez un Administrateur : il vous réinvite. |
 
-Après cinq tentatives de connexion échouées, le compte est verrouillé quinze minutes.
+Après cinq tentatives de connexion échouées, le compte est verrouillé quinze minutes. L'écran affiche alors le même message qu'un mot de passe faux : c'est voulu, pour ne pas indiquer aux inconnus quelles adresses ont un compte.
 
 ---
 

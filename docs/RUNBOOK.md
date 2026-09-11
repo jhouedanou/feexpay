@@ -158,7 +158,7 @@ violation de CSP y apparaît explicitement).
 | Mot de passe oublié | `/admin/mot-de-passe-oublie`. Lien valable une heure, à usage unique. Le second facteur reste exigé ensuite. |
 | Second facteur perdu, codes de récupération disponibles | Écran 2FA → code de récupération. Le facteur TOTP est retiré, à ré-enrôler à la connexion suivante. |
 | Second facteur et codes perdus | Un autre administrateur suspend puis réactive le compte, ou le réinvite. |
-| « Trop de tentatives » | Verrouillage de 15 minutes après cinq échecs. Une réinitialisation réussie remet le compteur à zéro. |
+| « Email ou mot de passe incorrect » malgré un mot de passe juste | Verrouillage de 15 minutes après cinq échecs. Le message est le même que pour une adresse inconnue, pour ne pas révéler quelles adresses ont un compte ; l'entrée `login.locked` du journal d'audit le confirme. Une réinitialisation réussie remet le compteur à zéro. |
 | « Ce compte est suspendu ou révoqué » | Admin → Comptes → réactiver. |
 | Dernier administrateur | Le dernier compte Administrateur actif ne peut être ni suspendu, ni révoqué, ni rétrogradé (garde en base). Créer d'abord un second administrateur. |
 

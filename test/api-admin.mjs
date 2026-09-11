@@ -89,7 +89,7 @@ check('liste des comptes accessible à l’admin', liste.status === 200 && Array
 // 4. Reconnexion : mot de passe puis TOTP
 const login2 = session()
 const l1 = await login2('POST', '/api/admin/auth/login', { email: ADMIN, password: 'mauvais-mot-de-passe' })
-check('mauvais mot de passe refusé avec tentatives restantes', l1.status === 401 && /tentative/.test(l1.data?.data?.message ?? ''), l1.data?.data?.message)
+check('mauvais mot de passe refusé, message sans indice sur le compte', l1.status === 401 && l1.data?.data?.message === 'Email ou mot de passe incorrect.', l1.data?.data?.message)
 const l2 = await login2('POST', '/api/admin/auth/login', { email: ADMIN, password: PWD })
 check('connexion par mot de passe', l2.status === 200 && l2.data?.mfa?.requise === true && l2.data?.mfa?.enrolee === true)
 const l3 = await login2('POST', '/api/admin/auth/2fa/verify', { code: totp.generate() })

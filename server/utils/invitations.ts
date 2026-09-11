@@ -23,6 +23,10 @@ export interface InvitationInput {
  * d'où le lien renvoyé à l'appelant pour transmission manuelle (A10, « Copier le lien »).
  */
 export async function creerInvitation(event: H3Event, input: InvitationInput, inviterId: string) {
+  // Une invitation ne doit jamais viser un compte qui existe déjà : son acceptation
+  // reposerait le mot de passe et réactiverait le compte hors des gardes de A10.
+  const existant = await db().query(`select 1 from admin_user where email = $1 and status <> 'invited'`, [input.email])
+  if (existant.rowCount) throw apiError(event, 'DUPLICATE_SUBMISSION', 'Un compte existe déjà pour cette adresse.')
   const token = newToken()
   const row = await tx(async (c) => {
     await c.query(`update admin_invitation set status = 'revoked' where email = $1 and status = 'pending'`, [input.email])
@@ -105,8 +109,10 @@ export async function accepterInvitation(event: H3Event, token: string, prenom: 
   const inv = await invitationParJeton(event, token)
   const sb = supabaseAdmin()
   let userId: string
-  const existant = await db().query<{ id: string }>(`select id from admin_user where email = $1`, [inv.email])
+  const existant = await db().query<{ id: string; status: string }>(`select id, status from admin_user where email = $1`, [inv.email])
   if (existant.rows[0]) {
+    // Seul un compte encore « invité » (amorçage) peut être pris par une invitation.
+    if (existant.rows[0].status !== 'invited') throw apiError(event, 'FORBIDDEN_SCOPE', 'Un compte existe déjà pour cette adresse.')
     userId = existant.rows[0].id
     const r = await sb.auth.admin.updateUserById(userId, { password, email_confirm: true })
     if (r.error) throw apiError(event, 'VALIDATION_ERROR', r.error.message)

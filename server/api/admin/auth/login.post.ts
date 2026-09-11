@@ -8,7 +8,8 @@ const VERROU_MIN = 15
 
 /**
  * POST /api/admin/auth/login — A01. Mot de passe vérifié par Supabase, compte actif exigé,
- * verrouillage progressif après cinq échecs (CDC : « verrouillage progressif »).
+ * verrouillage progressif après cinq échecs (CDC : « verrouillage progressif »), réponse
+ * identique pour toute cause de refus.
  * Réponse : `mfa` indique si un second facteur est attendu avant d'entrer.
  */
 export default defineEventHandler(async (event) => {
@@ -21,14 +22,19 @@ export default defineEventHandler(async (event) => {
     [email],
   )
   const compte = rows[0]
+  // Même réponse quelle que soit la cause (adresse inconnue, mot de passe faux, compte
+  // verrouillé) : le formulaire ne doit pas révéler quelles adresses ont un compte
+  // (audit du 11 septembre 2026). Le verrouillage reste appliqué et journalisé.
+  const REFUS = 'Email ou mot de passe incorrect.'
   if (compte?.locked_until && compte.locked_until > new Date()) {
-    throw apiError(event, 'ACCOUNT_LOCKED', `Trop de tentatives. Réessayez dans ${VERROU_MIN} minutes.`)
+    await audit(event, 'login.locked', 'admin_user', compte.id, {}, null)
+    throw apiError(event, 'UNAUTHENTICATED', REFUS)
   }
 
   const r = await supabaseAnon().auth.signInWithPassword({ email, password })
   if (r.error || !r.data.session || !compte) {
-    const restantes = compte ? Math.max(0, MAX_TENTATIVES - (compte.failed_logins + 1)) : 0
     if (compte) {
+      const restantes = Math.max(0, MAX_TENTATIVES - (compte.failed_logins + 1))
       await db().query(
         `update admin_user set failed_logins = failed_logins + 1,
                 locked_until = case when failed_logins + 1 >= $2 then now() + interval '${VERROU_MIN} minutes' else null end
@@ -37,11 +43,7 @@ export default defineEventHandler(async (event) => {
       )
       await audit(event, 'login.failed', 'admin_user', compte.id, { restantes }, null)
     }
-    throw apiError(
-      event,
-      'UNAUTHENTICATED',
-      compte ? `Email ou mot de passe incorrect. Il vous reste ${restantes} tentative${restantes > 1 ? 's' : ''}.` : 'Email ou mot de passe incorrect.',
-    )
+    throw apiError(event, 'UNAUTHENTICATED', REFUS)
   }
   if (compte.status !== 'active') {
     await audit(event, 'login.refused', 'admin_user', compte.id, { status: compte.status }, null)
