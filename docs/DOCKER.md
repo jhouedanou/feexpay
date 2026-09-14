@@ -156,9 +156,22 @@ le même fichier, contrairement au déploiement hébergé où ils vivent chez Su
 par `DATABASE_URL` ; sur cette pile, aucune donnée réelle n'est en jeu.
 
 ```bash
-docker compose --env-file docker/.env --profile outils run --rm \
-  -e APP_BASE_URL=http://app:3000 outils pnpm test:api
+docker compose --env-file docker/.env --profile outils run --rm outils pnpm test:api
 ```
+
+Le service joint l'application par `API_BASE_URL=http://app:3000`, posé dans le compose ;
+`APP_BASE_URL` y reste l'URL publique, pour les liens qu'impriment les seeds.
+
+**L'image `outils` embarque les sources.** Elle est construite une fois, à l'étape `build`
+du Dockerfile ; `run` réutilise l'image existante. Après toute modification de `test/`,
+`scripts/` ou du moteur, la reconstruire, sinon c'est l'ancienne version qui tourne :
+
+```bash
+docker compose --env-file docker/.env build outils
+```
+
+Même chose pour `amorcer`, qui partage cette image, et pour `app` (`build app`) après un
+changement du code applicatif.
 
 ## 5. Ce que la pile a changé dans le code
 
