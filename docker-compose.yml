@@ -263,9 +263,10 @@ services:
         condition: service_healthy
     environment:
       <<: *env-outils
-      # Les tests HTTP de `test/` joignent l'application par APP_BASE_URL : depuis ce
-      # conteneur, c'est le nom du service, pas l'adresse de la machine hôte.
-      APP_BASE_URL: http://app:3000
+      # Les tests HTTP de `test/` joignent l'application par cette adresse : depuis ce
+      # conteneur, c'est le nom du service. APP_BASE_URL reste l'URL publique, pour les
+      # liens qu'impriment les seeds.
+      API_BASE_URL: http://app:3000
     command: ["pnpm", "seed:scoring"]
 
 volumes:

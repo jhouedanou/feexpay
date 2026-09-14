@@ -10,7 +10,7 @@ import { createHash, createHmac, randomBytes } from 'node:crypto'
 import pg from 'pg'
 import * as OTPAuth from 'otpauth'
 import { createClient } from '@supabase/supabase-js'
-const BASE = process.env.APP_BASE_URL ?? 'http://localhost:3000'
+const BASE = process.env.API_BASE_URL ?? process.env.APP_BASE_URL ?? 'http://localhost:3000'
 const env = Object.fromEntries(
   readFileSync('.env', 'utf8').split('\n').filter((l) => /^[A-Z_]+=/.test(l))
     .map((l) => { const i = l.indexOf('='); let v = l.slice(i + 1).trim(); const q = /^(["'])(.*?)\1/.exec(v); v = q ? q[2] : v.replace(/\s+#.*$/, ''); return [l.slice(0, i), v.trim()] }),

@@ -5,7 +5,7 @@
  *
  *   nvm use 22 && pnpm test:results
  */
-const BASE = process.env.APP_BASE_URL ?? 'http://localhost:3000'
+const BASE = process.env.API_BASE_URL ?? process.env.APP_BASE_URL ?? 'http://localhost:3000'
 let cookie = ''
 let fails = 0
 
