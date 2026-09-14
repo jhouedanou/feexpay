@@ -128,6 +128,49 @@ Les images `app` et `outils` embarquent les sources : reconstruire après toute 
 (`build app`, `build outils`). Montage détaillé, sauvegardes, hébergement sur un serveur,
 limites (pas de TLS, un seul mot de passe Postgres) : [docs/DOCKER.md](docs/DOCKER.md).
 
+## Secrets
+
+`.env` et `docker/.env` sont exclus du dépôt (`.gitignore`). Seuls les modèles
+`.env.example` et `docker/.env.example` sont versionnés : ils donnent la liste des variables
+et leurs commentaires, jamais les valeurs. Ce que reçoit la personne chargée du déploiement
+dépend de la cible.
+
+### Vercel + Supabase
+
+Les valeurs existent déjà et désignent des services en ligne : il faut bien les transmettre.
+Deux d'entre elles donnent un accès complet si elles fuitent — `SUPABASE_SERVICE_KEY`, qui
+contourne toutes les politiques RLS, et `DATABASE_URL`, qui contient le mot de passe Postgres.
+
+Le mieux est de ne rien transmettre du tout : saisir les variables dans le tableau de bord
+Vercel (Project → Settings → Environment Variables), ou les poser avec `vercel env add`. Le
+fichier ne circule alors jamais.
+
+Si un transfert est inévitable, il passe par un gestionnaire de secrets partagé (1Password,
+Bitwarden) ou, à défaut, par un lien à usage unique et à expiration. Ni messagerie
+instantanée, ni email, ni espace de fichiers partagé : ces canaux conservent une copie en
+clair, indexée et rejouable. Une valeur passée par l'un d'eux est à considérer comme
+divulguée — la révoquer et la régénérer côté Supabase.
+
+### Tout en conteneurs
+
+**Aucun secret ne se transmet.** `JWT_SECRET`, `SUPABASE_KEY`, `SUPABASE_SERVICE_KEY`,
+`POSTGRES_PASSWORD` et `CRON_SECRET` sont générés sur la machine cible par
+`docker/scripts/generer-secrets.mjs`, et n'ont d'existence que dans cette pile. Les deux
+« clés Supabase » n'appartiennent à aucun compte hébergé : ce sont des jetons JWT signés avec
+le `JWT_SECRET` local, portant le rôle Postgres que lisent GoTrue et PostgREST.
+
+Restent à transmettre les seules valeurs qui désignent des services extérieurs, et uniquement
+si la fonction est activée : `RESEND_API_KEY` et `RESEND_WEBHOOK_SECRET` quand
+`MAIL_TRANSPORT=resend`, `GA4_API_SECRET` et `META_CAPI_ACCESS_TOKEN` quand
+`TRACKING_ENABLED=true`. Par défaut, le courrier va à Mailpit et le tracking est éteint :
+rien à envoyer.
+
+Rotation : rejouer `generer-secrets.mjs` et remplacer les lignes dans `docker/.env`. Les
+jetons `anon` et `service` dépendent du `JWT_SECRET` — changer l'un impose de régénérer les
+autres, sinon l'authentification et PostgREST se rejettent mutuellement
+([docs/DOCKER.md](docs/DOCKER.md), limite 6). Variables manquantes ou incohérentes :
+[docs/RUNBOOK.md](docs/RUNBOOK.md) §2.
+
 ## Tests
 
 ```bash
