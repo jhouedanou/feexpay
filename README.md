@@ -60,6 +60,12 @@ Les écarts par rapport à la stack annoncée au PLAN.md §2 — pas de Drizzle,
 
 ## Démarrer
 
+Deux façons de faire tourner le même code : sur le poste, branché sur Supabase (déploiement
+de référence, Vercel), ou tout en conteneurs, sans aucun compte hébergé (version
+auto-hébergeable, branche `docker-backend`).
+
+### Sur le poste, avec Supabase
+
 `node` par défaut est en v10 sur le poste de développement : forcer la v22 avant tout `pnpm`.
 
 ```bash
@@ -68,8 +74,16 @@ pnpm install
 pnpm dev
 ```
 
-Tout en conteneurs, sans projet Supabase ni clé Resend — base, authentification, tâches
-planifiées et boîte de réception comprises :
+Env : copier `.env.example` → `.env`. En local, `DATABASE_URL` utilise la connexion directe
+Supabase (port 5432). Sur Vercel, elle doit pointer le **pooler Supavisor en mode session** :
+la connexion directe est IPv6-only et les fonctions Vercel n'ont pas d'egress IPv6. La valeur
+prête est dans `.env` sous `DATABASE_URL_POOLER`. Ne jamais utiliser le port 6543 (mode
+transaction) : il ne supporte pas les prepared statements.
+
+### Tout en conteneurs (auto-hébergé)
+
+Base, authentification, tâches planifiées et boîte de réception comprises. Prérequis : Docker
+avec Compose v2 et `node` ≥ 20 sur la machine (uniquement pour générer les secrets).
 
 ```bash
 cp docker/.env.example docker/.env
@@ -77,16 +91,42 @@ node docker/scripts/generer-secrets.mjs >> docker/.env
 docker compose --env-file docker/.env up -d --build
 ```
 
-La pile s'amorce seule : version du moteur publiée, administrateur principal et invitations
-créés au premier démarrage. Les liens d'invitation sont imprimés par le service `amorcer`
-(`docker compose --env-file docker/.env logs amorcer`) ; aucun email n'est envoyé à cette
-étape. Montage, exploitation et limites : [docs/DOCKER.md](docs/DOCKER.md).
+`--env-file` est obligatoire : sans lui, Compose lit le `.env` du dépôt, qui vise Supabase en
+ligne. Le premier passage construit l'image (plusieurs minutes), puis la pile s'amorce
+seule : version du moteur publiée, administrateur principal et invitations créés.
 
-Env : copier `.env.example` → `.env`. En local, `DATABASE_URL` utilise la connexion directe
-Supabase (port 5432). Sur Vercel, elle doit pointer le **pooler Supavisor en mode session** :
-la connexion directe est IPv6-only et les fonctions Vercel n'ont pas d'egress IPv6. La valeur
-prête est dans `.env` sous `DATABASE_URL_POOLER`. Ne jamais utiliser le port 6543 (mode
-transaction) : il ne supporte pas les prepared statements.
+| Adresse | Rôle |
+|---|---|
+| <http://localhost:3000> | Application et espace admin |
+| <http://localhost:8025> | Boîte de réception Mailpit : tout le courrier y arrive, rien ne sort |
+| <http://localhost:8000> | Passerelle auth + REST (usage interne) |
+| `localhost:5432`, base `radar` | Postgres, pour `psql` |
+
+**Premier accès à l'espace admin.** Les liens d'invitation sont imprimés par le service
+`amorcer`, aucun email n'est envoyé à cette étape :
+
+```bash
+docker compose --env-file docker/.env logs amorcer
+```
+
+Ouvrir le lien `admin` : prénom, nom, mot de passe (12 caractères, refusé s'il figure dans une
+fuite connue), puis activation de la double authentification avec une application TOTP. Les
+dix codes de récupération ne sont affichés qu'une fois.
+
+**Au quotidien :**
+
+```bash
+docker compose --env-file docker/.env ps                          # état des services
+docker compose --env-file docker/.env logs -f app                 # journal de l'application
+docker compose --env-file docker/.env build app && docker compose --env-file docker/.env up -d app   # après un changement de code
+docker compose --env-file docker/.env --profile outils run --rm outils pnpm test:api   # tests HTTP
+docker compose --env-file docker/.env down                        # arrêt, données conservées
+docker compose --env-file docker/.env down -v                     # arrêt et purge complète
+```
+
+Les images `app` et `outils` embarquent les sources : reconstruire après toute modification
+(`build app`, `build outils`). Montage détaillé, sauvegardes, hébergement sur un serveur,
+limites (pas de TLS, un seul mot de passe Postgres) : [docs/DOCKER.md](docs/DOCKER.md).
 
 ## Tests
 
