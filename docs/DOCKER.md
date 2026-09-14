@@ -6,13 +6,11 @@ compte hébergé. Le déploiement de référence reste Vercel + Supabase, décri
 même code, utile pour travailler hors ligne, pour monter une recette jetable, ou pour héberger
 l'ensemble sur une machine louée.
 
-> **Rien de ceci n'a été exécuté.** La pile a été écrite sans Docker sur le poste de
-> développement, à la demande. Les versions d'images sont épinglées sur celles que Supabase
-> fait tourner ensemble, la configuration suit leur documentation, et les deux parties
-> vérifiables sans Docker l'ont été : le serveur compilé démarre par `docker/app/entrypoint.sh`
-> et répond sur `/api/public/health`, avec la configuration lue à l'exécution. Le premier
-> `docker compose up` demandera probablement des ajustements ; §7 liste les endroits les plus
-> probables.
+> Pile exécutée le 14 septembre 2026 sur macOS (Docker 29.7, Compose 5.4) : premier
+> `docker compose up --build` complet, amorçage, parcours public, résultats, envoi d'email
+> vers Mailpit et tâche planifiée vérifiés. Trois ajustements ont suivi ce premier passage
+> (search_path de GoTrue, sonde nginx en IPv4, adresse de l'application vue depuis `outils`) ;
+> ils sont dans le dépôt.
 
 ---
 

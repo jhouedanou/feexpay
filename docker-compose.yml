@@ -157,7 +157,7 @@ services:
     ports:
       - "${GATEWAY_PORT:-8000}:8000"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/sante"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8000/sante"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -261,7 +261,11 @@ services:
     depends_on:
       app:
         condition: service_healthy
-    environment: *env-outils
+    environment:
+      <<: *env-outils
+      # Les tests HTTP de `test/` joignent l'application par APP_BASE_URL : depuis ce
+      # conteneur, c'est le nom du service, pas l'adresse de la machine hôte.
+      APP_BASE_URL: http://app:3000
     command: ["pnpm", "seed:scoring"]
 
 volumes:

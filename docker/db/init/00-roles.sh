@@ -36,6 +36,9 @@ grant service_role to authenticator;
 create role supabase_auth_admin login noinherit createrole password :'mdp';
 create schema if not exists auth authorization supabase_auth_admin;
 grant create on database :"base" to supabase_auth_admin;
+-- GoTrue pose ses tables (schema_migrations, users…) dans le schéma courant : sans
+-- ce search_path, il tente public et s'arrête sur « permission denied ».
+alter role supabase_auth_admin set search_path = auth;
 
 grant usage on schema public to anon, authenticated, service_role;
 SQL
