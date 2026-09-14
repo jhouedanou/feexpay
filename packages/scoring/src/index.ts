@@ -1,20 +1,16 @@
-export * from './types'
-export {
-  VERSION,
-  CHECKSUM,
-  constants,
-  questions,
-  options,
-  archetypes,
-  combinedRules,
-  dimensions,
-  DIMS,
-  RAYONNEMENT_DIMS,
-  questionsOf,
-  optionByCode,
-  fromSequence,
-} from './data'
-export { scoreDirigeant } from './dirigeant'
-export { scoreRayonnement } from './rayonnement'
+/**
+ * Moteur de scoring Radar by FeexPay — V2.1.
+ * Pur, déterministe, versionné, sans dépendance ni I/O : la même paire (réponses, version)
+ * produit toujours le même snapshot. Autorité serveur (CDC F.1).
+ */
+export { answersFromLetters, validate, type ValidatedAnswers } from './answers'
 export { crossReading } from './cross'
-export { buildInsights } from './insights'
+export { CURRENT_VERSION, getVersion, listVersions, V2_1, V2_2, type ScoringVersion } from './data'
+export { scoreDirigeant } from './dirigeant'
+export { ScoringError, type ScoringErrorCode } from './errors'
+export { buildInsights, type InsightInput } from './insights'
+export { CAS_ARCHETYPES, CAS_CONTROLE, CAS_DEPARTAGE, executerControles, type ResultatControle } from './controls'
+export { toPublicDirigeant, toPublicRayonnement } from './public'
+export { scoreRayonnement } from './rayonnement'
+export { level, round, round2 } from './utils'
+export type * from './types'

@@ -1,16 +1,36 @@
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
-import * as schema from '../db/schema'
+import pg from 'pg'
 
-let _db: ReturnType<typeof drizzle<typeof schema>> | null = null
+let pool: pg.Pool | undefined
 
-export function useDb() {
-  if (_db) return _db
-  const url = useRuntimeConfig().databaseUrl || process.env.DATABASE_URL
-  if (!url) throw new Error('DATABASE_URL manquant')
-  // Pooler Supabase en transaction mode : prepare=false obligatoire.
-  const client = postgres(url, { prepare: false, max: 10 })
-  _db = drizzle(client, { schema })
-  return _db
+/**
+ * Pool Postgres partagé. Accès serveur uniquement, via la connexion directe :
+ * les tables métier sont en RLS deny-all, aucun accès client direct (CDC F.1).
+ */
+export function db(): pg.Pool {
+  if (pool) return pool
+  const { databaseUrl } = useRuntimeConfig()
+  if (!databaseUrl) throw new Error('DATABASE_URL manquant')
+  pool = new pg.Pool({
+    connectionString: databaseUrl,
+    ssl: { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 30_000,
+  })
+  return pool
 }
-export { schema }
+
+/** Exécute `fn` dans une transaction, rollback sur exception. */
+export async function tx<T>(fn: (c: pg.PoolClient) => Promise<T>): Promise<T> {
+  const client = await db().connect()
+  try {
+    await client.query('begin')
+    const out = await fn(client)
+    await client.query('commit')
+    return out
+  } catch (err) {
+    await client.query('rollback').catch(() => {})
+    throw err
+  } finally {
+    client.release()
+  }
+}

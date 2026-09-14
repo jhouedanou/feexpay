@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A10 · Gestion et administration des profils admins · comptes-admin</title>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+--fx-navy-900:#06142B;--fx-navy-800:#0A2044;--fx-navy-700:#0D2650;--fx-navy-600:#112C56;--fx-navy-500:#23477E;--fx-navy-400:#45689F;--fx-navy-300:#7E97BF;--fx-navy-200:#B5C5DC;--fx-navy-100:#DDE5F0;--fx-navy-50:#EEF3F9;
+--fx-orange-900:#6A2E00;--fx-orange-800:#8E3E00;--fx-orange-700:#AD4B00;--fx-orange-600:#D45D00;--fx-orange-500:#E5762A;--fx-orange-400:#EF9453;--fx-orange-300:#F6B684;--fx-orange-200:#FBD6BB;--fx-orange-100:#FDEBDE;--fx-orange-50:#FFF6F0;
+--fx-gray-50:#F6F7F9;--fx-gray-100:#EEF0F4;--fx-gray-200:#E0E4EB;--fx-gray-300:#C7CEDA;--fx-gray-400:#98A3B4;--fx-gray-500:#6C7686;--fx-gray-600:#4C5665;--fx-gray-700:#373E4B;--fx-gray-800:#232932;--fx-gray-900:#12171E;
+--fx-green-600:#0F7A48;--fx-green-100:#E4F4EB;--fx-amber-600:#A66A00;--fx-amber-100:#FBF0DA;--fx-red-600:#B5372A;--fx-red-100:#FBE6E3;--fx-blue-600:#17549B;--fx-blue-100:#E5EFFB;
+--font-sans:"Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+--gradient-inverse:linear-gradient(135deg,#0D2650 0%,#112C56 55%,#23477E 100%);
+--gradient-hero:linear-gradient(180deg,#EEF3F9 0%,#FFFFFF 68%);
+}
+html,body{margin:0;padding:0}
+body{background:#DFE3E9;font-family:"Poppins","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#D45D00;text-decoration:none}
+a:hover{color:#AD4B00;text-decoration:underline;text-underline-offset:3px}
+
+:root{--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+body{padding:24px;display:flex;justify-content:center}
+</style>
+</head>
+<body>
+<div style="width:1440px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px"><span style="font:600 11px/1 var(--font-mono);letter-spacing:.04em;padding:5px 7px;background:#112C56;color:#fff;border-radius:5px">A10</span><span style="font:600 13px/1.2 var(--font-sans);color:#112C56">Gestion et administration des profils admins</span></div>
+      <div style="background:#F6F7F9;border:1px solid #C7CEDA;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(17,44,86,.1);display:flex;min-height:900px">
+        <div style="width:240px;background:#112C56;padding:24px 0;flex:none">
+          <div style="padding:0 20px 28px"><img src="/MarketingBS/Annexe_02_Maquettes_UI_Radar_by_FeexPay/assets/logo-feexpay-white.png" alt="FeexPay" style="height:22px;width:auto"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;padding:0 12px">
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px"><span class="mdi mdi-view-dashboard-outline" style="font-size:20px;color:#B5C5DC"></span><span style="font:400 14px/1 var(--font-sans);color:#DDE5F0">Dashboard</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px"><span class="mdi mdi-account-multiple-outline" style="font-size:20px;color:#B5C5DC"></span><span style="font:400 14px/1 var(--font-sans);color:#DDE5F0">Prospects</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px"><span class="mdi mdi-clipboard-list-outline" style="font-size:20px;color:#B5C5DC"></span><span style="font:400 14px/1 var(--font-sans);color:#DDE5F0">Participations</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px"><span class="mdi mdi-file-document-outline" style="font-size:20px;color:#B5C5DC"></span><span style="font:400 14px/1 var(--font-sans);color:#DDE5F0">Rapports et emails</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;background:rgba(255,255,255,.1);border-radius:10px"><span class="mdi mdi-shield-account-outline" style="font-size:20px;color:#D45D00"></span><span style="font:600 14px/1 var(--font-sans);color:#fff">Comptes admin</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px"><span class="mdi mdi-source-branch" style="font-size:20px;color:#B5C5DC"></span><span style="font:400 14px/1 var(--font-sans);color:#DDE5F0">Versions</span></div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:#fff;border-bottom:1px solid #E0E4EB">
+            <div><h1 style="margin:0;font:600 24px/1.2 var(--font-sans);color:#112C56">Comptes admin</h1><p style="margin:4px 0 0;font:400 13px/1.3 var(--font-sans);color:#6C7686">12 comptes · 9 actifs · 2 invitations en attente · 1 suspendu</p></div>
+            <div style="display:flex;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1.5px solid #C7CEDA;border-radius:10px;background:#fff"><span class="mdi mdi-history" style="font-size:18px;color:#6C7686"></span><span style="font:600 14px/1 var(--font-sans);color:#112C56">Journal des accès</span></div>
+              <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;background:#D45D00"><span class="mdi mdi-account-plus-outline" style="font-size:18px;color:#fff"></span><span style="font:600 14px/1 var(--font-sans);color:#fff">Créer un compte</span></div>
+            </div>
+          </div>
+          <div style="padding:28px 32px 36px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:10px;width:280px;height:40px;padding:0 14px;border:1.5px solid #C7CEDA;border-radius:10px;background:#fff"><span class="mdi mdi-magnify" style="font-size:18px;color:#6C7686"></span><span style="font:400 14px/1 var(--font-sans);color:#98A3B4">Nom ou adresse email</span></div>
+              <span style="display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1.5px solid #C7CEDA;border-radius:999px;font:400 14px/1 var(--font-sans);color:#4C5665">Rôle<span class="mdi mdi-chevron-down" style="font-size:16px"></span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1.5px solid #C7CEDA;border-radius:999px;font:400 14px/1 var(--font-sans);color:#4C5665">Statut<span class="mdi mdi-chevron-down" style="font-size:16px"></span></span>
+              <span style="display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1.5px solid #C7CEDA;border-radius:999px;font:400 14px/1 var(--font-sans);color:#4C5665">Équipe<span class="mdi mdi-chevron-down" style="font-size:16px"></span></span>
+            </div>
+            <div style="display:flex;gap:20px;align-items:flex-start">
+              <div style="flex:1;min-width:0;background:#fff;border:1px solid #E0E4EB;border-radius:14px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;background:#F6F7F9;border-bottom:1px solid #E0E4EB">
+                  <span style="padding:13px 20px;font:600 12px/1.2 var(--font-sans);color:#4C5665">Compte</span>
+                  <span style="padding:13px 16px;font:600 12px/1.2 var(--font-sans);color:#4C5665">Rôle</span>
+                  <span style="padding:13px 16px;font:600 12px/1.2 var(--font-sans);color:#4C5665">Équipe</span>
+                  <span style="padding:13px 16px;font:600 12px/1.2 var(--font-sans);color:#4C5665">Dernière connexion</span>
+                  <span style="padding:13px 16px;font:600 12px/1.2 var(--font-sans);color:#4C5665">Statut</span>
+                  <span style="padding:13px 8px"></span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;border-bottom:1px solid #EEF0F4">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#112C56;font:600 13px/1 var(--font-sans);color:#fff">MK</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#112C56">Marc Koffi</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#6C7686">marc.koffi@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#FFF6F0;border:1px solid #FBD6BB;border-radius:999px;font:600 12px/1.4 var(--font-sans);color:#AD4B00">Administrateur</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#373E4B">Commerciale — CI</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#4C5665">Aujourd’hui · 08 h 41</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#E4F4EB;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#0F7A48"><span class="mdi mdi-check" style="font-size:13px"></span>Actif</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;border-bottom:1px solid #EEF0F4">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#23477E;font:600 13px/1 var(--font-sans);color:#fff">SB</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#112C56">Sylvie Bationo</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#6C7686">sylvie.b@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#EEF3F9;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#112C56">Analyste</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#373E4B">Données — Groupe</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#4C5665">Hier · 17 h 22</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#E4F4EB;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#0F7A48"><span class="mdi mdi-check" style="font-size:13px"></span>Actif</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;border-bottom:1px solid #EEF0F4;background:#FFF6F0">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px dashed #C7CEDA;font:600 13px/1 var(--font-sans);color:#98A3B4">NA</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#112C56">Nadège Ahouandjinou</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#6C7686">nadege.a@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#EEF3F9;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#112C56">Commercial</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#373E4B">Commerciale — Bénin</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#98A3B4">Jamais</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#FBF0DA;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#A66A00"><span class="mdi mdi-email-outline" style="font-size:13px"></span>Invité</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;border-bottom:1px solid #EEF0F4">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#23477E;font:600 13px/1 var(--font-sans);color:#fff">JD</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#112C56">Joseph Dossou</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#6C7686">joseph.d@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#EEF3F9;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#112C56">Commercial</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#373E4B">Commerciale — Togo</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#4C5665">14 août · 10 h 05</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#E4F4EB;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#0F7A48"><span class="mdi mdi-check" style="font-size:13px"></span>Actif</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px;border-bottom:1px solid #EEF0F4">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#98A3B4;font:600 13px/1 var(--font-sans);color:#fff">CT</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#6C7686">Clarisse Tapsoba</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#98A3B4">clarisse.t@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#F6F7F9;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#6C7686">Lecture seule</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#6C7686">Marketing — Groupe</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#98A3B4">2 juillet · 09 h 12</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#FBE6E3;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#B5372A"><span class="mdi mdi-pause" style="font-size:13px"></span>Suspendu</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr) 44px">
+                  <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;min-width:0"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#23477E;font:600 13px/1 var(--font-sans);color:#fff">AS</span><div><p style="margin:0;font:500 14px/1.3 var(--font-sans);color:#112C56">Aminata Sow</p><p style="margin:2px 0 0;font:400 12px/1.3 var(--font-sans);color:#6C7686">aminata.s@feexpay.me</p></div></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="padding:4px 10px;background:#EEF3F9;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#112C56">Analyste</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#373E4B">Données — Sénégal</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="font:400 13px/1.4 var(--font-sans);color:#4C5665">Aujourd’hui · 07 h 58</span></div>
+                  <div style="padding:14px 16px;display:flex;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#E4F4EB;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#0F7A48"><span class="mdi mdi-check" style="font-size:13px"></span>Actif</span></div>
+                  <div style="padding:14px 8px;display:flex;align-items:center;justify-content:center"><span class="mdi mdi-dots-vertical" style="font-size:20px;color:#98A3B4"></span></div>
+                </div>
+              </div>
+              <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:20px">
+                <div style="background:#fff;border:1px solid #E0E4EB;border-radius:14px;padding:24px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                    <p style="margin:0;font:600 12px/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:#6C7686">Compte sélectionné</p>
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:#FBF0DA;border-radius:999px;font:500 12px/1.4 var(--font-sans);color:#A66A00">Invité</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+                    <span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1.5px dashed #C7CEDA;font:600 15px/1 var(--font-sans);color:#98A3B4">NA</span>
+                    <div><p style="margin:0;font:600 16px/1.3 var(--font-sans);color:#112C56">Nadège Ahouandjinou</p><p style="margin:2px 0 0;font:400 13px/1.3 var(--font-sans);color:#6C7686">Commercial · Bénin</p></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:12px;padding:18px 0;border-top:1px solid #EEF0F4;border-bottom:1px solid #EEF0F4;margin-bottom:18px">
+                    <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:400 13px/1.4 var(--font-sans);color:#6C7686">Invitée par</span><span style="font:500 13px/1.4 var(--font-sans);color:#112C56">Marc Koffi</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:400 13px/1.4 var(--font-sans);color:#6C7686">Invitation envoyée</span><span style="font:500 13px/1.4 var(--font-sans);color:#112C56">18 août · 09 h 32</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:400 13px/1.4 var(--font-sans);color:#6C7686">Expire le</span><span style="font:500 13px/1.4 var(--font-sans);color:#AD4B00">25 août</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:12px"><span style="font:400 13px/1.4 var(--font-sans);color:#6C7686">Double authentification</span><span style="font:500 13px/1.4 var(--font-sans);color:#112C56">Requise</span></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;height:44px;background:#112C56;border-radius:10px;font:600 14px/1 var(--font-sans);color:#fff"><span class="mdi mdi-email-sync-outline" style="font-size:17px"></span>Renvoyer l’invitation</div>
+                    <div style="display:flex;align-items:center;justify-content:center;height:44px;border:1.5px solid #C7CEDA;border-radius:10px;font:600 14px/1 var(--font-sans);color:#112C56">Changer le rôle</div>
+                    <div style="display:flex;align-items:center;justify-content:center;height:44px;border:1.5px solid #FBD6BB;background:#FFF6F0;border-radius:10px;font:600 14px/1 var(--font-sans);color:#B5372A">Annuler l’invitation</div>
+                  </div>
+                </div>
+                <div style="background:#fff;border:1px solid #E0E4EB;border-radius:14px;padding:24px">
+                  <p style="margin:0 0 16px;font:600 12px/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:#6C7686">Périmètre par rôle</p>
+                  <div style="display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:10px 6px;align-items:center">
+                    <span></span>
+                    <span style="font:600 11px/1.2 var(--font-sans);color:#6C7686;text-align:center">Lect.</span>
+                    <span style="font:600 11px/1.2 var(--font-sans);color:#6C7686;text-align:center">Com.</span>
+                    <span style="font:600 11px/1.2 var(--font-sans);color:#6C7686;text-align:center">Anal.</span>
+                    <span style="font:600 11px/1.2 var(--font-sans);color:#6C7686;text-align:center">Admin</span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Dashboard</span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Fiches prospects</span>
+                    <span style="text-align:center"><span class="mdi mdi-eye-outline" style="font-size:16px;color:#98A3B4"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Renvoi de rapport</span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Export complet</span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Modèles d’email</span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Comptes admin</span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                    <span style="font:400 13px/1.35 var(--font-sans);color:#373E4B">Suppression de données</span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-minus" style="font-size:16px;color:#C7CEDA"></span></span>
+                    <span style="text-align:center"><span class="mdi mdi-check" style="font-size:17px;color:#0F7A48"></span></span>
+                  </div>
+                  <p style="margin:18px 0 0;font:400 12px/1.5 var(--font-sans);color:#6C7686">L’œil signifie consultation sans action. Le tiret signifie section masquée, pas bouton désactivé.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="margin:12px 0 0;font:400 12px/1.5 var(--font-sans);color:#6C7686">Un administrateur ne peut ni se retirer son propre rôle, ni supprimer le dernier compte administrateur actif : l’action est absente du menu, pas grisée.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+[
+  {
+    "id": "RC01",
+    "theme": "Parcours social fragmenté",
+    "gravite": 2,
+    "condition": "Q11C + R6A, R6B ou R6C",
+    "groups": [
+      [
+        "Q11C"
+      ],
+      [
+        "R6A",
+        "R6B",
+        "R6C"
+      ]
+    ],
+    "signaux": "Les ventes passent par les réseaux sociaux, mais le passage des interactions ou demandes numériques à des ventes mesurées reste à clarifier.",
+    "hypothese": "Le parcours entre découverte, conversation, commande et paiement pourrait être fragmenté.",
+    "relance": "Après une demande reçue sur les réseaux sociaux, quelles étapes le client suit-il jusqu’au paiement ?"
+  },
+  {
+    "id": "RC02",
+    "theme": "Site vitrine déconnecté",
+    "gravite": 2,
+    "condition": "Q11B + R6A ou R6B",
+    "groups": [
+      [
+        "Q11B"
+      ],
+      [
+        "R6A",
+        "R6B"
+      ]
+    ],
+    "signaux": "Le site présente l’offre, mais la commande se finalise ailleurs et le digital produit peu d’opportunités.",
+    "hypothese": "Le passage du site vers la commande ou le paiement pourrait provoquer des abandons.",
+    "relance": "Que doit faire un visiteur intéressé après avoir consulté une offre sur votre site ?"
+  },
+  {
+    "id": "RC03",
+    "theme": "Site transactionnel peu performant",
+    "gravite": 2,
+    "condition": "Q11A + R6A ou R6B",
+    "groups": [
+      [
+        "Q11A"
+      ],
+      [
+        "R6A",
+        "R6B"
+      ]
+    ],
+    "signaux": "Le site permet de commander et payer, mais les effets numériques restent faibles ou non mesurés.",
+    "hypothese": "La difficulté pourrait se situer dans l’acquisition, la conversion ou la mesure du parcours.",
+    "relance": "À quelle étape du site perdez-vous le plus de visiteurs ou de commandes ?"
+  },
+  {
+    "id": "RC04",
+    "theme": "Encaissement à distance incomplet",
+    "gravite": 3,
+    "condition": "Q10C ou Q10D + Q11A, Q11B ou Q11C",
+    "groups": [
+      [
+        "Q10C",
+        "Q10D"
+      ],
+      [
+        "Q11A",
+        "Q11B",
+        "Q11C"
+      ]
+    ],
+    "signaux": "L’activité possède un canal de vente digital, mais ne dispose pas d’un parcours organisé pour encaisser à distance.",
+    "hypothese": "La finalisation du paiement pourrait interrompre certaines ventes digitales.",
+    "relance": "Combien de demandes à distance restent sans suite au moment de payer ?"
+  },
+  {
+    "id": "RC05",
+    "theme": "Dispersion des paiements et trésorerie",
+    "gravite": 3,
+    "condition": "Q6B, Q6C ou Q6D + Q7C ou Q7D",
+    "groups": [
+      [
+        "Q6B",
+        "Q6C",
+        "Q6D"
+      ],
+      [
+        "Q7C",
+        "Q7D"
+      ]
+    ],
+    "signaux": "Les paiements sont dispersés et la trésorerie est évaluée à partir des soldes ou au moment des dépenses.",
+    "hypothese": "La fragmentation des encaissements pourrait empêcher une lecture fiable de la trésorerie.",
+    "relance": "Comment obtenez-vous un montant unique et fiable avant de décider d’une dépense ?"
+  },
+  {
+    "id": "RC06",
+    "theme": "Écarts impossibles à expliquer rapidement",
+    "gravite": 3,
+    "condition": "Q4C ou Q4D + Q5C ou Q5D",
+    "groups": [
+      [
+        "Q4C",
+        "Q4D"
+      ],
+      [
+        "Q5C",
+        "Q5D"
+      ]
+    ],
+    "signaux": "Le suivi des ventes est reconstitué ou informel et les écarts dépendent d’explications ou restent sans preuve.",
+    "hypothese": "L’entreprise pourrait manquer des éléments nécessaires pour distinguer erreur, oubli et vente non déclarée.",
+    "relance": "Pouvez-vous retracer une vente précise depuis la commande jusqu’au paiement reçu ?"
+  },
+  {
+    "id": "RC07",
+    "theme": "Délégation insuffisamment traçable",
+    "gravite": 3,
+    "condition": "Q9B ou Q9C + Q5C ou Q5D",
+    "groups": [
+      [
+        "Q9B",
+        "Q9C"
+      ],
+      [
+        "Q5C",
+        "Q5D"
+      ]
+    ],
+    "signaux": "Des collaborateurs encaissent, mais le contrôle repose sur un support partagé, un point oral ou un montant global.",
+    "hypothese": "Les responsabilités individuelles pourraient être difficiles à établir en cas d’écart.",
+    "relance": "Comment attribuez-vous précisément un écart à une vente et à la personne concernée ?"
+  },
+  {
+    "id": "RC08",
+    "theme": "Comptabilité dépendante des reconstitutions",
+    "gravite": 3,
+    "condition": "Q8C ou Q8D + Q4C ou Q4D",
+    "groups": [
+      [
+        "Q8C",
+        "Q8D"
+      ],
+      [
+        "Q4C",
+        "Q4D"
+      ]
+    ],
+    "signaux": "Les ventes et opérations doivent être rassemblées ou reconstituées avant la comptabilité.",
+    "hypothese": "La préparation comptable pourrait consommer beaucoup de temps et laisser des opérations mal documentées.",
+    "relance": "Quelles informations vous manquent le plus souvent au moment de préparer la comptabilité ?"
+  },
+  {
+    "id": "RC09",
+    "theme": "Présence irrégulière sans conversion",
+    "gravite": 2,
+    "condition": "R5A ou R5B + R6A ou R6B",
+    "groups": [
+      [
+        "R5A",
+        "R5B"
+      ],
+      [
+        "R6A",
+        "R6B"
+      ]
+    ],
+    "signaux": "La présence numérique est faible ou irrégulière et produit peu de résultats commerciaux identifiables.",
+    "hypothese": "Le problème pourrait combiner manque de régularité, absence de parcours et faible mesure.",
+    "relance": "Quel résultat précis attendez-vous de votre présence numérique aujourd’hui ?"
+  },
+  {
+    "id": "RC10",
+    "theme": "Faible notoriété et faible présence",
+    "gravite": 2,
+    "condition": "R1A ou R1B + R5A ou R5B",
+    "groups": [
+      [
+        "R1A",
+        "R1B"
+      ],
+      [
+        "R5A",
+        "R5B"
+      ]
+    ],
+    "signaux": "La notoriété reste limitée et la présence numérique est faible ou irrégulière.",
+    "hypothese": "La faible exposition de l’entreprise pourrait contribuer directement à son rayonnement limité.",
+    "relance": "Comment de nouveaux prospects qui ne vous connaissent pas découvrent-ils actuellement l’entreprise ?"
+  },
+  {
+    "id": "RC11",
+    "theme": "Lecture du marché et différence peu claires",
+    "gravite": 3,
+    "condition": "R2A ou R2B + R4A ou R4B",
+    "groups": [
+      [
+        "R2A",
+        "R2B"
+      ],
+      [
+        "R4A",
+        "R4B"
+      ]
+    ],
+    "signaux": "L’entreprise comprend peu les choix en faveur des concurrents et sa différence reste difficile à percevoir sans explication.",
+    "hypothese": "La proposition de valeur pourrait être construite sans suffisamment de retours du marché.",
+    "relance": "Quelles raisons vos prospects donnent-ils lorsqu’ils choisissent une autre offre ?"
+  },
+  {
+    "id": "RC12",
+    "theme": "Différence peu convertie",
+    "gravite": 2,
+    "condition": "R4C ou R4D + R6A, R6B ou R6C",
+    "groups": [
+      [
+        "R4C",
+        "R4D"
+      ],
+      [
+        "R6A",
+        "R6B",
+        "R6C"
+      ]
+    ],
+    "signaux": "La différence est visible ou reconnue, mais sa transformation en ventes numériques mesurées n’est pas établie.",
+    "hypothese": "La difficulté pourrait se situer dans la transformation de la différence en action commerciale.",
+    "relance": "Quel appel à l’action permet aujourd’hui à un prospect convaincu de passer à l’étape suivante ?"
+  },
+  {
+    "id": "RC13",
+    "theme": "Besoin de visibilité de trésorerie confirmé",
+    "gravite": 3,
+    "condition": "Q7C ou Q7D + Q14A",
+    "groups": [
+      [
+        "Q7C",
+        "Q7D"
+      ],
+      [
+        "Q14A"
+      ]
+    ],
+    "signaux": "Le manque de visibilité sur la trésorerie apparaît dans la pratique et dans le progrès prioritaire déclaré.",
+    "hypothese": "Le besoin est cohérent et mérite d’être quantifié pendant l’échange.",
+    "relance": "Quelles décisions sont aujourd’hui retardées par ce manque de visibilité ?"
+  },
+  {
+    "id": "RC14",
+    "theme": "Besoin de traçabilité confirmé",
+    "gravite": 3,
+    "condition": "Q5C ou Q5D ou Q12C ou Q12D + Q14B",
+    "groups": [
+      [
+        "Q5C",
+        "Q5D",
+        "Q12C",
+        "Q12D"
+      ],
+      [
+        "Q14B"
+      ]
+    ],
+    "signaux": "La difficulté à expliquer ou retrouver les mouvements est cohérente avec le besoin prioritaire déclaré.",
+    "hypothese": "La traçabilité constitue probablement un enjeu central du prospect.",
+    "relance": "Quels mouvements de fonds vous préoccupent le plus aujourd’hui ?"
+  },
+  {
+    "id": "RC15",
+    "theme": "Besoin d’encaissement omnicanal confirmé",
+    "gravite": 2,
+    "condition": "Q10C ou Q10D ou Q6B, Q6C ou Q6D + Q14C",
+    "groups": [
+      [
+        "Q10C",
+        "Q10D",
+        "Q6B",
+        "Q6C",
+        "Q6D"
+      ],
+      [
+        "Q14C"
+      ]
+    ],
+    "signaux": "Les limites actuelles d’encaissement concordent avec la volonté d’encaisser sur tous les canaux.",
+    "hypothese": "Le besoin d’élargir ou unifier les parcours d’encaissement paraît cohérent.",
+    "relance": "Sur quel canal perdez-vous actuellement le plus de ventes au moment du paiement ?"
+  },
+  {
+    "id": "RC16",
+    "theme": "Besoin de contrôle dans la délégation confirmé",
+    "gravite": 3,
+    "condition": "Q9B ou Q9C + Q14D",
+    "groups": [
+      [
+        "Q9B",
+        "Q9C"
+      ],
+      [
+        "Q14D"
+      ]
+    ],
+    "signaux": "La manière actuelle de suivre les collaborateurs concorde avec le besoin de déléguer sans perdre le contrôle.",
+    "hypothese": "La sécurisation de la délégation semble être un enjeu concret.",
+    "relance": "Quel contrôle aimeriez-vous conserver lorsque d’autres personnes encaissent ?"
+  }
+]

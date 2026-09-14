@@ -8,7 +8,9 @@ import { join } from 'node:path'
 import XLSX from 'xlsx'
 
 const SRC = process.argv[2] ?? 'MarketingBS/Annexe_01_Matrice_scoring_Radar_by_FeexPay_V2.1_Normative.xlsx'
-const OUT = 'packages/scoring/src/versions/v2.1'
+// Version lue dans le nom du fichier (…_V2.2_…) ou passée en 3e argument.
+const VERSION = process.argv[3] ?? /_V(\d+\.\d+)_/.exec(SRC)?.[1] ?? '2.1'
+const OUT = `packages/scoring/src/versions/v${VERSION}`
 
 const wb = XLSX.readFile(SRC)
 const rows = (name: string): unknown[][] =>
@@ -148,7 +150,7 @@ const combinedRules = rows('Règles combinées')
   }))
 
 const constants = {
-  version: '2.1',
+  version: VERSION,
   dirigeant: {
     max: { VIS: 12, STR: 15, EXE: 17, ORG: 18, INF: 17, AUD: 15, ADA: 16, TRA: 17 },
     ordreTechnique: archetypes.map((a) => a.code),
@@ -180,5 +182,5 @@ for (const [name, data] of Object.entries(files)) {
   writeFileSync(join(OUT, name), txt)
   hash.update(name).update(txt)
 }
-writeFileSync(join(OUT, 'checksum.json'), JSON.stringify({ version: '2.1', sha256: hash.digest('hex'), source: SRC }, null, 2) + '\n')
+writeFileSync(join(OUT, 'checksum.json'), JSON.stringify({ version: VERSION, sha256: hash.digest('hex'), source: SRC }, null, 2) + '\n')
 console.log(`OK: ${questions.length} questions, ${options.length} options, ${archetypes.length} archétypes, ${combinedRules.length} règles`)

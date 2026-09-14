@@ -1,0 +1,174 @@
+{
+  "version": "2.2",
+  "dirigeant": {
+    "max": {
+      "VIS": 12,
+      "STR": 15,
+      "EXE": 17,
+      "ORG": 18,
+      "INF": 17,
+      "AUD": 15,
+      "ADA": 16,
+      "TRA": 17
+    },
+    "ordreTechnique": [
+      "Stratège",
+      "Visionnaire",
+      "Bâtisseur",
+      "Conquérant",
+      "Fédérateur",
+      "Résilient",
+      "Gestionnaire",
+      "Réformateur"
+    ],
+    "secondaire": {
+      "minAffinite": 55,
+      "ratioMin": 0.9,
+      "ecartMax": 8
+    },
+    "pilotageLevels": [
+      {
+        "min": 75,
+        "niveau": "Pilotage structuré",
+        "lecture": "Les opérations sont suivies avec des données et des points de contrôle."
+      },
+      {
+        "min": 50,
+        "niveau": "Pilotage partiellement structuré",
+        "lecture": "Des outils existent, mais la régularité ou la centralisation restent incomplètes."
+      },
+      {
+        "min": 25,
+        "niveau": "Pilotage réactif",
+        "lecture": "Le suivi se déclenche surtout lorsqu’une échéance ou un problème apparaît."
+      },
+      {
+        "min": 0,
+        "niveau": "Pilotage informel",
+        "lecture": "La visibilité repose principalement sur des estimations, notifications ou reconstitutions."
+      }
+    ]
+  },
+  "rayonnement": {
+    "poids": {
+      "notoriete": 0.2,
+      "lectureConcurrentielle": 0.15,
+      "differenciation": 0.25,
+      "digital": 0.2,
+      "empreinte": 0.2
+    },
+    "digital": {
+      "r5": 0.6,
+      "r6": 0.4
+    },
+    "levels": [
+      {
+        "min": 80,
+        "niveau": "Dominant",
+        "meteo": "Soleil",
+        "lecture": "La marque rayonne et doit défendre puis renouveler son leadership."
+      },
+      {
+        "min": 60,
+        "niveau": "Challenger fort",
+        "meteo": "Éclaircies",
+        "lecture": "La marque devient difficile à ignorer, mais doit consolider certains leviers."
+      },
+      {
+        "min": 40,
+        "niveau": "Acteur silencieux",
+        "meteo": "Nuageux",
+        "lecture": "La valeur existe, mais le marché ne la perçoit pas encore à sa juste mesure."
+      },
+      {
+        "min": 20,
+        "niveau": "Marque fragile",
+        "meteo": "Pluie",
+        "lecture": "La présence et la différence restent insuffisamment installées."
+      },
+      {
+        "min": 0,
+        "niveau": "Zone de disparition",
+        "meteo": "Tempête",
+        "lecture": "L’empreinte est très faible et plusieurs fondamentaux doivent être retravaillés."
+      }
+    ],
+    "nuance": {
+      "marge": 5,
+      "dimsMin": 2,
+      "minDim": 20,
+      "libelle": "avec potentiel d’éclaircie"
+    }
+  },
+  "cross": {
+    "seuil": 60,
+    "ecartMax": 15,
+    "readings": [
+      {
+        "code": "CC",
+        "pilotage": "high",
+        "rayonnement": "high",
+        "lecture": "Cohérence consolidée",
+        "interpretation": "Les fondations internes se matérialisent dans le rayonnement.",
+        "prioriteFeexpay": "Optimiser et industrialiser",
+        "prioriteMarketing": "Consolider le leadership",
+        "formulation": "Votre organisation soutient déjà la place que votre entreprise occupe."
+      },
+      {
+        "code": "PS",
+        "pilotage": "high",
+        "rayonnement": "low",
+        "lecture": "Potentiel sous-exploité",
+        "interpretation": "Le business est mieux structuré qu’il n’est perçu par son marché.",
+        "prioriteFeexpay": "Connecter les données aux parcours de croissance",
+        "prioriteMarketing": "Accroître visibilité, preuve et acquisition",
+        "formulation": "Vos fondations sont plus solides que votre rayonnement actuel."
+      },
+      {
+        "code": "RT",
+        "pilotage": "low",
+        "rayonnement": "high",
+        "lecture": "Rayonnement sous tension",
+        "interpretation": "La visibilité dépasse la capacité interne à tracer, suivre et absorber l’activité.",
+        "prioriteFeexpay": "Sécuriser encaissements, trésorerie et contrôle",
+        "prioriteMarketing": "Éviter d’accélérer sans structurer",
+        "formulation": "Votre rayonnement avance plus vite que vos systèmes de pilotage."
+      },
+      {
+        "code": "FR",
+        "pilotage": "low",
+        "rayonnement": "low",
+        "lecture": "Fondations à renforcer",
+        "interpretation": "Les fragilités internes se reflètent dans un rayonnement encore limité.",
+        "prioriteFeexpay": "Structurer les fondamentaux prioritaires",
+        "prioriteMarketing": "Clarifier l’offre et installer une présence régulière",
+        "formulation": "Le renforcement du pilotage peut devenir le premier levier de rayonnement."
+      }
+    ],
+    "ecartQualificatifs": [
+      {
+        "plage": "De −15 à +15",
+        "qualificatif": "Cohérence relative",
+        "lecture": "Les deux scores racontent une situation globalement cohérente.",
+        "action": "Travailler le levier le plus faible sans remettre en cause l’ensemble."
+      },
+      {
+        "plage": "≤ −16",
+        "qualificatif": "Fondations sous-exploitées",
+        "lecture": "Le pilotage est plus avancé que la perception du marché.",
+        "action": "Transformer l’organisation interne en preuves, visibilité et acquisition."
+      },
+      {
+        "plage": "≥ +16",
+        "qualificatif": "Rayonnement exposé",
+        "lecture": "Le marché perçoit davantage que ce que les systèmes internes semblent pouvoir soutenir.",
+        "action": "Sécuriser la traçabilité, la trésorerie et la délégation avant l’accélération."
+      }
+    ]
+  },
+  "insights": {
+    "maxDifficultes": 6,
+    "maxForces": 4,
+    "maxHypotheses": 6
+  }
+}

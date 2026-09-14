@@ -1,0 +1,2374 @@
+[
+  {
+    "code": "Q1A",
+    "questionCode": "Q1",
+    "lettre": "A",
+    "texte": "Je me projette d’abord sur ce qu’elle pourrait apporter à mon entreprise.",
+    "dim2": "VIS",
+    "dim1": "AUD",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Moteur de décision",
+        "valeur": "Projection"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le prospect se projette d’abord sur l’impact futur d’une opportunité.",
+      "difficulte": "",
+      "hypothese": "Sa décision semble sensible à la perspective de développement.",
+      "relance": "Quels résultats attendez-vous généralement avant de considérer une opportunité comme intéressante ?",
+      "usage": "Comprendre son moteur de décision."
+    }
+  },
+  {
+    "code": "Q1B",
+    "questionCode": "Q1",
+    "lettre": "B",
+    "texte": "Je vérifie les chiffres avant de décider si elle mérite mon investissement.",
+    "dim2": "STR",
+    "dim1": "AUD",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Moteur de décision",
+        "valeur": "Chiffres"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le prospect examine les chiffres avant d’investir.",
+      "difficulte": "",
+      "hypothese": "Il cherchera probablement des éléments quantifiables avant d’avancer.",
+      "relance": "Quels chiffres vous permettent aujourd’hui de juger qu’une décision est rentable ?",
+      "usage": "Préparer un échange fondé sur des données."
+    }
+  },
+  {
+    "code": "Q1C",
+    "questionCode": "Q1",
+    "lettre": "C",
+    "texte": "J’observe si elle répond à une demande réelle de mes clients.",
+    "dim2": "INF",
+    "dim1": "ADA",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Moteur de décision",
+        "valeur": "Demande client"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le prospect observe d’abord la demande réelle de ses clients.",
+      "difficulte": "",
+      "hypothese": "La preuve par l’usage client semble déterminante dans ses choix.",
+      "relance": "Comment recueillez-vous aujourd’hui les demandes ou objections de vos clients ?",
+      "usage": "Comprendre la place du retour client."
+    }
+  },
+  {
+    "code": "Q1D",
+    "questionCode": "Q1",
+    "lettre": "D",
+    "texte": "Je préfère la tester à petite échelle avant de m’engager davantage.",
+    "dim2": "AUD",
+    "dim1": "VIS",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Moteur de décision",
+        "valeur": "Test limité"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le prospect préfère tester une opportunité à petite échelle.",
+      "difficulte": "",
+      "hypothese": "Une démarche pilote peut faciliter son engagement.",
+      "relance": "À quoi ressemble, pour vous, un test suffisamment concluant pour poursuivre ?",
+      "usage": "Comprendre son mode d’expérimentation."
+    }
+  },
+  {
+    "code": "Q2A",
+    "questionCode": "Q2",
+    "lettre": "A",
+    "texte": "Je cherche d’abord à sécuriser les nouveaux encaissements.",
+    "dim2": "ORG",
+    "dim1": "TRA",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Priorité en croissance",
+        "valeur": "Sécuriser les encaissements"
+      }
+    ],
+    "constat": {
+      "dimension": "Croissance",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En période de croissance, sa priorité est de sécuriser les encaissements.",
+      "difficulte": "",
+      "hypothese": "Il associe l’augmentation des ventes à un risque opérationnel sur les paiements.",
+      "relance": "Qu’est-ce qui devient le plus difficile à contrôler lorsque vos ventes augmentent ?",
+      "usage": "Identifier les tensions créées par la croissance."
+    }
+  },
+  {
+    "code": "Q2B",
+    "questionCode": "Q2",
+    "lettre": "B",
+    "texte": "Je m’assure que mon organisation peut absorber cette augmentation.",
+    "dim2": "TRA",
+    "dim1": "INF",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Priorité en croissance",
+        "valeur": "Structurer les opérations"
+      }
+    ],
+    "constat": {
+      "dimension": "Croissance",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En période de croissance, sa priorité est la capacité de l’organisation à suivre.",
+      "difficulte": "",
+      "hypothese": "La charge opérationnelle peut constituer son principal frein à l’accélération.",
+      "relance": "Quels processus sont les premiers à être débordés lorsque l’activité augmente ?",
+      "usage": "Identifier les limites opérationnelles."
+    }
+  },
+  {
+    "code": "Q2C",
+    "questionCode": "Q2",
+    "lettre": "C",
+    "texte": "Je veille surtout à maintenir une bonne expérience pour mes clients.",
+    "dim2": "INF",
+    "dim1": "VIS",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Priorité en croissance",
+        "valeur": "Préserver l’expérience client"
+      }
+    ],
+    "constat": {
+      "dimension": "Croissance",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En période de croissance, sa priorité est de préserver l’expérience client.",
+      "difficulte": "",
+      "hypothese": "Il pourrait arbitrer les outils et processus selon leur impact sur le client.",
+      "relance": "À quel moment l’augmentation des commandes commence-t-elle à affecter vos clients ?",
+      "usage": "Identifier les frictions côté client."
+    }
+  },
+  {
+    "code": "Q2D",
+    "questionCode": "Q2",
+    "lettre": "D",
+    "texte": "Je prépare immédiatement la prochaine étape de développement.",
+    "dim2": "VIS",
+    "dim1": "AUD",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Priorité en croissance",
+        "valeur": "Accélérer le développement"
+      }
+    ],
+    "constat": {
+      "dimension": "Croissance",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En période de croissance, sa priorité est de préparer l’étape suivante.",
+      "difficulte": "",
+      "hypothese": "Il peut être davantage orienté accélération que consolidation.",
+      "relance": "Quels éléments doivent être sécurisés avant votre prochaine phase de développement ?",
+      "usage": "Comprendre son rythme d’expansion."
+    }
+  },
+  {
+    "code": "Q3A",
+    "questionCode": "Q3",
+    "lettre": "A",
+    "texte": "Je m’appuie sur mon expérience pour choisir la direction qui me paraît juste.",
+    "dim2": "AUD",
+    "dim1": "VIS",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Style de décision",
+        "valeur": "Expérience"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En situation d’incertitude, il s’appuie d’abord sur son expérience.",
+      "difficulte": "",
+      "hypothese": "Certaines décisions peuvent dépendre d’informations détenues principalement par le dirigeant.",
+      "relance": "Quelles informations restent aujourd’hui difficiles à obtenir sans votre expérience personnelle ?",
+      "usage": "Comprendre la dépendance au dirigeant."
+    }
+  },
+  {
+    "code": "Q3B",
+    "questionCode": "Q3",
+    "lettre": "B",
+    "texte": "Je préfère attendre d’avoir des données plus fiables avant de me prononcer.",
+    "dim2": "STR",
+    "dim1": "ORG",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Style de décision",
+        "valeur": "Données"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En situation d’incertitude, il attend des données plus fiables.",
+      "difficulte": "",
+      "hypothese": "L’accès ou la qualité des données peut ralentir certaines décisions.",
+      "relance": "Quelles données vous manquent le plus souvent au moment de décider ?",
+      "usage": "Identifier les données critiques."
+    }
+  },
+  {
+    "code": "Q3C",
+    "questionCode": "Q3",
+    "lettre": "C",
+    "texte": "Je demande l’avis de personnes capables de compléter ma lecture.",
+    "dim2": "INF",
+    "dim1": "STR",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Style de décision",
+        "valeur": "Consultation"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En situation d’incertitude, il consulte des personnes capables de compléter sa lecture.",
+      "difficulte": "",
+      "hypothese": "La décision repose sur la disponibilité et la fiabilité de plusieurs interlocuteurs.",
+      "relance": "Comment consolidez-vous les informations reçues de plusieurs personnes ?",
+      "usage": "Comprendre la circulation de l’information."
+    }
+  },
+  {
+    "code": "Q3D",
+    "questionCode": "Q3",
+    "lettre": "D",
+    "texte": "Je lance un test limité pour observer ce qui fonctionne réellement.",
+    "dim2": "AUD",
+    "dim1": "EXE",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Style de décision",
+        "valeur": "Expérimentation"
+      }
+    ],
+    "constat": {
+      "dimension": "Décision",
+      "nature": "Signal déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "En situation d’incertitude, il lance un test limité.",
+      "difficulte": "",
+      "hypothese": "Il privilégie l’apprentissage par l’action.",
+      "relance": "Comment mesurez-vous les résultats d’un test avant de généraliser ?",
+      "usage": "Comprendre sa méthode de validation."
+    }
+  },
+  {
+    "code": "Q4A",
+    "questionCode": "Q4",
+    "lettre": "A",
+    "texte": "Je consulte régulièrement un outil qui centralise toutes mes ventes.",
+    "dim2": "TRA",
+    "dim1": "STR",
+    "qualification": "Suivi des ventes",
+    "points": 3,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Outil centralisé"
+      }
+    ],
+    "constat": {
+      "dimension": "Suivi des ventes",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Les ventes sont suivies régulièrement dans un outil centralisé.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quelles informations consultez-vous le plus souvent dans cet outil ?",
+      "usage": "Confirmer la qualité du suivi existant."
+    }
+  },
+  {
+    "code": "Q4B",
+    "questionCode": "Q4",
+    "lettre": "B",
+    "texte": "Je note les ventes dans un fichier ou un cahier lorsque j’en ai le temps.",
+    "dim2": "EXE",
+    "dim1": "ORG",
+    "qualification": "Suivi des ventes",
+    "points": 2,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Fichier ou cahier irrégulier"
+      }
+    ],
+    "constat": {
+      "dimension": "Suivi des ventes",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Les ventes sont notées dans un fichier ou un cahier, mais sans rythme fixe.",
+      "difficulte": "Le suivi des ventes est irrégulier.",
+      "hypothese": "Certaines ventes peuvent être enregistrées tardivement ou être oubliées.",
+      "relance": "À quelle fréquence ce fichier ou ce cahier est-il réellement mis à jour ?",
+      "usage": "Qualifier la régularité du suivi."
+    }
+  },
+  {
+    "code": "Q4C",
+    "questionCode": "Q4",
+    "lettre": "C",
+    "texte": "Je reconstitue les ventes à partir des messages et des paiements reçus.",
+    "dim2": "ADA",
+    "dim1": "EXE",
+    "qualification": "Suivi des ventes",
+    "points": 1,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Reconstitution manuelle"
+      }
+    ],
+    "constat": {
+      "dimension": "Suivi des ventes",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Les ventes sont reconstituées à partir des messages et des paiements reçus.",
+      "difficulte": "Il n’existe pas de registre consolidé des ventes disponible immédiatement.",
+      "hypothese": "Le chiffre d’affaires réel d’une période peut être difficile à établir rapidement.",
+      "relance": "Combien de temps vous faut-il pour reconstituer une semaine complète de ventes ?",
+      "usage": "Mesurer le coût de la reconstitution."
+    }
+  },
+  {
+    "code": "Q4D",
+    "questionCode": "Q4",
+    "lettre": "D",
+    "texte": "Je me fie surtout à ce que j’ai vendu et à l’argent encore disponible.",
+    "dim2": "AUD",
+    "dim1": "ADA",
+    "qualification": "Suivi des ventes",
+    "points": 0,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Estimation informelle"
+      }
+    ],
+    "constat": {
+      "dimension": "Suivi des ventes",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Le suivi repose principalement sur la mémoire des ventes et l’argent encore disponible.",
+      "difficulte": "Les ventes ne sont pas suivies dans un système formalisé.",
+      "hypothese": "Les ventes réalisées, les encaissements et la trésorerie disponible peuvent être confondus.",
+      "relance": "Comment vérifiez-vous qu’aucune vente n’a été oubliée dans votre estimation ?",
+      "usage": "Faire préciser la méthode réelle de suivi."
+    }
+  },
+  {
+    "code": "Q5A",
+    "questionCode": "Q5",
+    "lettre": "A",
+    "texte": "Je consulte l’historique des transactions pour retrouver l’origine de l’écart.",
+    "dim2": "STR",
+    "dim1": "TRA",
+    "qualification": "Gestion des écarts",
+    "points": 3,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Historique transactionnel"
+      }
+    ],
+    "constat": {
+      "dimension": "Écarts d’encaissement",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Un écart peut être recherché dans l’historique des transactions.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Combien de temps faut-il généralement pour retrouver l’origine d’un écart ?",
+      "usage": "Confirmer la profondeur de la traçabilité."
+    }
+  },
+  {
+    "code": "Q5B",
+    "questionCode": "Q5",
+    "lettre": "B",
+    "texte": "Je reprends mon registre de ventes pour identifier ce qui manque.",
+    "dim2": "ORG",
+    "dim1": "EXE",
+    "qualification": "Gestion des écarts",
+    "points": 2,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Registre de ventes"
+      }
+    ],
+    "constat": {
+      "dimension": "Écarts d’encaissement",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "L’écart est recherché manuellement dans le registre des ventes.",
+      "difficulte": "L’explication des écarts dépend d’un rapprochement manuel.",
+      "hypothese": "La recherche peut devenir lente lorsque le volume de ventes augmente.",
+      "relance": "Quelles informations rapprochez-vous pour identifier ce qui manque ?",
+      "usage": "Comprendre le rapprochement existant."
+    }
+  },
+  {
+    "code": "Q5C",
+    "questionCode": "Q5",
+    "lettre": "C",
+    "texte": "Je demande des explications aux personnes qui ont encaissé.",
+    "dim2": "INF",
+    "dim1": "EXE",
+    "qualification": "Gestion des écarts",
+    "points": 1,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Explication de l’équipe"
+      }
+    ],
+    "constat": {
+      "dimension": "Écarts d’encaissement",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "L’explication d’un écart dépend d’abord des personnes ayant encaissé.",
+      "difficulte": "La traçabilité dépend des explications de l’équipe.",
+      "hypothese": "Il peut être difficile de distinguer une erreur, un oubli ou un encaissement non déclaré.",
+      "relance": "Quelles preuves pouvez-vous consulter lorsque les explications ne concordent pas ?",
+      "usage": "Tester la traçabilité indépendante de l’équipe."
+    }
+  },
+  {
+    "code": "Q5D",
+    "questionCode": "Q5",
+    "lettre": "D",
+    "texte": "Je n’ai pas toujours les éléments nécessaires pour expliquer immédiatement l’écart.",
+    "dim2": "ADA",
+    "dim1": "AUD",
+    "qualification": "Gestion des écarts",
+    "points": 0,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Écart difficile à expliquer"
+      }
+    ],
+    "constat": {
+      "dimension": "Écarts d’encaissement",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Les éléments disponibles ne permettent pas d’expliquer immédiatement un écart.",
+      "difficulte": "Certains écarts d’encaissement restent difficiles à retracer.",
+      "hypothese": "Des ventes ou paiements peuvent rester sans explication fiable.",
+      "relance": "Quel est le dernier écart que vous n’avez pas pu expliquer complètement ?",
+      "usage": "Obtenir un exemple concret d’écart."
+    }
+  },
+  {
+    "code": "Q6A",
+    "questionCode": "Q6",
+    "lettre": "A",
+    "texte": "Je consulte un tableau de bord qui regroupe tous les paiements reçus.",
+    "dim2": "TRA",
+    "dim1": "STR",
+    "qualification": "Centralisation des paiements",
+    "points": 3,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Tableau de bord unique"
+      }
+    ],
+    "constat": {
+      "dimension": "Centralisation des paiements",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Tous les paiements reçus sont visibles dans un tableau de bord unique.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quels moyens de paiement sont effectivement couverts par cette vue ?",
+      "usage": "Confirmer le périmètre de centralisation."
+    }
+  },
+  {
+    "code": "Q6B",
+    "questionCode": "Q6",
+    "lettre": "B",
+    "texte": "Je vérifie séparément le solde de chaque moyen de paiement.",
+    "dim2": "STR",
+    "dim1": "ORG",
+    "qualification": "Centralisation des paiements",
+    "points": 2,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Consultation séparée"
+      }
+    ],
+    "constat": {
+      "dimension": "Centralisation des paiements",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Chaque moyen de paiement est consulté séparément.",
+      "difficulte": "La vue des encaissements est fragmentée entre plusieurs canaux.",
+      "hypothese": "Obtenir un total fiable nécessite plusieurs vérifications.",
+      "relance": "Combien de comptes ou d’interfaces devez-vous consulter pour faire un point complet ?",
+      "usage": "Mesurer la dispersion des paiements."
+    }
+  },
+  {
+    "code": "Q6C",
+    "questionCode": "Q6",
+    "lettre": "C",
+    "texte": "Je regroupe manuellement les différents montants à certains moments.",
+    "dim2": "EXE",
+    "dim1": "ADA",
+    "qualification": "Centralisation des paiements",
+    "points": 1,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Consolidation manuelle"
+      }
+    ],
+    "constat": {
+      "dimension": "Centralisation des paiements",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Les montants des différents moyens de paiement sont regroupés manuellement.",
+      "difficulte": "La consolidation des encaissements dépend d’un travail manuel.",
+      "hypothese": "Le point global peut être tardif et exposé aux erreurs de saisie.",
+      "relance": "Qui réalise cette consolidation et à quelle fréquence ?",
+      "usage": "Qualifier le coût de consolidation."
+    }
+  },
+  {
+    "code": "Q6D",
+    "questionCode": "Q6",
+    "lettre": "D",
+    "texte": "Je me base principalement sur les notifications reçues au fil des paiements.",
+    "dim2": "ADA",
+    "dim1": "AUD",
+    "qualification": "Centralisation des paiements",
+    "points": 0,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Suivi par notifications"
+      }
+    ],
+    "constat": {
+      "dimension": "Centralisation des paiements",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "La vue d’ensemble repose surtout sur les notifications reçues.",
+      "difficulte": "Il n’existe pas de suivi consolidé fiable des paiements.",
+      "hypothese": "Des notifications manquées ou difficiles à rapprocher peuvent fausser la lecture des encaissements.",
+      "relance": "Comment faites-vous lorsqu’une notification n’arrive pas ou n’est plus disponible ?",
+      "usage": "Identifier la dépendance aux notifications."
+    }
+  },
+  {
+    "code": "Q7A",
+    "questionCode": "Q7",
+    "lettre": "A",
+    "texte": "Je peux consulter ma trésorerie disponible à tout moment.",
+    "dim2": "STR",
+    "dim1": "VIS",
+    "qualification": "Visibilité sur la trésorerie",
+    "points": 3,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Temps réel"
+      }
+    ],
+    "constat": {
+      "dimension": "Trésorerie",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La trésorerie disponible peut être consultée à tout moment.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Cette vue tient-elle compte des dépenses engagées et des paiements attendus ?",
+      "usage": "Confirmer la qualité de la visibilité."
+    }
+  },
+  {
+    "code": "Q7B",
+    "questionCode": "Q7",
+    "lettre": "B",
+    "texte": "Je le sais après avoir fait un point périodique sur mes entrées et mes sorties.",
+    "dim2": "ORG",
+    "dim1": "STR",
+    "qualification": "Visibilité sur la trésorerie",
+    "points": 2,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Point périodique"
+      }
+    ],
+    "constat": {
+      "dimension": "Trésorerie",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "La trésorerie est connue après un point périodique sur les entrées et sorties.",
+      "difficulte": "La visibilité sur la trésorerie n’est pas continue.",
+      "hypothese": "Une décision prise entre deux points peut reposer sur une information ancienne.",
+      "relance": "À quelle fréquence réalisez-vous ce point et que se passe-t-il entre deux contrôles ?",
+      "usage": "Mesurer le délai d’information."
+    }
+  },
+  {
+    "code": "Q7C",
+    "questionCode": "Q7",
+    "lettre": "C",
+    "texte": "Je me fie au solde visible sur mes comptes au moment de décider.",
+    "dim2": "AUD",
+    "dim1": "ADA",
+    "qualification": "Visibilité sur la trésorerie",
+    "points": 1,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Solde instantané"
+      }
+    ],
+    "constat": {
+      "dimension": "Trésorerie",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "La décision de dépenser repose sur le solde visible des comptes.",
+      "difficulte": "Le solde des comptes sert de principale mesure de trésorerie disponible.",
+      "hypothese": "Les charges à venir ou les montants déjà engagés peuvent ne pas être pris en compte.",
+      "relance": "Comment tenez-vous compte des dépenses déjà engagées mais pas encore débitées ?",
+      "usage": "Distinguer solde et trésorerie réellement disponible."
+    }
+  },
+  {
+    "code": "Q7D",
+    "questionCode": "Q7",
+    "lettre": "D",
+    "texte": "Je le découvre surtout lorsqu’une dépense importante doit être réglée.",
+    "dim2": "AUD",
+    "dim1": "EXE",
+    "qualification": "Visibilité sur la trésorerie",
+    "points": 0,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Découverte à l’échéance"
+      }
+    ],
+    "constat": {
+      "dimension": "Trésorerie",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "La capacité à dépenser est découverte lorsqu’une dépense importante arrive.",
+      "difficulte": "La trésorerie n’est pas anticipée.",
+      "hypothese": "Certaines échéances peuvent créer des tensions inattendues.",
+      "relance": "Quelle dépense vous a récemment obligé à reconstituer votre situation financière en urgence ?",
+      "usage": "Faire émerger les tensions de trésorerie."
+    }
+  },
+  {
+    "code": "Q8A",
+    "questionCode": "Q8",
+    "lettre": "A",
+    "texte": "Mes opérations sont déjà enregistrées et peuvent être consultées rapidement.",
+    "dim2": "TRA",
+    "dim1": "VIS",
+    "qualification": "Préparation comptable",
+    "points": 3,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Opérations à jour"
+      }
+    ],
+    "constat": {
+      "dimension": "Comptabilité",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Les opérations sont déjà enregistrées et rapidement consultables au moment de la comptabilité.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "À quelle fréquence ces opérations sont-elles mises à jour ?",
+      "usage": "Confirmer la disponibilité des données."
+    }
+  },
+  {
+    "code": "Q8B",
+    "questionCode": "Q8",
+    "lettre": "B",
+    "texte": "Mes justificatifs sont conservés, mais je dois encore les organiser.",
+    "dim2": "EXE",
+    "dim1": "ORG",
+    "qualification": "Préparation comptable",
+    "points": 2,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Justificatifs à organiser"
+      }
+    ],
+    "constat": {
+      "dimension": "Comptabilité",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Les justificatifs existent, mais doivent encore être organisés.",
+      "difficulte": "La préparation comptable nécessite un travail de classement.",
+      "hypothese": "Des justificatifs peuvent être difficiles à rattacher aux bonnes opérations.",
+      "relance": "Comment reliez-vous chaque justificatif au paiement ou à la vente correspondante ?",
+      "usage": "Comprendre l’organisation documentaire."
+    }
+  },
+  {
+    "code": "Q8C",
+    "questionCode": "Q8",
+    "lettre": "C",
+    "texte": "Je rassemble les informations nécessaires à l’approche de l’échéance.",
+    "dim2": "ADA",
+    "dim1": "EXE",
+    "qualification": "Préparation comptable",
+    "points": 1,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Collecte à l’échéance"
+      }
+    ],
+    "constat": {
+      "dimension": "Comptabilité",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Les informations sont rassemblées à l’approche de l’échéance comptable.",
+      "difficulte": "La préparation comptable est tardive.",
+      "hypothese": "Les erreurs ou informations manquantes sont découvertes au dernier moment.",
+      "relance": "Combien de jours sont consacrés à rassembler les informations avant l’échéance ?",
+      "usage": "Mesurer la charge de préparation."
+    }
+  },
+  {
+    "code": "Q8D",
+    "questionCode": "Q8",
+    "lettre": "D",
+    "texte": "Je dois souvent reconstituer certaines opérations après leur réalisation.",
+    "dim2": "ADA",
+    "dim1": "AUD",
+    "qualification": "Préparation comptable",
+    "points": 0,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Reconstitution après coup"
+      }
+    ],
+    "constat": {
+      "dimension": "Comptabilité",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Certaines opérations doivent être reconstituées après leur réalisation.",
+      "difficulte": "La comptabilité dépend de reconstitutions a posteriori.",
+      "hypothese": "Des opérations peuvent rester mal documentées ou être enregistrées avec retard.",
+      "relance": "Quelles opérations sont les plus difficiles à reconstituer en fin de période ?",
+      "usage": "Identifier les principales pertes d’information."
+    }
+  },
+  {
+    "code": "Q9A",
+    "questionCode": "Q9",
+    "lettre": "A",
+    "texte": "Chaque encaissement peut être rattaché à une vente et à la personne concernée.",
+    "dim2": "ORG",
+    "dim1": "INF",
+    "qualification": "Contrôle des encaissements délégués",
+    "points": 3,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Traçabilité par personne"
+      },
+      {
+        "tag": "Configuration d’encaissement",
+        "valeur": "Équipe"
+      }
+    ],
+    "constat": {
+      "dimension": "Délégation des encaissements",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Chaque encaissement peut être relié à une vente et à la personne concernée.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Comment contrôlez-vous les écarts par personne ou par point de vente ?",
+      "usage": "Confirmer le niveau de contrôle."
+    }
+  },
+  {
+    "code": "Q9B",
+    "questionCode": "Q9",
+    "lettre": "B",
+    "texte": "Les personnes concernées enregistrent leurs encaissements dans un support commun.",
+    "dim2": "EXE",
+    "dim1": "INF",
+    "qualification": "Contrôle des encaissements délégués",
+    "points": 2,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Support commun"
+      },
+      {
+        "tag": "Configuration d’encaissement",
+        "valeur": "Équipe"
+      }
+    ],
+    "constat": {
+      "dimension": "Délégation des encaissements",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Les collaborateurs enregistrent leurs encaissements dans un support commun.",
+      "difficulte": "Le contrôle dépend de la qualité de mise à jour d’un support partagé.",
+      "hypothese": "Un encaissement mal saisi peut être difficile à attribuer ensuite.",
+      "relance": "Le support permet-il d’identifier automatiquement la personne, l’heure et la vente concernée ?",
+      "usage": "Vérifier la granularité du suivi."
+    }
+  },
+  {
+    "code": "Q9C",
+    "questionCode": "Q9",
+    "lettre": "C",
+    "texte": "Je reçois principalement un point oral ou un montant global en fin de journée.",
+    "dim2": "INF",
+    "dim1": "ADA",
+    "qualification": "Contrôle des encaissements délégués",
+    "points": 1,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Point oral ou global"
+      },
+      {
+        "tag": "Configuration d’encaissement",
+        "valeur": "Équipe"
+      }
+    ],
+    "constat": {
+      "dimension": "Délégation des encaissements",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Le suivi repose surtout sur un point oral ou un montant global en fin de journée.",
+      "difficulte": "Les encaissements délégués manquent de traçabilité détaillée.",
+      "hypothese": "Des ventes non déclarées, erreurs ou détournements peuvent être difficiles à identifier.",
+      "relance": "Comment vérifiez-vous le montant annoncé lorsqu’il ne correspond pas aux ventes ?",
+      "usage": "Faire préciser les contrôles réels."
+    }
+  },
+  {
+    "code": "Q9D",
+    "questionCode": "Q9",
+    "lettre": "D",
+    "texte": "Pour le moment, je suis la seule personne à encaisser dans mon entreprise.",
+    "dim2": "AUD",
+    "dim1": "EXE",
+    "qualification": "Contrôle des encaissements délégués",
+    "points": null,
+    "poids": 10,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Encaissement en solo"
+      },
+      {
+        "tag": "Configuration d’encaissement",
+        "valeur": "Solo"
+      }
+    ],
+    "constat": {
+      "dimension": "Délégation des encaissements",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le dirigeant est actuellement la seule personne à encaisser.",
+      "difficulte": "",
+      "hypothese": "La délégation n’est pas encore un sujet observable dans la situation actuelle.",
+      "relance": "Prévoyez-vous que d’autres personnes encaissent prochainement ?",
+      "usage": "Identifier un éventuel besoin futur sans pénaliser le score."
+    }
+  },
+  {
+    "code": "Q10A",
+    "questionCode": "Q10",
+    "lettre": "A",
+    "texte": "Je lui transmets un lien ou une page de paiement prévue à cet effet.",
+    "dim2": "TRA",
+    "dim1": "INF",
+    "qualification": "Paiement à distance",
+    "points": 3,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Lien ou page de paiement"
+      }
+    ],
+    "constat": {
+      "dimension": "Paiement à distance",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Un lien ou une page de paiement est déjà utilisé pour encaisser à distance.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Comment rapprochez-vous ces paiements des commandes correspondantes ?",
+      "usage": "Confirmer la qualité du parcours à distance."
+    }
+  },
+  {
+    "code": "Q10B",
+    "questionCode": "Q10",
+    "lettre": "B",
+    "texte": "Je lui communique un numéro après avoir échangé avec lui.",
+    "dim2": "ADA",
+    "dim1": "INF",
+    "qualification": "Paiement à distance",
+    "points": 2,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Numéro communiqué"
+      }
+    ],
+    "constat": {
+      "dimension": "Paiement à distance",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Le paiement à distance nécessite de communiquer manuellement un numéro au client.",
+      "difficulte": "Le parcours de paiement dépend d’un échange manuel.",
+      "hypothese": "La vérification et le rapprochement peuvent être plus longs lorsque les demandes augmentent.",
+      "relance": "Que se passe-t-il entre la demande du client et la confirmation définitive du paiement ?",
+      "usage": "Cartographier le parcours manuel."
+    }
+  },
+  {
+    "code": "Q10C",
+    "questionCode": "Q10",
+    "lettre": "C",
+    "texte": "Je privilégie encore le paiement à la livraison ou lors d’une rencontre.",
+    "dim2": "ORG",
+    "dim1": "ADA",
+    "qualification": "Paiement à distance",
+    "points": 1,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Paiement à la livraison"
+      }
+    ],
+    "constat": {
+      "dimension": "Paiement à distance",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Le paiement est encore privilégié à la livraison ou lors d’une rencontre.",
+      "difficulte": "Les ventes à distance dépendent d’une présence physique ou de la livraison.",
+      "hypothese": "Certains clients peuvent abandonner avant la finalisation de la vente.",
+      "relance": "Combien de commandes n’aboutissent pas parce que le paiement doit attendre la livraison ou une rencontre ?",
+      "usage": "Évaluer les pertes liées au paiement tardif."
+    }
+  },
+  {
+    "code": "Q10D",
+    "questionCode": "Q10",
+    "lettre": "D",
+    "texte": "Je ne propose pas encore de moyen de paiement à distance.",
+    "dim2": "ORG",
+    "dim1": "TRA",
+    "qualification": "Paiement à distance",
+    "points": 0,
+    "poids": 10,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Aucune solution à distance"
+      }
+    ],
+    "constat": {
+      "dimension": "Paiement à distance",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Aucun moyen de paiement à distance n’est proposé.",
+      "difficulte": "L’entreprise ne peut pas encaisser un client à distance de manière organisée.",
+      "hypothese": "La zone de vente et les possibilités de finalisation immédiate sont limitées.",
+      "relance": "Que faites-vous lorsqu’un client éloigné veut acheter immédiatement ?",
+      "usage": "Mesurer l’impact commercial de l’absence de paiement à distance."
+    }
+  },
+  {
+    "code": "Q11A",
+    "questionCode": "Q11",
+    "lettre": "A",
+    "texte": "Mon site permet aux clients de commander et de payer directement.",
+    "dim2": "VIS",
+    "dim1": "TRA",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Canal de vente",
+        "valeur": "E-commerce intégré"
+      },
+      {
+        "tag": "Niveau digital",
+        "valeur": "Transactionnel"
+      }
+    ],
+    "constat": {
+      "dimension": "Parcours de vente digital",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le site permet déjà de commander et de payer directement.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "À quel endroit du parcours observez-vous le plus d’abandons ?",
+      "usage": "Comprendre la performance du parcours existant."
+    }
+  },
+  {
+    "code": "Q11B",
+    "questionCode": "Q11",
+    "lettre": "B",
+    "texte": "Mon site présente mes offres, mais les commandes se finalisent ailleurs.",
+    "dim2": "TRA",
+    "dim1": "VIS",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Canal de vente",
+        "valeur": "Site vitrine"
+      },
+      {
+        "tag": "Niveau digital",
+        "valeur": "Non transactionnel"
+      }
+    ],
+    "constat": {
+      "dimension": "Parcours de vente digital",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Le site présente les offres, mais la commande se termine ailleurs.",
+      "difficulte": "Le parcours entre consultation, commande et paiement est fragmenté.",
+      "hypothese": "Le passage vers un autre canal peut créer des abandons ou compliquer le suivi des ventes.",
+      "relance": "Que doit faire exactement un visiteur après avoir choisi une offre sur le site ?",
+      "usage": "Cartographier la rupture du parcours."
+    }
+  },
+  {
+    "code": "Q11C",
+    "questionCode": "Q11",
+    "lettre": "C",
+    "texte": "Je vends principalement à travers les réseaux sociaux et les messageries.",
+    "dim2": "ADA",
+    "dim1": "INF",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Canal de vente",
+        "valeur": "Social commerce"
+      },
+      {
+        "tag": "Niveau digital",
+        "valeur": "Conversationnel"
+      }
+    ],
+    "constat": {
+      "dimension": "Parcours de vente digital",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Les ventes passent principalement par les réseaux sociaux et les messageries.",
+      "difficulte": "Le parcours de vente dépend fortement des échanges conversationnels.",
+      "hypothese": "Les demandes, commandes et paiements peuvent être difficiles à suivre dans un même parcours.",
+      "relance": "Comment suivez-vous une demande reçue sur les réseaux sociaux jusqu’au paiement ?",
+      "usage": "Explorer la continuité du parcours de vente."
+    }
+  },
+  {
+    "code": "Q11D",
+    "questionCode": "Q11",
+    "lettre": "D",
+    "texte": "Mes ventes se font encore essentiellement en présentiel.",
+    "dim2": "EXE",
+    "dim1": "ORG",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Canal de vente",
+        "valeur": "Présentiel"
+      },
+      {
+        "tag": "Niveau digital",
+        "valeur": "Physique"
+      }
+    ],
+    "constat": {
+      "dimension": "Parcours de vente digital",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Les ventes sont encore principalement réalisées en présentiel.",
+      "difficulte": "",
+      "hypothese": "Le besoin digital dépendra du projet de développement de l’entreprise.",
+      "relance": "Souhaitez-vous développer la vente à distance ou rester principalement en présentiel ?",
+      "usage": "Comprendre l’ambition digitale."
+    }
+  },
+  {
+    "code": "Q12A",
+    "questionCode": "Q12",
+    "lettre": "A",
+    "texte": "Je recherche la transaction à partir de sa référence.",
+    "dim2": "STR",
+    "dim1": "TRA",
+    "qualification": "Recherche d’un paiement",
+    "points": 3,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Recherche par référence"
+      }
+    ],
+    "constat": {
+      "dimension": "Traçabilité d’un paiement",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Un paiement peut être recherché à partir de sa référence.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "La référence permet-elle aussi de retrouver la commande et le client concernés ?",
+      "usage": "Confirmer la profondeur du rapprochement."
+    }
+  },
+  {
+    "code": "Q12B",
+    "questionCode": "Q12",
+    "lettre": "B",
+    "texte": "Je lui demande une preuve de paiement pour poursuivre la vérification.",
+    "dim2": "INF",
+    "dim1": "STR",
+    "qualification": "Recherche d’un paiement",
+    "points": 2,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Preuve demandée au client"
+      }
+    ],
+    "constat": {
+      "dimension": "Traçabilité d’un paiement",
+      "nature": "Difficulté",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "La vérification dépend d’une preuve envoyée par le client.",
+      "difficulte": "L’entreprise ne retrouve pas toujours un paiement depuis ses propres données.",
+      "hypothese": "La résolution dépend de la disponibilité et de la qualité de la preuve du client.",
+      "relance": "Que pouvez-vous vérifier lorsque le client ne retrouve plus sa preuve ?",
+      "usage": "Tester l’autonomie de vérification."
+    }
+  },
+  {
+    "code": "Q12C",
+    "questionCode": "Q12",
+    "lettre": "C",
+    "texte": "Je consulte mes différents soldes pour voir si le montant apparaît.",
+    "dim2": "EXE",
+    "dim1": "STR",
+    "qualification": "Recherche d’un paiement",
+    "points": 1,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Vérification des soldes"
+      }
+    ],
+    "constat": {
+      "dimension": "Traçabilité d’un paiement",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "La recherche oblige à consulter plusieurs soldes.",
+      "difficulte": "Un paiement ne peut pas être retrouvé rapidement dans une vue unique.",
+      "hypothese": "Le délai de confirmation peut dégrader l’expérience client et mobiliser plusieurs vérifications.",
+      "relance": "Combien de comptes devez-vous vérifier avant de confirmer un paiement ?",
+      "usage": "Mesurer la complexité de recherche."
+    }
+  },
+  {
+    "code": "Q12D",
+    "questionCode": "Q12",
+    "lettre": "D",
+    "texte": "J’attends la notification ou la confirmation de mon opérateur de paiement.",
+    "dim2": "ORG",
+    "dim1": "ADA",
+    "qualification": "Recherche d’un paiement",
+    "points": 0,
+    "poids": 15,
+    "applicable": true,
+    "tags": [
+      {
+        "tag": "Mode opérationnel",
+        "valeur": "Attente de confirmation"
+      }
+    ],
+    "constat": {
+      "dimension": "Traçabilité d’un paiement",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "La confirmation dépend de l’arrivée d’une notification ou de l’opérateur.",
+      "difficulte": "L’entreprise ne maîtrise pas le délai de vérification d’un paiement.",
+      "hypothese": "Une commande peut rester bloquée malgré la déclaration du client.",
+      "relance": "Combien de temps une commande peut-elle rester en attente dans cette situation ?",
+      "usage": "Évaluer l’impact opérationnel du délai."
+    }
+  },
+  {
+    "code": "Q13A",
+    "questionCode": "Q13",
+    "lettre": "A",
+    "texte": "Je veux savoir s’il peut s’intégrer facilement à mon fonctionnement actuel.",
+    "dim2": "TRA",
+    "dim1": "VIS",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Déclencheur d’adoption",
+        "valeur": "Intégration"
+      },
+      {
+        "tag": "Disposition au changement",
+        "valeur": "Ouvert sous condition"
+      }
+    ],
+    "constat": {
+      "dimension": "Adoption",
+      "nature": "Condition déclarée",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "L’intégration au fonctionnement actuel est la première condition d’adoption.",
+      "difficulte": "",
+      "hypothese": "Une solution trop éloignée des habitudes existantes peut être rejetée.",
+      "relance": "Quelles habitudes ou outils doivent absolument être préservés ?",
+      "usage": "Comprendre les conditions d’adoption."
+    }
+  },
+  {
+    "code": "Q13B",
+    "questionCode": "Q13",
+    "lettre": "B",
+    "texte": "Je veux vérifier s’il me permettra de gagner du temps dans le suivi.",
+    "dim2": "EXE",
+    "dim1": "STR",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Déclencheur d’adoption",
+        "valeur": "Gain de temps"
+      },
+      {
+        "tag": "Disposition au changement",
+        "valeur": "Ouvert sous condition"
+      }
+    ],
+    "constat": {
+      "dimension": "Adoption",
+      "nature": "Condition déclarée",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le gain de temps est la première condition d’adoption.",
+      "difficulte": "",
+      "hypothese": "La valeur attendue devra être observable dans les tâches quotidiennes.",
+      "relance": "Quelles tâches de suivi vous prennent aujourd’hui le plus de temps ?",
+      "usage": "Identifier les gains attendus."
+    }
+  },
+  {
+    "code": "Q13C",
+    "questionCode": "Q13",
+    "lettre": "C",
+    "texte": "Je veux m’assurer que mon équipe pourra l’utiliser sans difficulté.",
+    "dim2": "INF",
+    "dim1": "ORG",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Déclencheur d’adoption",
+        "valeur": "Facilité pour l’équipe"
+      },
+      {
+        "tag": "Disposition au changement",
+        "valeur": "Ouvert sous condition"
+      }
+    ],
+    "constat": {
+      "dimension": "Adoption",
+      "nature": "Condition déclarée",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La facilité d’utilisation par l’équipe est la première condition d’adoption.",
+      "difficulte": "",
+      "hypothese": "La capacité de l’équipe à adopter un nouvel outil sera déterminante.",
+      "relance": "Quelles difficultés votre équipe rencontre-t-elle habituellement avec de nouveaux outils ?",
+      "usage": "Comprendre le risque d’adoption."
+    }
+  },
+  {
+    "code": "Q13D",
+    "questionCode": "Q13",
+    "lettre": "D",
+    "texte": "Je préfère attendre que le besoin devienne vraiment urgent avant de changer.",
+    "dim2": "STR",
+    "dim1": "ORG",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Déclencheur d’adoption",
+        "valeur": "Urgence"
+      },
+      {
+        "tag": "Disposition au changement",
+        "valeur": "Attentiste"
+      }
+    ],
+    "constat": {
+      "dimension": "Adoption",
+      "nature": "Point de vigilance",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Le changement est envisagé seulement lorsque le besoin devient urgent.",
+      "difficulte": "Les améliorations peuvent être reportées jusqu’à l’apparition d’un problème critique.",
+      "hypothese": "Le prospect peut reconnaître la difficulté sans être encore prêt à agir.",
+      "relance": "Quel événement rendrait ce sujet suffisamment urgent pour agir maintenant ?",
+      "usage": "Évaluer la maturité du besoin."
+    }
+  },
+  {
+    "code": "Q14A",
+    "questionCode": "Q14",
+    "lettre": "A",
+    "texte": "Je pourrais connaître l’état de ma trésorerie sans attendre la fin du mois.",
+    "dim2": "VIS",
+    "dim1": "TRA",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Besoin prioritaire",
+        "valeur": "Visibilité sur la trésorerie"
+      }
+    ],
+    "constat": {
+      "dimension": "Besoin déclaré",
+      "nature": "Besoin déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le progrès prioritaire déclaré est de connaître la trésorerie sans attendre la fin du mois.",
+      "difficulte": "",
+      "hypothese": "Le besoin de visibilité financière est explicitement reconnu.",
+      "relance": "Qu’est-ce que cette visibilité vous permettrait de décider plus rapidement ?",
+      "usage": "Approfondir le besoin déclaré."
+    }
+  },
+  {
+    "code": "Q14B",
+    "questionCode": "Q14",
+    "lettre": "B",
+    "texte": "Je pourrais retrouver facilement l’origine de chaque mouvement de fonds.",
+    "dim2": "VIS",
+    "dim1": "TRA",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Besoin prioritaire",
+        "valeur": "Traçabilité des fonds"
+      }
+    ],
+    "constat": {
+      "dimension": "Besoin déclaré",
+      "nature": "Besoin déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le progrès prioritaire déclaré est de retrouver l’origine de chaque mouvement de fonds.",
+      "difficulte": "",
+      "hypothese": "Le besoin de traçabilité est explicitement reconnu.",
+      "relance": "Quels mouvements sont aujourd’hui les plus difficiles à expliquer ?",
+      "usage": "Approfondir le besoin déclaré."
+    }
+  },
+  {
+    "code": "Q14C",
+    "questionCode": "Q14",
+    "lettre": "C",
+    "texte": "Je pourrais encaisser mes clients sur tous mes canaux de vente.",
+    "dim2": "VIS",
+    "dim1": "AUD",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Besoin prioritaire",
+        "valeur": "Encaissement omnicanal"
+      }
+    ],
+    "constat": {
+      "dimension": "Besoin déclaré",
+      "nature": "Besoin déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le progrès prioritaire déclaré est d’encaisser sur tous les canaux de vente.",
+      "difficulte": "",
+      "hypothese": "Le besoin d’un parcours d’encaissement plus large est explicitement reconnu.",
+      "relance": "Quel canal vous empêche aujourd’hui de finaliser certaines ventes ?",
+      "usage": "Approfondir le besoin déclaré."
+    }
+  },
+  {
+    "code": "Q14D",
+    "questionCode": "Q14",
+    "lettre": "D",
+    "texte": "Je pourrais déléguer davantage sans perdre le contrôle de mon activité.",
+    "dim2": "VIS",
+    "dim1": "INF",
+    "qualification": null,
+    "points": null,
+    "poids": 0,
+    "applicable": false,
+    "tags": [
+      {
+        "tag": "Besoin prioritaire",
+        "valeur": "Délégation et contrôle"
+      }
+    ],
+    "constat": {
+      "dimension": "Besoin déclaré",
+      "nature": "Besoin déclaré",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Le progrès prioritaire déclaré est de déléguer sans perdre le contrôle.",
+      "difficulte": "",
+      "hypothese": "Le besoin de contrôle dans la délégation est explicitement reconnu.",
+      "relance": "Qu’aimeriez-vous pouvoir déléguer tout en continuant à vérifier ?",
+      "usage": "Approfondir le besoin déclaré."
+    }
+  },
+  {
+    "code": "R1A",
+    "questionCode": "R1",
+    "lettre": "A",
+    "texte": "Elle est principalement connue par mon entourage et mes contacts directs.",
+    "dimension": "Notoriété",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Notoriété",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "L’entreprise est principalement connue de l’entourage et des contacts directs.",
+      "difficulte": "La notoriété dépasse peu le réseau immédiat.",
+      "hypothese": "L’acquisition peut dépendre fortement des relations personnelles.",
+      "relance": "Quelle part de vos nouveaux clients vient de personnes qui ne vous connaissaient pas auparavant ?",
+      "usage": "Mesurer l’ouverture au marché."
+    }
+  },
+  {
+    "code": "R1B",
+    "questionCode": "R1",
+    "lettre": "B",
+    "texte": "Elle commence à être connue par des personnes situées dans ma zone.",
+    "dimension": "Notoriété",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Notoriété",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "L’entreprise commence à être connue dans sa zone.",
+      "difficulte": "La reconnaissance reste principalement locale.",
+      "hypothese": "Le développement hors de la zone actuelle peut être limité.",
+      "relance": "Qu’est-ce qui vous empêche aujourd’hui d’être connu au-delà de votre zone ?",
+      "usage": "Comprendre la limite de portée."
+    }
+  },
+  {
+    "code": "R1C",
+    "questionCode": "R1",
+    "lettre": "C",
+    "texte": "Elle est régulièrement identifiée par des prospects de mon secteur.",
+    "dimension": "Notoriété",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Notoriété",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "L’entreprise est identifiée par des prospects de son secteur.",
+      "difficulte": "La reconnaissance existe, mais n’est pas encore large sur le marché visé.",
+      "hypothese": "La marque peut devoir convertir cette reconnaissance en préférence.",
+      "relance": "Les prospects qui vous connaissent comprennent-ils clairement pourquoi vous choisir ?",
+      "usage": "Passer de la reconnaissance à la préférence."
+    }
+  },
+  {
+    "code": "R1D",
+    "questionCode": "R1",
+    "lettre": "D",
+    "texte": "Elle est reconnue par une partie importante du marché que je vise.",
+    "dimension": "Notoriété",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Notoriété",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "L’entreprise est reconnue par une partie importante de son marché cible.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quels éléments ont le plus contribué à cette reconnaissance ?",
+      "usage": "Identifier les actifs de notoriété."
+    }
+  },
+  {
+    "code": "R2A",
+    "questionCode": "R2",
+    "lettre": "A",
+    "texte": "Je reçois rarement des informations sur les raisons de son choix.",
+    "dimension": "Lecture concurrentielle",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Lecture concurrentielle",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Les raisons qui conduisent un prospect chez un concurrent sont rarement connues.",
+      "difficulte": "Les pertes commerciales ne produisent presque aucune information exploitable.",
+      "hypothese": "Les décisions commerciales peuvent être prises sans comprendre les arbitrages du marché.",
+      "relance": "Comment analysez-vous aujourd’hui une opportunité commerciale perdue ?",
+      "usage": "Évaluer la connaissance des pertes."
+    }
+  },
+  {
+    "code": "R2B",
+    "questionCode": "R2",
+    "lettre": "B",
+    "texte": "J’essaie de comprendre sa décision à partir de ce que j’observe.",
+    "dimension": "Lecture concurrentielle",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Lecture concurrentielle",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "Les raisons du choix d’un concurrent sont principalement déduites par observation.",
+      "difficulte": "La lecture des pertes repose surtout sur des suppositions.",
+      "hypothese": "Certaines causes réelles de perte peuvent être mal interprétées.",
+      "relance": "Quand avez-vous demandé pour la dernière fois à un prospect pourquoi il n’a pas choisi votre offre ?",
+      "usage": "Tester l’accès au retour direct."
+    }
+  },
+  {
+    "code": "R2C",
+    "questionCode": "R2",
+    "lettre": "C",
+    "texte": "Il m’arrive de lui demander ce qui a motivé son choix.",
+    "dimension": "Lecture concurrentielle",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Lecture concurrentielle",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Les raisons du choix d’un concurrent sont parfois demandées au prospect.",
+      "difficulte": "Le retour sur les pertes existe, mais n’est pas systématique.",
+      "hypothese": "Les enseignements peuvent rester anecdotiques et difficiles à comparer.",
+      "relance": "Où conservez-vous les raisons recueillies auprès des prospects perdus ?",
+      "usage": "Vérifier la capitalisation des retours."
+    }
+  },
+  {
+    "code": "R2D",
+    "questionCode": "R2",
+    "lettre": "D",
+    "texte": "Je recueille régulièrement ces raisons pour mieux comprendre mon marché.",
+    "dimension": "Lecture concurrentielle",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Lecture concurrentielle",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Les raisons de perte sont recueillies régulièrement pour comprendre le marché.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quelles raisons reviennent le plus souvent dans vos pertes commerciales ?",
+      "usage": "Exploiter la connaissance existante."
+    }
+  },
+  {
+    "code": "R3A",
+    "questionCode": "R3",
+    "lettre": "A",
+    "texte": "Ils viennent souvent vers moi parce que mes prix leur conviennent.",
+    "dimension": "Tag de différenciation",
+    "points": null,
+    "tags": [
+      {
+        "tag": "Nature de la différenciation",
+        "valeur": "Prix"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La principale raison de choix déclarée est le prix.",
+      "difficulte": "",
+      "hypothese": "La solidité de cet avantage dépend de la capacité à le maintenir sans fragiliser la marge.",
+      "relance": "Que se passe-t-il lorsqu’un concurrent propose un prix inférieur ?",
+      "usage": "Comprendre la solidité de la différenciation."
+    }
+  },
+  {
+    "code": "R3B",
+    "questionCode": "R3",
+    "lettre": "B",
+    "texte": "Ils me choisissent parce que je suis proche d’eux et facilement accessible.",
+    "dimension": "Tag de différenciation",
+    "points": null,
+    "tags": [
+      {
+        "tag": "Nature de la différenciation",
+        "valeur": "Proximité"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La principale raison de choix déclarée est la proximité.",
+      "difficulte": "",
+      "hypothese": "L’avantage peut dépendre de la présence personnelle ou géographique.",
+      "relance": "Cette proximité reste-t-elle perceptible lorsque le volume de clients augmente ?",
+      "usage": "Comprendre la capacité à maintenir l’avantage."
+    }
+  },
+  {
+    "code": "R3C",
+    "questionCode": "R3",
+    "lettre": "C",
+    "texte": "Ils reviennent parce qu’ils font confiance à la qualité de ce que je propose.",
+    "dimension": "Tag de différenciation",
+    "points": null,
+    "tags": [
+      {
+        "tag": "Nature de la différenciation",
+        "valeur": "Qualité"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La principale raison de choix déclarée est la qualité.",
+      "difficulte": "",
+      "hypothese": "La qualité doit être rendue visible et prouvée avant l’achat.",
+      "relance": "Comment un nouveau prospect peut-il vérifier votre niveau de qualité avant de vous choisir ?",
+      "usage": "Rechercher les preuves de qualité."
+    }
+  },
+  {
+    "code": "R3D",
+    "questionCode": "R3",
+    "lettre": "D",
+    "texte": "Ils trouvent chez moi un avantage qu’ils retrouvent difficilement ailleurs.",
+    "dimension": "Tag de différenciation",
+    "points": null,
+    "tags": [
+      {
+        "tag": "Nature de la différenciation",
+        "valeur": "Avantage distinctif"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Contexte",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "La principale raison de choix déclarée est un avantage difficile à retrouver ailleurs.",
+      "difficulte": "",
+      "hypothese": "Cet avantage doit être formulé et protégé pour rester distinctif.",
+      "relance": "Pouvez-vous expliquer cet avantage en une phrase et apporter une preuve ?",
+      "usage": "Tester la clarté de l’avantage."
+    }
+  },
+  {
+    "code": "R4A",
+    "questionCode": "R4",
+    "lettre": "A",
+    "texte": "Je ne saurais pas encore expliquer clairement ce qui me différencie.",
+    "dimension": "Différenciation",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "Le dirigeant ne peut pas encore expliquer clairement ce qui différencie l’entreprise.",
+      "difficulte": "La proposition de valeur n’est pas clairement définie.",
+      "hypothese": "Les prospects peuvent comparer l’entreprise principalement sur le prix ou la proximité.",
+      "relance": "Quelle phrase utilisez-vous aujourd’hui pour expliquer pourquoi vous choisir ?",
+      "usage": "Faire émerger la promesse actuelle."
+    }
+  },
+  {
+    "code": "R4B",
+    "questionCode": "R4",
+    "lettre": "B",
+    "texte": "J’arrive à l’expliquer lorsque je présente personnellement mon activité.",
+    "dimension": "Différenciation",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "La différence est comprise lorsque le dirigeant présente personnellement l’activité.",
+      "difficulte": "La proposition de valeur dépend encore de l’explication orale du dirigeant.",
+      "hypothese": "La communication autonome peut ne pas transmettre ce qui rend l’offre particulière.",
+      "relance": "Un prospect qui ne vous parle pas directement comprend-il la même chose ?",
+      "usage": "Tester l’autonomie de la communication."
+    }
+  },
+  {
+    "code": "R4C",
+    "questionCode": "R4",
+    "lettre": "C",
+    "texte": "Ma différence apparaît déjà dans mes offres et ma communication.",
+    "dimension": "Différenciation",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "La différence apparaît déjà dans les offres et la communication.",
+      "difficulte": "La différenciation est formulée, mais sa reconnaissance spontanée n’est pas encore établie.",
+      "hypothese": "Le marché peut voir la différence sans encore l’associer fortement à la marque.",
+      "relance": "Quelles preuves montrent que les prospects perçoivent réellement cette différence ?",
+      "usage": "Rechercher une preuve de perception."
+    }
+  },
+  {
+    "code": "R4D",
+    "questionCode": "R4",
+    "lettre": "D",
+    "texte": "Mes clients citent spontanément ce qui rend mon entreprise particulière.",
+    "dimension": "Différenciation",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Différenciation",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Les clients citent spontanément ce qui rend l’entreprise particulière.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quels mots utilisent-ils le plus souvent pour décrire cette différence ?",
+      "usage": "Capitaliser sur la perception du marché."
+    }
+  },
+  {
+    "code": "R5A",
+    "questionCode": "R5",
+    "lettre": "A",
+    "texte": "Mon entreprise y est peu présente ou ne dispose pas encore de page active.",
+    "dimension": "Présence digitale",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Présence digitale",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "L’entreprise est peu présente ou ne dispose pas de page active.",
+      "difficulte": "La présence numérique est insuffisante pour installer une visibilité continue.",
+      "hypothese": "Les prospects qui recherchent l’entreprise en ligne peuvent trouver peu d’informations récentes.",
+      "relance": "Que trouve aujourd’hui un prospect qui recherche votre entreprise sur internet ?",
+      "usage": "Évaluer la visibilité disponible."
+    }
+  },
+  {
+    "code": "R5B",
+    "questionCode": "R5",
+    "lettre": "B",
+    "texte": "Je publie principalement lorsque j’ai une actualité ou du temps disponible.",
+    "dimension": "Présence digitale",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Présence digitale",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "La publication dépend principalement des actualités ou du temps disponible.",
+      "difficulte": "La présence numérique est irrégulière.",
+      "hypothese": "La marque peut disparaître de l’attention du marché entre deux publications.",
+      "relance": "Quelle est la principale raison des périodes sans communication ?",
+      "usage": "Identifier la cause de l’irrégularité."
+    }
+  },
+  {
+    "code": "R5C",
+    "questionCode": "R5",
+    "lettre": "C",
+    "texte": "Je communique régulièrement sur le canal que j’utilise le plus.",
+    "dimension": "Présence digitale",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Présence digitale",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "La communication est régulière sur un canal principal.",
+      "difficulte": "La présence numérique repose essentiellement sur un seul canal.",
+      "hypothese": "La portée et l’acquisition peuvent dépendre fortement de ce canal.",
+      "relance": "Que se passerait-il si ce canal produisait soudainement moins de résultats ?",
+      "usage": "Évaluer la dépendance au canal."
+    }
+  },
+  {
+    "code": "R5D",
+    "questionCode": "R5",
+    "lettre": "D",
+    "texte": "Je maintiens une présence continue sur les canaux utiles à mon activité.",
+    "dimension": "Présence digitale",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Présence digitale",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "L’entreprise maintient une présence continue sur les canaux utiles à son activité.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quels canaux contribuent réellement aux demandes commerciales ?",
+      "usage": "Identifier les canaux les plus utiles."
+    }
+  },
+  {
+    "code": "R6A",
+    "questionCode": "R6",
+    "lettre": "A",
+    "texte": "Je ne mesure pas encore réellement ce qu’elle apporte à mon activité.",
+    "dimension": "Performance digitale",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Performance digitale",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "L’apport réel de la présence numérique n’est pas mesuré.",
+      "difficulte": "L’entreprise ne sait pas ce que le digital produit pour l’activité.",
+      "hypothese": "Il est difficile d’identifier les actions qui méritent d’être maintenues ou corrigées.",
+      "relance": "Quelles données relient aujourd’hui vos actions numériques à vos résultats commerciaux ?",
+      "usage": "Identifier le niveau de mesure."
+    }
+  },
+  {
+    "code": "R6B",
+    "questionCode": "R6",
+    "lettre": "B",
+    "texte": "Elle me permet surtout d’obtenir de la visibilité et des réactions.",
+    "dimension": "Performance digitale",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Performance digitale",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "La présence numérique produit surtout de la visibilité et des réactions.",
+      "difficulte": "La visibilité numérique se transforme peu en opportunités commerciales identifiables.",
+      "hypothese": "Le passage entre attention, demande et vente peut être insuffisamment structuré.",
+      "relance": "Que doit faire une personne intéressée après avoir vu l’un de vos contenus ?",
+      "usage": "Explorer le parcours de conversion."
+    }
+  },
+  {
+    "code": "R6C",
+    "questionCode": "R6",
+    "lettre": "C",
+    "texte": "Elle génère régulièrement des demandes d’information ou de devis.",
+    "dimension": "Performance digitale",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Performance digitale",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "La présence numérique génère régulièrement des demandes ou des devis.",
+      "difficulte": "Les opportunités existent, mais leur transformation en ventes n’est pas encore démontrée.",
+      "hypothese": "Le suivi entre la demande initiale et la vente peut manquer de mesure.",
+      "relance": "Quelle proportion de ces demandes devient réellement cliente ?",
+      "usage": "Mesurer la conversion commerciale."
+    }
+  },
+  {
+    "code": "R6D",
+    "questionCode": "R6",
+    "lettre": "D",
+    "texte": "Je peux identifier des ventes directement issues de mes actions numériques.",
+    "dimension": "Performance digitale",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Performance digitale",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Des ventes issues des actions numériques peuvent être identifiées.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Quelles actions numériques génèrent le plus de ventes mesurables ?",
+      "usage": "Capitaliser sur les actions performantes."
+    }
+  },
+  {
+    "code": "R7A",
+    "questionCode": "R7",
+    "lettre": "A",
+    "texte": "Les personnes directement impliquées dans mon activité le remarqueraient.",
+    "dimension": "Empreinte dans l’écosystème",
+    "points": 0,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Faible"
+      }
+    ],
+    "constat": {
+      "dimension": "Empreinte marché",
+      "nature": "Difficulté",
+      "gravite": 3,
+      "niveau": "Élevée",
+      "factuel": "L’arrêt de l’activité serait surtout remarqué par les personnes directement impliquées.",
+      "difficulte": "L’empreinte de l’entreprise reste très limitée au-delà de son fonctionnement interne.",
+      "hypothese": "Le marché pourrait remplacer facilement l’offre actuelle.",
+      "relance": "Qu’est-ce que vos clients perdraient réellement si votre entreprise disparaissait ?",
+      "usage": "Faire préciser la valeur irremplaçable."
+    }
+  },
+  {
+    "code": "R7B",
+    "questionCode": "R7",
+    "lettre": "B",
+    "texte": "Mes clients réguliers ressentiraient rapidement mon absence.",
+    "dimension": "Empreinte dans l’écosystème",
+    "points": 1,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Émergent"
+      }
+    ],
+    "constat": {
+      "dimension": "Empreinte marché",
+      "nature": "Difficulté",
+      "gravite": 2,
+      "niveau": "Modérée",
+      "factuel": "L’arrêt de l’activité serait principalement ressenti par les clients réguliers.",
+      "difficulte": "L’empreinte existe auprès de la clientèle actuelle, mais reste peu visible dans l’écosystème.",
+      "hypothese": "Le développement dépend encore fortement de la base de clients existante.",
+      "relance": "Qui, en dehors de vos clients réguliers, défendrait spontanément votre importance ?",
+      "usage": "Mesurer l’empreinte élargie."
+    }
+  },
+  {
+    "code": "R7C",
+    "questionCode": "R7",
+    "lettre": "C",
+    "texte": "Certains partenaires ou professionnels de mon secteur le remarqueraient.",
+    "dimension": "Empreinte dans l’écosystème",
+    "points": 2,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Installé"
+      }
+    ],
+    "constat": {
+      "dimension": "Empreinte marché",
+      "nature": "Point de vigilance",
+      "gravite": 1,
+      "niveau": "Légère",
+      "factuel": "Certains partenaires ou professionnels remarqueraient l’arrêt de l’activité.",
+      "difficulte": "L’entreprise compte dans son réseau, mais son absence ne serait pas encore largement ressentie par le marché.",
+      "hypothese": "L’autorité professionnelle peut être plus avancée que la préférence du marché.",
+      "relance": "Comment cette reconnaissance professionnelle se transforme-t-elle en nouvelles opportunités ?",
+      "usage": "Relier réseau et développement."
+    }
+  },
+  {
+    "code": "R7D",
+    "questionCode": "R7",
+    "lettre": "D",
+    "texte": "Une partie de mon marché constaterait clairement la disparition de mon offre.",
+    "dimension": "Empreinte dans l’écosystème",
+    "points": 3,
+    "tags": [
+      {
+        "tag": "Niveau déclaré",
+        "valeur": "Fort"
+      }
+    ],
+    "constat": {
+      "dimension": "Empreinte marché",
+      "nature": "Force",
+      "gravite": 0,
+      "niveau": "Aucune alerte",
+      "factuel": "Une partie du marché constaterait clairement la disparition de l’offre.",
+      "difficulte": "",
+      "hypothese": "",
+      "relance": "Qu’est-ce qui rend aujourd’hui votre entreprise difficile à remplacer ?",
+      "usage": "Identifier les actifs différenciants."
+    }
+  }
+]

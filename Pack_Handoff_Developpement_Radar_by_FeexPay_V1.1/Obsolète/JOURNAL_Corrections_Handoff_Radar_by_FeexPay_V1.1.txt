@@ -1,0 +1,18 @@
+RADAR BY FEEXPAY — JOURNAL DE CORRECTIONS DU HANDOFF
+Version 1.1 — 31 août 2026
+
+1. Remplacement de l’ancienne maquette HTML par les deux fichiers actuels : maquette principale et arborescence.
+2. Intégration de support.js, du design system et des actifs nécessaires au rendu des deux HTML.
+3. Retrait de l’ancienne maquette Annexe_02_Maquette_HTML_Radar_by_FeexPay_Version_finale.html.
+4. Retrait des anciens visuels hero-diagnostic et Illustration_hero_Radar_by_FeexPay.jpg.
+5. Intégration de la nouvelle illustration hero-archetypes-orbit.
+6. Intégration des huit emblèmes d’archétypes en 64 px, 256 px et version source.
+7. Mise à jour de la notice des actifs graphiques.
+8. Classement du plan de tracking comme Annexe 04 et ajout de son usage dans le README général.
+9. Correction de la référence au cahier des charges : V1.1, et non V1.0.
+10. Documentation de l’ordre de prévalence entre CDC, matrice, tracking, maquettes et kit graphique.
+11. Documentation de l’écart P13/P14 sans modification silencieuse du CDC.
+12. Exclusion des dossiers de construction, doublons et fichiers visuels antérieurs de la source de conception.
+13. Régénération complète du manifeste SHA-256 sur les fichiers réellement livrés.
+
+Les contenus du CDC V1.1, de la matrice V2.1 et du plan de tracking V1.0 n’ont pas été modifiés.

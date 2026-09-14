@@ -1,0 +1,128 @@
+[
+  {
+    "code": "Q1",
+    "type": "dirigeant",
+    "ordre": 1,
+    "texte": "Une nouvelle opportunité se présente. Qu’est-ce qui vous pousse le plus à avancer ?"
+  },
+  {
+    "code": "Q2",
+    "type": "dirigeant",
+    "ordre": 2,
+    "texte": "Vos ventes augmentent brusquement. Quelle devient votre première priorité ?"
+  },
+  {
+    "code": "Q3",
+    "type": "dirigeant",
+    "ordre": 3,
+    "texte": "Vous devez prendre une décision sans avoir toutes les informations. Que faites-vous ?"
+  },
+  {
+    "code": "Q4",
+    "type": "dirigeant",
+    "ordre": 4,
+    "texte": "Comment suivez-vous généralement les ventes réalisées au cours d’une semaine ?"
+  },
+  {
+    "code": "Q5",
+    "type": "dirigeant",
+    "ordre": 5,
+    "texte": "Le montant encaissé ne correspond pas aux ventes réalisées. Quel est votre premier réflexe ?"
+  },
+  {
+    "code": "Q6",
+    "type": "dirigeant",
+    "ordre": 6,
+    "texte": "Vos clients utilisent plusieurs moyens de paiement. Comment gardez-vous une vue d’ensemble ?"
+  },
+  {
+    "code": "Q7",
+    "type": "dirigeant",
+    "ordre": 7,
+    "texte": "À quel moment savez-vous réellement ce que votre entreprise peut dépenser ?"
+  },
+  {
+    "code": "Q8",
+    "type": "dirigeant",
+    "ordre": 8,
+    "texte": "Lorsque vient le moment de faire la comptabilité, dans quel état se trouvent vos informations ?"
+  },
+  {
+    "code": "Q9",
+    "type": "dirigeant",
+    "ordre": 9,
+    "texte": "Lorsque d’autres personnes encaissent pour votre entreprise, comment suivez-vous leur activité ?"
+  },
+  {
+    "code": "Q10",
+    "type": "dirigeant",
+    "ordre": 10,
+    "texte": "Lorsqu’un client souhaite vous payer à distance, comment procédez-vous généralement ?"
+  },
+  {
+    "code": "Q11",
+    "type": "dirigeant",
+    "ordre": 11,
+    "texte": "Quelle place le digital occupe-t-il actuellement dans vos ventes ?"
+  },
+  {
+    "code": "Q12",
+    "type": "dirigeant",
+    "ordre": 12,
+    "texte": "Un client affirme avoir payé, mais vous ne retrouvez pas immédiatement son paiement. Que faites-vous ?"
+  },
+  {
+    "code": "Q13",
+    "type": "dirigeant",
+    "ordre": 13,
+    "texte": "Avant d’adopter un nouvel outil pour votre entreprise, qu’est-ce qui compte le plus pour vous ?"
+  },
+  {
+    "code": "Q14",
+    "type": "dirigeant",
+    "ordre": 14,
+    "texte": "Dans un an, quel progrès vous donnerait le plus le sentiment de mieux piloter votre entreprise ?"
+  },
+  {
+    "code": "R1",
+    "type": "rayonnement",
+    "ordre": 1,
+    "texte": "En dehors de vos clients actuels, jusqu’où votre entreprise est-elle connue ?"
+  },
+  {
+    "code": "R2",
+    "type": "rayonnement",
+    "ordre": 2,
+    "texte": "Lorsqu’un prospect choisit un concurrent, savez-vous généralement pourquoi ?"
+  },
+  {
+    "code": "R3",
+    "type": "rayonnement",
+    "ordre": 3,
+    "texte": "Pour quelle raison vos clients vous choisissent-ils principalement ?"
+  },
+  {
+    "code": "R4",
+    "type": "rayonnement",
+    "ordre": 4,
+    "texte": "Une personne qui découvre votre entreprise comprend-elle facilement ce qui vous distingue ?"
+  },
+  {
+    "code": "R5",
+    "type": "rayonnement",
+    "ordre": 5,
+    "texte": "Comment votre entreprise est-elle actuellement présente sur les canaux numériques ?"
+  },
+  {
+    "code": "R6",
+    "type": "rayonnement",
+    "ordre": 6,
+    "texte": "Que produit concrètement votre présence numérique pour votre entreprise ?"
+  },
+  {
+    "code": "R7",
+    "type": "rayonnement",
+    "ordre": 7,
+    "texte": "Si votre entreprise arrêtait ses activités demain, qui le remarquerait rapidement ?"
+  }
+]

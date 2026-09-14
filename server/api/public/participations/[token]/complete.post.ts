@@ -1,49 +1,126 @@
-import { randomUUID } from 'node:crypto'
-import { eq } from 'drizzle-orm'
-import { ScoringError, buildInsights, scoreDirigeant, scoreRayonnement } from '@radar/scoring'
-import { schema, useDb } from '../../../../utils/db'
-import { loadAnswers, requireParticipation } from '../../../../utils/participation'
-import { toPublicResult } from '../../../../utils/result'
+import {
+  buildInsights,
+  scoreDirigeant,
+  scoreRayonnement,
+  toPublicDirigeant,
+  toPublicRayonnement,
+  type Answers,
+} from '@radar/scoring'
 
-/** Valide, calcule, snapshot. Idempotent : re-appel → même snapshot. */
+/**
+ * POST /api/public/participations/{token}/complete — calcule, fige le snapshot, renvoie
+ * la projection publique. Idempotent : un second appel relit le snapshot existant
+ * (immuable en base par trigger) au lieu de recalculer.
+ *
+ * Le calcul est fait par le moteur pur, jamais côté client : seul ce qui est destiné
+ * à l'affichage sort d'ici (pas de pilotage, d'affinités, de tie-break ni d'hypothèses).
+ */
+import { envoyerCapi } from '../../../../utils/capi'
+
 export default defineEventHandler(async (event) => {
-  const p = await requireParticipation(event)
-  const db = useDb()
+  const token = getRouterParam(event, 'token')
+  if (!token) throw apiError(event, 'VALIDATION_ERROR', 'Jeton manquant.')
+
+  const session = await requireSession(event)
+  const p = await participationByToken(event, token, session.id)
+  const corps = (await readBody(event).catch(() => null)) as { eventId?: string } | null
+  const eventId = typeof corps?.eventId === 'string' && /^[0-9a-f-]{36}$/i.test(corps.eventId) ? corps.eventId : undefined
 
   if (p.status === 'completed') {
-    const [snap] = await db.select().from(schema.scoreSnapshot).where(eq(schema.scoreSnapshot.participationId, p.id)).limit(1)
-    if (snap) return { result: toPublicResult(p.diagnosticType, snap.result), event_id: randomUUID(), idempotent: true }
+    return { ...(await readSnapshot(event, p.id)), alreadyCompleted: true }
   }
 
-  const answers = await loadAnswers(p.id)
-  let scores: unknown
-  let result: unknown
-  let tieBreak: unknown = null
-  try {
-    if (p.diagnosticType === 'dirigeant') {
-      const { raw, norm, affinites, pilotage, tieBreak: tb, ...rest } = scoreDirigeant(answers)
-      scores = { raw, norm, affinites, pilotage }
-      result = { ...rest, norm }
-      tieBreak = tb
-    } else {
-      const r = scoreRayonnement(answers)
-      scores = { dims: r.dims, score: r.score }
-      result = r
-    }
-  } catch (e) {
-    if (e instanceof ScoringError) throw apiError(event, e.code, e.message)
-    throw e
+  const answers = (await engineAnswers(p.id)) as Answers
+  const expected = QUESTION_COUNT[p.diagnostic_type]
+  if (Object.keys(answers).length !== expected) {
+    throw apiError(
+      event,
+      'INCOMPLETE_PARTICIPATION',
+      `${Object.keys(answers).length} réponse(s) sur ${expected} : aucun calcul.`
+    )
   }
-  const insights = buildInsights(p.diagnosticType === 'dirigeant' ? answers : null, p.diagnosticType === 'rayonnement' ? answers : null)
-  const now = new Date()
 
-  await db.transaction(async (tx) => {
-    await tx.insert(schema.scoreSnapshot).values({ participationId: p.id, versionId: p.versionId, scores, result, tieBreak })
-    await tx.insert(schema.insightSnapshot).values({ participationId: p.id, versionId: p.versionId, items: insights })
-    await tx
-      .update(schema.participation)
-      .set({ status: 'completed', completedAt: now, durationS: Math.round((now.getTime() - p.startedAt.getTime()) / 1000) })
-      .where(eq(schema.participation.id, p.id))
+  const result =
+    p.diagnostic_type === 'dirigeant'
+      ? scoreDirigeant(answers, p.version)
+      : scoreRayonnement(answers, p.version)
+
+  const insights = buildInsights(
+    p.diagnostic_type === 'dirigeant'
+      ? { version: p.version, dirigeant: answers }
+      : { version: p.version, rayonnement: answers }
+  )
+
+  const publicResult =
+    result.type === 'dirigeant' ? toPublicDirigeant(result) : toPublicRayonnement(result)
+
+  await tx(async (c) => {
+    // Deux participations complétées en parallèle : la contrainte unique tranche.
+    const done = await c.query(
+      `update participation
+          set status = 'completed',
+              completed_at = now(),
+              duration_s = greatest(0, extract(epoch from (now() - started_at))::int)
+        where id = $1 and status <> 'completed'`,
+      [p.id]
+    )
+    if (done.rowCount === 0) return
+
+    const { scores, resume } = splitSnapshot(result)
+    await c.query(
+      `insert into score_snapshot (participation_id, version_id, scores, result, tie_break)
+       values ($1, $2, $3, $4, $5)`,
+      [
+        p.id,
+        p.version_id,
+        JSON.stringify(scores),
+        JSON.stringify(resume),
+        result.type === 'dirigeant' && result.tieBreak ? JSON.stringify(result.tieBreak) : null,
+      ]
+    )
+    await c.query(
+      `insert into insight_snapshot (participation_id, version_id, items) values ($1, $2, $3)`,
+      [p.id, p.version_id, JSON.stringify(insights)]
+    )
   })
-  return { result: toPublicResult(p.diagnosticType, result), event_id: randomUUID(), idempotent: false }
+
+  setResponseStatus(event, 201)
+  await envoyerCapi(event, 'quiz_completed', eventId, {}, { diagnostic: p.diagnostic_type })
+
+  return {
+    token,
+    type: p.diagnostic_type,
+    status: 'completed' as const,
+    result: publicResult,
+    alreadyCompleted: false,
+    // Identifiant d'évènement pour le tracking (déduplication client/CAPI, Lot 7).
+    eventId: `diag_${p.id}`,
+    event_id: `diag_${p.id}`,
+    correlation_id: event.context.correlationId,
+  }
 })
+
+/** Sépare ce qui est archivé « brut » (scores) de la conclusion (result). */
+function splitSnapshot(result: ReturnType<typeof scoreDirigeant> | ReturnType<typeof scoreRayonnement>) {
+  if (result.type === 'dirigeant') {
+    const { raw, norm, affinities, pilotage, principal, secondaire } = result
+    return {
+      scores: { raw, norm, affinities, pilotage },
+      resume: { type: 'dirigeant', principal, secondaire },
+    }
+  }
+  const { dimensions, score, scoreAffiche, niveau, meteo, lecture, nuance, niveauAffiche } = result
+  return {
+    scores: { dimensions, score },
+    resume: {
+      type: 'rayonnement',
+      scoreAffiche,
+      niveau,
+      niveauAffiche,
+      meteo,
+      lecture,
+      nuance,
+      differenciationDeclaree: result.differenciationDeclaree,
+    },
+  }
+}

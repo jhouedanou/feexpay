@@ -1,18 +1,31 @@
-import { questionsOf } from '@radar/scoring'
-import { loadAnswers, requireParticipation } from '../../../utils/participation'
-
+/**
+ * GET /api/public/participations/{token} — état du parcours : questions de la version
+ * épinglée, réponses déjà données, index de reprise. Aucun élément de barème.
+ */
 export default defineEventHandler(async (event) => {
-  const p = await requireParticipation(event)
-  const answers = await loadAnswers(p.id)
-  const qs = questionsOf(p.diagnosticType)
-  const firstUnanswered = qs.findIndex((q) => !answers[q.code])
+  const token = getRouterParam(event, 'token')
+  if (!token) throw apiError(event, 'VALIDATION_ERROR', 'Jeton manquant.')
+
+  const session = await requireSession(event)
+  const p = await participationByToken(event, token, session.id)
+
+  const questions = await questionsFor(p.version_id, p.diagnostic_type)
+  const answers = await answersFor(p.id)
+
   return {
-    type: p.diagnosticType,
+    token,
+    type: p.diagnostic_type,
+    version: p.version,
     status: p.status,
-    total: qs.length,
+    startedAt: p.started_at,
+    completedAt: p.completed_at,
+    total: QUESTION_COUNT[p.diagnostic_type],
+    answered: Object.keys(answers).length,
+    currentIndex: currentIndex(questions, answers),
+    // Alias snake_case : graphie utilisée par les écrans.
+    current_index: currentIndex(questions, answers),
+    questions,
     answers,
-    current_index: firstUnanswered === -1 ? qs.length : firstUnanswered + 1,
-    started_at: p.startedAt,
-    completed_at: p.completedAt,
+    correlation_id: event.context.correlationId,
   }
 })

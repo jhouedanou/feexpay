@@ -6,6 +6,92 @@
 
 ---
 
+## 0. État d'avancement (mis à jour le 2026-09-10)
+
+Lots 1 à 6 livrés et recettés. Lot 7 « Lancement » : le développement est terminé, la
+recette fonctionnelle et les éléments attendus du client restent ouverts (§10b).
+
+| §9 | Étape | État |
+|---|---|---|
+| 1 | Workspace pnpm + Nuxt + TS + Vitest | fait. **Manque : ESLint/Prettier et Playwright** — le DoD §12 exige un e2e aux largeurs 390/834/1440, il n'existe pas ; seuls des scripts HTTP couvrent l'API. Modules `@nuxtjs/supabase` et `nuxt-og-image` écartés (voir « Écarts de stack ») |
+| 2 | Supabase + `.env.example` | projet en ligne opérationnel (PostgreSQL 17.6). **Manque : un projet de production distinct** — le projet actuel sert à la fois de développement et de pré-production et contient des données de test |
+| 3 | Schéma, RLS, triggers, seed | fait — 28 tables, RLS activée et forcée sans policy sur toutes, triggers d'immutabilité, seed du moteur et seed admin. `packages/db` (Drizzle) abandonné : le SQL est la source de vérité |
+| 4 | CI, logger, en-têtes de sécurité | `correlation_id` fait ; **en-têtes de sécurité faits le 10/09** (HSTS, CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy). Manque : logger structuré. CI GitHub Actions abandonnée le 09/09 (déploiement Vercel, contrôles en local) |
+| 5 | Assets de marque | fait — logos, emblèmes, Poppins auto-hébergé, icônes MDI. Manque : variantes AVIF/WebP du hero |
+| 6 | `docs/ARCHITECTURE.md` | **fait le 10/09**, avec `docs/RUNBOOK.md`, `docs/MANUEL_ADMIN.md` et `openapi.json` |
+| 6b–8 | Moteur : extraction, `packages/scoring`, seed | fait — 47 contrôles verts. **V2.2 publiée**, V2.1 archivée, les deux coexistent dans `src/versions/` |
+| 9 | Lot 1 — API parcours | fait — 26 contrôles. **Abandon automatique fait le 10/09** : `/api/cron/abandon`, tâche planifiée quotidienne |
+| 10 | Lot 1 — écrans P01–P07 | fait. **File locale hors-ligne faite le 10/09** : les réponses sont conservées et rejouées au retour du réseau |
+| 11 | Lot 2 — résultats P08/P09 | fait — 15 contrôles |
+| 12 | Lot 3 — conversion P10/P11 | fait — 10 contrôles. La politique de confidentialité s'ouvre en fenêtre modale sur P10 (10/09) |
+| 13 | Lot 3 — rapport, PDF, email | fait — PDF par jsPDF à la demande, envoi Resend, webhook de statuts |
+| 14 | Lot 3 — partage P13/P14 | fait — **les quatre formats le 10/09**, trace en base dans `share_asset`. Rendu sur canvas côté navigateur, pas de dépôt sur Storage |
+| 15 | Lot 4 — admin auth | fait — 23 contrôles. **Réinitialisation du mot de passe faite le 10/09** (§10.5), 23 contrôles |
+| 16 | Lot 5 — admin métier | fait — 30 contrôles |
+| 17 | Lot 6 — ops admin | fait — 23 contrôles. Exports synchrones et non asynchrones (voir « Écarts de stack ») |
+| 18 | Lot 7 — lancement | **tracking serveur complété le 10/09** : GA4 Measurement Protocol (`report_generated`, `report_sent`), `POST /api/public/track`, file `tracking_event_outbox` idempotente. Restent : recette des 14 tests de tracking, passes axe et Lighthouse, revue OWASP ASVS, test de restauration — tous conditionnés par les identifiants réels et un environnement déployé |
+
+### Écarts de stack assumés
+
+Le code a divergé du §2 ; ces choix sont motivés dans `docs/ARCHITECTURE.md`.
+
+- Pas de Drizzle ni de `packages/db` : SQL brut dans `supabase/migrations/` (source de
+  vérité) et `pg` côté serveur. Les renvois du §9 à `server/db/schema.ts` et
+  `server/db/seed.ts` ne correspondent à rien : ce sont `supabase/migrations/` et
+  `scripts/seed-scoring-version.ts`.
+- Pas de `@nuxtjs/supabase` : le module expose un client au navigateur, or aucun accès
+  client à la base n'est voulu. Client serveur maison dans `server/utils/supabase.ts`.
+- Pas de `nuxt-og-image` ni de dépôt sur Storage pour le partage : carte dessinée sur canvas
+  côté navigateur, seule la trace est conservée.
+- Pas de `packages/email` ni de vue-email : quatre envois en HTML en ligne (rapport,
+  invitation, réinitialisation, alerte sécurité).
+- Pas de pg-boss ni de Playwright : PDF par jsPDF, synchrone ; exports synchrones journalisés
+  dans `export_job`.
+- Nuxt 4.5 au lieu de Nuxt 3 (même API, structure `app/` conforme au §3) ; Tailwind 4 par le
+  plugin Vite officiel.
+- Les composants annoncés au §3 (`ProgressBar`, `StepMeta`, `WeatherCard`, `ScoreGauge`,
+  `SeverityTag`, `DifficultyCard`, `ForceCard`, `HypothesisCard`, `FactCard`, `KpiCard`,
+  `EmptyValue`, `EmptyState`) n'existent pas comme fichiers : leur balisage est en place dans
+  les pages. Écart de nommage, pas de fonctionnalité.
+
+### Contrôles automatisés
+
+`pnpm test` (sans base externe) : 47 contrôles du moteur + 10 sur les migrations SQL (PGlite).
+
+Serveur lancé, écrivant dans la base de `DATABASE_URL` : `test:api` 26, `test:results` 15,
+`test:leads` 10, `test:admin` 23, `test:metier` 30, `test:lot6` 23, `test:reset` 23.
+
+### Décisions de déploiement (2026-09-08, inchangées)
+
+Vercel, sans CI GitHub Actions. Trois choix pour que l'application tienne dans des fonctions
+éphémères :
+
+1. **Base** — la connexion directe `db.<ref>.supabase.co` est IPv6 seulement et les fonctions
+   Vercel n'ont pas d'egress IPv6. `DATABASE_URL` doit pointer le **pooler Supavisor en mode
+   session** (port 5432). Le port 6543, mode transaction, ne prend pas en charge les requêtes
+   préparées : à proscrire. À noter : le pooler est à Londres, pas à Francfort comme
+   l'annonce le §2.
+2. **PDF** — Playwright abandonné : la limite de durée d'une fonction est de 10 s en Hobby et
+   un démarrage à froid de Chromium en consomme l'essentiel. jsPDF, à la demande. Compromis :
+   mise en page en coordonnées, pas un jumeau du rapport HTML.
+3. **File d'attente** — pg-boss abandonné : le cron Vercel en Hobby est plafonné à une
+   exécution par jour. L'envoi Resend se fait dans la requête, `notification` sert de journal,
+   le renvoi manuel depuis A07 remplace le retry automatique — ce que le CDC prévoit déjà.
+   La tâche quotidienne disponible sert à la clôture des parcours abandonnés.
+
+**Email sans accès DNS** : `RESEND_FROM` en variable d'environnement (défaut
+`onboarding@resend.dev`, qui ne délivre qu'au titulaire du compte Resend). Le jour où un
+domaine est vérifié dans Resend, on change la variable. Aucun changement de code.
+
+Prérequis machine : `node` par défaut est en v10 sur le poste de développement → `nvm use 22`
+avant tout `pnpm`. Le CLI `supabase` et Docker ne sont pas installés : on travaille
+directement sur le projet en ligne.
+
+Règle de départage appliquée : dimension centrale, comparaison après arrondi à deux
+décimales (défaut §10.1, toujours à confirmer par Cossi CODJIA).
+
+---
+
 ## 1. Contexte
 
 FeexPay (accompagné par Big Five) veut **Radar by FeexPay** (`radar.feexpay.me`) : web app mobile-first, publique sans compte, avec deux diagnostics indépendants :
@@ -25,7 +111,7 @@ Résultat gratuit affiché **avant** tout formulaire. Formulaire (P10) débloque
 |---|---|---|
 | App | **Nuxt 3 (Vue 3, TypeScript)**, monolithe : public + admin + API Nitro | 1 seul déploiement, SSR pour SEO P01, `routeRules` noindex, Nitro pour l'API |
 | API | Nitro `server/api/public/**`, `server/api/admin/**`, `server/middleware/` (correlation_id, RBAC) + **zod** + OpenAPI (`zod-to-openapi` → `openapi.json`) | CDC exige OpenAPI + validation stricte |
-| DB | **Supabase Postgres** (région EU Frankfurt) + **Drizzle ORM** (migrations SQL versionnées, appliquées via Drizzle, pas via dashboard) | Base relationnelle imposée, contraintes, transactions. Accès serveur uniquement (service role), RLS activé en défense en profondeur, aucun accès client direct aux tables |
+| DB | **Supabase Postgres** (région EU Frankfurt), migrations SQL versionnées dans `supabase/migrations/` (Drizzle écarté, cf. §0) | Base relationnelle imposée, contraintes, transactions. Accès serveur uniquement (service role), RLS activé en défense en profondeur, aucun accès client direct aux tables |
 | Auth admin | **Supabase Auth** : invitation-only (`auth.admin.inviteUserByEmail`, inscriptions publiques désactivées), mot de passe ≥12 + HIBP, **MFA TOTP natif** (`mfa.enroll/challenge/verify`, claim `aal2`), sessions cookie via `@nuxtjs/supabase` | Couvre invitation, 2FA, sessions, suspension (`admin.signOut` global / ban) |
 | Auth — maison | rôle/équipe dans `app_metadata` + table `admin_user` miroir ; **2FA obligatoire par rôle** (middleware exige `aal2` pour Analyste/Admin) ; **codes de récupération** (hash argon2, usage unique) ; domaine `@feexpay.me` vérifié serveur ; **invitations 7 j** en table maison (lien Supabase généré seulement à l'acceptation) ; garde dernier admin ; `audit_log` | Lacunes Supabase vs CDC E.1/E.3 |
 | Queue | **pg-boss** sur le Postgres Supabase, worker dans un plugin Nitro (ou process worker séparé en prod) | PDF, cartes, emails, exports, CAPI/MP ; retry borné, dead-letter, pas de Redis |
@@ -37,7 +123,7 @@ Résultat gratuit affiché **avant** tout formulaire. Formulaire (P10) débloque
 | UI | Tailwind 4 + tokens CSS Radar (`--fx-*`), Poppins self-hosted, MDI subset SVG, composants Vue SFC maison | Maquette prévaut sur `_ds/` générique (bundle React inutilisable) |
 | Tests | **Vitest** (scoring unitaire, handlers Nitro via `@nuxt/test-utils`), **Playwright** e2e | Cas de contrôle obligatoires |
 | Infra locale | **Supabase CLI** (`supabase start` : postgres, auth, storage, inbucket mail) | Env dev sans données réelles |
-| CI | GitHub Actions : lint, typecheck, vitest, migrations sur DB éphémère, e2e smoke | Lot 0 |
+| CI | Aucune : contrôles lancés en local (`pnpm test`, `pnpm typecheck:app`, suites HTTP) avant chaque livraison. Déploiement Vercel | Décision du 9 septembre 2026 |
 
 Écartés : Next.js (préférence équipe Vue) ; BullMQ/Redis (pg-boss suffit, un service de moins) ; auth maison complète (Supabase couvre TOTP/sessions).
 Point d'attention : Supabase sans région Afrique → Frankfurt ; mesurer latence Abidjan sur p95 API ≤ 500 ms.
@@ -81,7 +167,7 @@ radar/
                          findings.json, combined-rules.json, constants.json}
       src/{dirigeant.ts, rayonnement.ts, cross.ts, insights.ts, index.ts}
       test/controls.test.ts    # cas Contrôles + limites + tie
-    db/            # schéma Drizzle, migrations, seed v2.1
+    db/            # écarté : le schéma vit dans supabase/migrations/
     email/         # 6 templates vue-email
   supabase/        # config.toml, seed auth local
   docs/ARCHITECTURE.md   # livrable H.2, choix techniques justifiés vs CDC
@@ -91,7 +177,7 @@ radar/
 
 ---
 
-## 4. Modèle de données (Drizzle / Postgres)
+## 4. Modèle de données (Postgres — SQL brut, cf. §0 « écarts de stack »)
 
 Tables (du CDC F.2) — toutes avec `id uuid`, `created_at`, `updated_at` :
 
@@ -159,7 +245,7 @@ CC (≥60,≥60) Cohérence consolidée · PS (≥60,<60) Potentiel sous-exploit
 - Infos déclarées : Q11 canal, Q13 condition d'adoption, Q14 progrès prioritaire, R3 différenciation.
 - Règles combinées RC01–RC16 : OR intra-groupe, AND inter-groupes (voir annexe §11), **max 6**, tri gravité desc puis id. Hypothèse au conditionnel + relance obligatoire.
 - Preuves : exhaustif (code, question, option, version, date).
-- **Interdit** : tout champ `product_*`, `recommended_offer`, mapping constat→produit. Le tag « Produit FeexPay » de Q14 de la matrice n'est **pas** exposé (ni admin ni public).
+- Décision client du 8 septembre 2026 : la maquette prime sur le CDC. Les « Leviers FeexPay associés » de A05 (rattachement constat → produit) seront implémentés en admin (Lot 5), avec une table de correspondance éditable. Côté public, aucune recommandation produit.
 
 ### 5.5 Tests obligatoires (`controls.test.ts`)
 | Cas | Dirigeant | Rayonnement | Attendu |
@@ -238,14 +324,14 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 ## 9. Lots et ordre d'exécution
 
 **Lot 0 — Socle (jour 1–3)**
-1. ✅ (partiel : ESLint/Prettier/Playwright e2e non installés) `pnpm` workspace, Nuxt 3, TS strict, Vitest ; modules `@nuxtjs/supabase`, `nuxt-og-image`, Tailwind.
+1. ✅ partiel — `pnpm` workspace, Nuxt 4, TS strict, Vitest. ⏳ ESLint/Prettier et Playwright e2e. ❌ modules `@nuxtjs/supabase` et `nuxt-og-image` écartés (voir §0, écarts de stack) ; Tailwind 4 par le plugin Vite.
 2. ⏳ (Supabase en ligne retenu, pas de CLI local ; env à renseigner) `supabase init` + `supabase start` (postgres, auth, storage, inbucket) ; projet Supabase staging/prod région Frankfurt ; `.env.example` documenté (`SUPABASE_URL`, `SUPABASE_KEY` anon, `SUPABASE_SERVICE_KEY` serveur, `DATABASE_URL`).
-3. ✅ (`supabase/migrations/20260905000000_init.sql` source de vérité + `server/db/schema.ts` miroir Lot 1–3 ; seed admin ⏳) `packages/db` : schéma Drizzle complet (§4), migrations, triggers immutabilité, RLS deny-all sur tables métier (accès service role seulement), seed admin initial (script one-shot : `inviteUserByEmail` + ligne `admin_user`). Config Auth : signups off, password ≥12 + HIBP, MFA TOTP on.
-4. ✅ CI GitHub Actions ; ✅ `correlation_id` ; ⏳ pino, headers sécurité (HSTS/CSP). Headers sécurité (HSTS, CSP, noindex middleware).
+3. ✅ (`supabase/migrations/` source de vérité, 28 tables ; seed admin fait) `packages/db` : schéma Drizzle complet (§4), migrations, triggers immutabilité, RLS deny-all sur tables métier (accès service role seulement), seed admin initial (script one-shot : `inviteUserByEmail` + ligne `admin_user`). Config Auth : signups off, password ≥12 + HIBP, MFA TOTP on.
+4. ❌ CI GitHub Actions retirée le 9 septembre 2026 (déploiement Vercel, contrôles en local) ; ✅ `correlation_id` ; ✅ en-têtes de sécurité posés le 10 septembre (HSTS, CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy, `noindex` par `routeRules`) ; ⏳ logger structuré.
 5. ✅ (assets → `public/brand/`, tokens CSS Tailwind 4 ; ⏳ Poppins self-hosted, MDI) Copier assets Annexe 02 `assets/` → `app/public/brand/` ; tokens CSS Radar ; Poppins self-hosted ; MDI subset.
-6. ⏳ `docs/ARCHITECTURE.md` (livrable H.2 n°2, exigé par CDC F.1 « choix consignés dans la documentation d'architecture ») :
+6. ✅ `docs/ARCHITECTURE.md` écrit le 10 septembre 2026 (livrable H.2 n°2, exigé par CDC F.1 « choix consignés dans la documentation d'architecture »), avec `docs/RUNBOOK.md`, `docs/MANUEL_ADMIN.md` et `openapi.json`. Contenu attendu :
    - choix techniques (§2 de ce plan) avec, pour chacun, l'exigence CDC satisfaite (E.1, F.1, G.1, G.3, G.5…) ;
-   - schéma de données (§4) + diagramme ER généré depuis Drizzle ;
+   - schéma de données (§4) + diagramme ER ;
    - diagramme de déploiement : Nuxt/Nitro (Docker) + worker pg-boss/Playwright, Supabase (Postgres, Auth, Storage) Frankfurt, Resend, GA4/Meta ; trois environnements dev (Supabase local) / staging / prod ;
    - flux sensibles : jetons publics hashés, clé service Supabase serveur seulement, secrets par environnement ;
    - sauvegardes : plan Supabase retenu, PITR ou backups quotidiens, procédure de restauration, RPO/RTO ;
@@ -254,32 +340,32 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 
 **Lot 2 avant Lot 1 (moteur d'abord, pur, testable)**
 6. ✅ `scripts/extract-matrix.ts` → JSON v2.1 + checksum.
-7. ✅ `packages/scoring` : dirigeant, rayonnement, cross, insights ; tests §5.5 verts (26 tests).
-8. ✅ Seed `scoring_version 2.1` published + questions/options (`server/db/seed.ts`).
+7. ✅ `packages/scoring` : dirigeant, rayonnement, cross, insights ; tests §5.5 verts (47 contrôles).
+8. ✅ Seed `scoring_version` published + questions/options (`scripts/seed-scoring-version.ts`). V2.2 publiée, V2.1 archivée.
 
 **Lot 1 — Parcours questions**
-9. ✅ API sessions/participations/answers ; cookie session ; reprise 7j ; ⏳ abandon (cron).
-10. ✅ P01–P07 + AnswerCard, ProgressBar (⏳ StepMeta, Skeleton, file offline, contrôle visuel 390/834/1440 vs maquette).
+9. ✅ API sessions/participations/answers ; cookie session ; reprise 7 j ; ✅ abandon automatique le 10 septembre (`/api/cron/abandon`, tâche quotidienne `vercel.json`).
+10. ✅ P01–P07, contrôle visuel 390/834/1440 fait le 9 septembre ; ✅ file locale hors-ligne le 10 septembre (réponses conservées et rejouées au retour du réseau).
 
 **Lot 2 suite — Résultats**
-11. ✅ `complete` → snapshot + insight_snapshot ; P08/P09 ; DimensionBars, WeatherCard, emblèmes (⏳ ScoreGauge).
+11. ✅ `complete` → snapshot + insight_snapshot ; P08/P09 ; emblèmes et barres de dimensions.
 
 **Lot 3 — Conversion**
-12. `leads` + rapprochement contact + cross_reading ; P10/P11.
-13. Report + token ; P12 + `/print` ; job pg-boss PDF Playwright → Supabase Storage ; job email Resend + webhooks ; 3 templates rapport.
-14. Share assets nuxt-og-image 4 formats → Storage ; P13/P14 ; Web Share.
+12. ✅ `leads` + rapprochement contact + cross_reading ; P10/P11. Politique de confidentialité en fenêtre modale sur P10 (10 septembre).
+13. ✅ Report + token ; P12. PDF par jsPDF à la demande (ni pg-boss, ni Playwright, ni Storage, ni route `/print`) ; envoi Resend et webhook de statuts ; un gabarit de rapport.
+14. ✅ P13/P14, les quatre formats (10 septembre), trace en base dans `share_asset`. Carte dessinée sur canvas côté navigateur : ni `nuxt-og-image`, ni dépôt sur Storage.
 
 **Lot 4 — Admin auth**
-15. Invitations maison 7 j → `generateLink` Supabase ; enrôlement TOTP obligatoire au premier login Analyste/Admin ; codes de récupération ; middleware `aal2` + rôle (`app_metadata`) ; gardes admin (dernier admin, auto-rétrogradation, suspension = `admin.signOut` global) ; `audit_log` ; A01, A09, A10 ; templates invitation/reset/alerte.
+15. ✅ Invitations maison 7 j ; ✅ réinitialisation du mot de passe le 10 septembre (§10.5) ; enrôlement TOTP obligatoire au premier login Analyste/Admin ; codes de récupération ; middleware `aal2` + rôle (`app_metadata`) ; gardes admin (dernier admin, auto-rétrogradation, suspension = `admin.signOut` global) ; `audit_log` ; A01, A09, A10 ; emails invitation, réinitialisation et alerte sécurité.
 
 **Lot 5 — Admin métier**
-16. A02 dashboard KPI ; A03 liste ; A04/A05/A06 ; cartes Difficulty/Force/Hypothesis/Fact, SeverityTag, KpiCard, EmptyState/EmptyValue.
+16. A02 dashboard KPI ; A03 liste ; A04/A05/A06 ; cartes Difficulty/Force/Hypothesis/Fact, SeverityTag, KpiCard, EmptyState/EmptyValue. Livré le 8 septembre 2026 : migration `20260908140000_admin_metier.sql` (leviers, suivi, notes), utilitaire `server/utils/admin-metier.ts`, dix routes `/api/admin/**`, pages `admin/index`, `admin/prospects/**`, `admin/participations/**`, `admin/reglages/leviers`, test `test/api-metier.mjs`.
 
 **Lot 6 — Ops admin**
-17. A07 rapports + renvoi ; exports async journalisés ; T01 versions + publication contrôlée ; A08 états.
+17. ✅ A07 rapports + renvoi ; exports **synchrones** journalisés dans `export_job` (conséquence de l'abandon de pg-boss) ; T01 versions + publication contrôlée ; A08 états. Livré le 9 septembre 2026 : migration `20260909000000_rapports_versions.sql` (journal d'envoi, ouverture en ligne), `server/utils/{rapports,versions}.ts`, `packages/scoring/src/controls.ts` (cas de contrôle partagés test/admin), webhook Resend, pages `admin/rapports`, `admin/versions`, test `test/api-lot6.mjs`.
 
 **Lot 7 — Lancement**
-18. Tracking complet + recette 14 tests ; WCAG 2.2 AA (axe + clavier) ; Lighthouse (LCP ≤2.5 s, CLS ≤0.1) ; revue OWASP ASVS ; sauvegarde/restauration testée ; docs (architecture, OpenAPI, runbook, manuel admin).
+18. ✅ tracking serveur complété le 10 septembre (GA4 Measurement Protocol pour `report_generated` et `report_sent`, `POST /api/public/track`, file `tracking_event_outbox` idempotente) ; ✅ docs (architecture, OpenAPI, runbook, manuel admin). ⏳ recette 14 tests DebugView/Meta Test Events ; WCAG 2.2 AA (axe + clavier) ; Lighthouse (LCP ≤2,5 s, CLS ≤0,1) ; revue OWASP ASVS ; sauvegarde/restauration testée. Ces cinq points exigent les identifiants réels et un environnement déployé.
 
 ---
 
@@ -289,7 +375,7 @@ Admin (1440, exploitable 1024, sidebar navy, menus masqués par rôle **et** API
 2. **RGPD / consentement** : aucun CMP ni Consent Mode dans CDC ni plan tracking. Défaut retenu : bandeau minimal + Consent Mode v2, tracking off tant que refus ; mentions légales + politique de confidentialité en footer. Rétention contacts/participations à définir.
 3. **Libellés écart** : onglet « Lecture croisée » vs Simulateur → retenu onglet.
 4. **Fournisseurs** : Supabase confirmé (DB, auth, storage). Reste : email (Resend vs Brevo) et hébergement Nuxt (Docker/VPS recommandé à cause de Playwright, sinon worker PDF séparé). Frais et titulaire des comptes (Big Five ou FeexPay) non tranchés : ne rien ouvrir avant réponse.
-5. Réinitialisation mot de passe admin « si activé » ; notes internes A04 ; licence MDI.
+5. ~~Réinitialisation mot de passe admin~~ **tranchée et livrée le 10 septembre** : lien d'une heure à usage unique, sans énumération de comptes, second facteur conservé. ~~Notes internes A04~~ livrées. **Licence MDI : toujours ouverte.**
 6. Météo : maquette montre 5 libellés différents des niveaux matrice (ex. « Marque de référence » vs « Dominant ») → matrice prévaut.
 
 ### 10b. Éléments demandés au chef de projet / client — attendus avant le **18 septembre 2026** (email envoyé le 05/09)
@@ -335,7 +421,7 @@ Textes (thème, signaux, hypothèse, relance) : onglet « Règles combinées » 
 
 ## 12. Vérification (definition of done par lot)
 
-- Lot 0 : `supabase start` + `pnpm dev` OK ; migrations reproductibles ; CI verte ; `docs/ARCHITECTURE.md` relu et validé par Jean-Luc.
+- Lot 0 : `supabase start` + `pnpm dev` OK ; migrations reproductibles ; contrôles locaux verts ; `docs/ARCHITECTURE.md` relu et validé par Jean-Luc.
 - Scoring : `pnpm --filter scoring test` → 5 cas limites + 8 accessibilité + tie + invariant 7/7 verts.
 - Lot 1–3 : e2e Playwright : parcours complet Dirigeant puis Rayonnement → résultat avant formulaire → lead → rapport → PDF → carte ; à 390/834/1440 ; double soumission neutralisée ; reprise après reload.
 - Lot 4–6 : tests API RBAC (403 par rôle), dernier admin, invitation expirée ; renvoi sans recalcul.

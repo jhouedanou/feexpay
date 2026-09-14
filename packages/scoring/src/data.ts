@@ -1,75 +1,118 @@
-import questionsJson from './versions/v2.1/questions.json'
-import optionsJson from './versions/v2.1/options.json'
-import archetypesJson from './versions/v2.1/archetypes.json'
-import dimensionsJson from './versions/v2.1/dimensions.json'
-import rulesJson from './versions/v2.1/combined-rules.json'
-import constantsJson from './versions/v2.1/constants.json'
-import checksumJson from './versions/v2.1/checksum.json'
+/**
+ * Chargement et indexation des données de version.
+ * Les JSON sont générés par `scripts/extract-matrix.ts` depuis la matrice normative
+ * et commités : ils sont la donnée de seed de `scoring_version`.
+ */
+import archetypesV21 from './versions/v2.1/archetypes.json'
+import checksumV21 from './versions/v2.1/checksum.json'
+import combinedRulesV21 from './versions/v2.1/combined-rules.json'
+import constantsV21 from './versions/v2.1/constants.json'
+import dimensionsV21 from './versions/v2.1/dimensions.json'
+import optionsV21 from './versions/v2.1/options.json'
+import questionsV21 from './versions/v2.1/questions.json'
 import type {
-  Answers,
-  Archetype,
-  CombinedRule,
+  ArchetypeData,
+  CombinedRuleData,
+  Constants,
+  DimensionData,
   DiagnosticType,
-  Dim,
-  Dimension,
-  Option,
-  Question,
-  RayonnementDimension,
-  ScoringError as _SE,
+  OptionCode,
+  OptionData,
+  QuestionCode,
+  QuestionData,
 } from './types'
-import { ScoringError } from './types'
 
-export const VERSION = constantsJson.version
-export const CHECKSUM = checksumJson.sha256
-export const constants = constantsJson
-export const questions = questionsJson as Question[]
-export const options = optionsJson as Option[]
-export const archetypes = archetypesJson as Archetype[]
-export const combinedRules = rulesJson as CombinedRule[]
-export const DIMS: Dim[] = ['VIS', 'STR', 'EXE', 'ORG', 'INF', 'AUD', 'ADA', 'TRA']
+export interface ScoringVersion {
+  version: string
+  checksum: string
+  questions: QuestionData[]
+  options: OptionData[]
+  archetypes: ArchetypeData[]
+  dimensions: DimensionData[]
+  combinedRules: CombinedRuleData[]
+  constants: Constants
+  /** Index code option -> option. */
+  optionByCode: ReadonlyMap<OptionCode, OptionData>
+  /** Index code question -> question. */
+  questionByCode: ReadonlyMap<QuestionCode, QuestionData>
+  /** Codes questions par diagnostic, dans l'ordre de passation. */
+  questionCodes: Record<DiagnosticType, QuestionCode[]>
+}
 
-/** Les 8 dimensions dirigeant avec nom et définition, issues de la matrice V2.1. */
-export const dimensions = dimensionsJson as Dimension[]
+function build(raw: {
+  version: string
+  checksum: string
+  questions: QuestionData[]
+  options: OptionData[]
+  archetypes: ArchetypeData[]
+  dimensions: DimensionData[]
+  combinedRules: CombinedRuleData[]
+  constants: Constants
+}): ScoringVersion {
+  const optionByCode = new Map(raw.options.map((o) => [o.code, o]))
+  const questionByCode = new Map(raw.questions.map((q) => [q.code, q]))
+  const codes = (type: DiagnosticType) =>
+    raw.questions
+      .filter((q) => q.type === type)
+      .sort((a, b) => a.ordre - b.ordre)
+      .map((q) => q.code)
+  return {
+    ...raw,
+    optionByCode,
+    questionByCode,
+    questionCodes: { dirigeant: codes('dirigeant'), rayonnement: codes('rayonnement') },
+  }
+}
+
+import archetypesV22 from './versions/v2.2/archetypes.json'
+import checksumV22 from './versions/v2.2/checksum.json'
+import combinedRulesV22 from './versions/v2.2/combined-rules.json'
+import constantsV22 from './versions/v2.2/constants.json'
+import dimensionsV22 from './versions/v2.2/dimensions.json'
+import optionsV22 from './versions/v2.2/options.json'
+import questionsV22 from './versions/v2.2/questions.json'
+
+export const V2_1: ScoringVersion = build({
+  version: (constantsV21 as Constants).version,
+  checksum: (checksumV21 as { sha256: string }).sha256,
+  questions: questionsV21 as QuestionData[],
+  options: optionsV21 as OptionData[],
+  archetypes: archetypesV21 as ArchetypeData[],
+  dimensions: dimensionsV21 as DimensionData[],
+  combinedRules: combinedRulesV21 as CombinedRuleData[],
+  constants: constantsV21 as Constants,
+})
 
 /**
- * Les 5 dimensions de rayonnement, dans l'ordre d'affichage de la maquette P09.
- * Volontairement en code source et non dans les JSON versionnés : la matrice V2.1
- * ne porte que les clés de pondération, et régénérer les JSON changerait CHECKSUM,
- * donc ferait échouer la garde de version au seed sur une base déjà semée.
+ * V2.2 (7 septembre 2026) : mêmes questions, options, constats et règles que la V2.1 ;
+ * seule la règle de départage est précisée (score central arrondi à deux décimales) et un
+ * cas de contrôle ajouté. Les snapshots V2.1 restent relus avec la V2.1.
  */
-export const RAYONNEMENT_DIMS: RayonnementDimension[] = [
-  { code: 'notoriete', nom: 'Notoriété' },
-  { code: 'lectureConcurrentielle', nom: 'Lecture concurrentielle' },
-  { code: 'differenciation', nom: 'Différenciation' },
-  { code: 'digital', nom: 'Digital' },
-  { code: 'empreinte', nom: 'Empreinte' },
-]
+export const V2_2: ScoringVersion = build({
+  version: (constantsV22 as Constants).version,
+  checksum: (checksumV22 as { sha256: string }).sha256,
+  questions: questionsV22 as QuestionData[],
+  options: optionsV22 as OptionData[],
+  archetypes: archetypesV22 as ArchetypeData[],
+  dimensions: dimensionsV22 as DimensionData[],
+  combinedRules: combinedRulesV22 as CombinedRuleData[],
+  constants: constantsV22 as Constants,
+})
 
-const byCode = new Map(options.map((o) => [o.code, o]))
-export const optionByCode = (code: string): Option => {
-  const o = byCode.get(code)
-  if (!o) throw new ScoringError('INVALID_ANSWER', `Option inconnue : ${code}`)
-  return o
+const REGISTRY = new Map<string, ScoringVersion>([
+  [V2_1.version, V2_1],
+  [V2_2.version, V2_2],
+])
+
+/** Version par défaut du moteur (dernière publiée). */
+export const CURRENT_VERSION = V2_2.version
+
+export function getVersion(version: string = CURRENT_VERSION): ScoringVersion {
+  const found = REGISTRY.get(version)
+  if (!found) throw new Error(`VERSION_INACTIVE: version de scoring inconnue « ${version} »`)
+  return found
 }
-export const questionsOf = (type: DiagnosticType) => questions.filter((q) => q.type === type).sort((a, b) => a.ordre - b.ordre)
 
-/** Vérifie complétude + validité, retourne les options choisies dans l'ordre des questions. */
-export function resolveAnswers(type: DiagnosticType, answers: Answers): Option[] {
-  const qs = questionsOf(type)
-  const missing = qs.filter((q) => !answers[q.code]).map((q) => q.code)
-  if (missing.length) throw new ScoringError('INCOMPLETE_PARTICIPATION', `Réponses manquantes : ${missing.join(', ')}`)
-  return qs.map((q) => optionByCode(`${q.code}${answers[q.code]}`))
-}
-
-/** "BCBADBADDBCADA" -> { Q1:'B', ... } ; "CCCCCCC" -> { R1:'C', ... } */
-export function fromSequence(type: DiagnosticType, seq: string): Answers {
-  const qs = questionsOf(type)
-  if (seq.length !== qs.length) throw new ScoringError('INCOMPLETE_PARTICIPATION', `Séquence ${type} : ${qs.length} lettres attendues`)
-  const out: Answers = {}
-  qs.forEach((q, i) => {
-    const l = seq[i]!.toUpperCase()
-    if (!'ABCD'.includes(l)) throw new ScoringError('INVALID_ANSWER', `Lettre invalide : ${l}`)
-    out[q.code] = l as Answers[string]
-  })
-  return out
+export function listVersions(): string[] {
+  return [...REGISTRY.keys()]
 }

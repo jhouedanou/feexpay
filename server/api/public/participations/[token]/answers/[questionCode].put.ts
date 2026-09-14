@@ -1,35 +1,80 @@
-import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { schema, useDb } from '../../../../../utils/db'
-import { requireParticipation } from '../../../../../utils/participation'
 
-const Body = z.object({ optionCode: z.string().regex(/^[QR]\d{1,2}[A-D]$/) })
+const Body = z.object({ optionCode: z.string().regex(/^(Q([1-9]|1[0-4])|R[1-7])[A-D]$/) }).strict()
 
-/** Idempotent : upsert de la réponse ; l'historique est journalisé par trigger DB. */
+/**
+ * PUT /api/public/participations/{token}/answers/{questionCode} — idempotent.
+ * L'historisation (`answer_history`) et la cohérence option↔question sont assurées
+ * par les triggers en base : on ne les redouble pas ici.
+ */
 export default defineEventHandler(async (event) => {
-  const p = await requireParticipation(event)
-  if (p.status !== 'in_progress') throw apiError(event, 'DUPLICATE_SUBMISSION', 'Participation déjà terminée')
-  const questionCode = getRouterParam(event, 'questionCode') ?? ''
-  const parsed = Body.safeParse(await readBody(event))
-  if (!parsed.success) throw apiError(event, 'VALIDATION_ERROR', undefined, parsed.error.flatten())
+  const token = getRouterParam(event, 'token')
+  const questionCode = getRouterParam(event, 'questionCode')
+  if (!token || !questionCode) throw apiError(event, 'VALIDATION_ERROR', 'Paramètres manquants.')
+
+  const parsed = Body.safeParse(await readBody(event).catch(() => null))
+  if (!parsed.success) throw apiError(event, 'VALIDATION_ERROR', 'Champ `optionCode` invalide.')
   const { optionCode } = parsed.data
-  if (optionCode.slice(0, -1) !== questionCode) throw apiError(event, 'INVALID_ANSWER', 'Option hors question')
 
-  const db = useDb()
-  const [opt] = await db
-    .select({ optionId: schema.option.id, questionId: schema.question.id, type: schema.question.diagnosticType })
-    .from(schema.option)
-    .innerJoin(schema.question, eq(schema.option.questionId, schema.question.id))
-    .where(and(eq(schema.question.versionId, p.versionId), eq(schema.option.code, optionCode), eq(schema.question.code, questionCode)))
-    .limit(1)
-  if (!opt || opt.type !== p.diagnosticType) throw apiError(event, 'INVALID_ANSWER')
+  if (!optionCode.startsWith(questionCode)) {
+    throw apiError(
+      event,
+      'INVALID_ANSWER',
+      `L'option ${optionCode} n'appartient pas à la question ${questionCode}.`
+    )
+  }
 
-  await db
-    .insert(schema.answer)
-    .values({ participationId: p.id, questionId: opt.questionId, optionId: opt.optionId })
-    .onConflictDoUpdate({
-      target: [schema.answer.participationId, schema.answer.questionId],
-      set: { optionId: opt.optionId, revisedAt: new Date() },
-    })
-  return { ok: true, questionCode, optionCode }
+  const session = await requireSession(event)
+  const p = await participationByToken(event, token, session.id)
+
+  if (p.status === 'completed') {
+    throw apiError(
+      event,
+      'DUPLICATE_SUBMISSION',
+      'Participation déjà complétée : son snapshot est immuable.'
+    )
+  }
+
+  const target = await db().query<{ qid: string; oid: string }>(
+    `select q.id as qid, o.id as oid
+       from question q join "option" o on o.question_id = q.id
+      where q.version_id = $1 and q.diagnostic_type = $2 and q.code = $3 and o.code = $4`,
+    [p.version_id, p.diagnostic_type, questionCode, optionCode]
+  )
+  if (!target.rowCount) {
+    throw apiError(event, 'INVALID_ANSWER', `Couple ${questionCode}/${optionCode} inconnu.`)
+  }
+  const { qid, oid } = target.rows[0]!
+
+  const answered = await tx(async (c) => {
+    await c.query(
+      `insert into answer (participation_id, question_id, option_id)
+       values ($1, $2, $3)
+       on conflict (participation_id, question_id) do update
+         set option_id  = excluded.option_id,
+             revised_at = case when answer.option_id <> excluded.option_id
+                               then now() else answer.revised_at end`,
+      [p.id, qid, oid]
+    )
+    // Répondre à nouveau relance un parcours abandonné (reprise à 7 j).
+    if (p.status === 'abandoned') {
+      await c.query(`update participation set status = 'in_progress' where id = $1`, [p.id])
+    }
+    const { rows } = await c.query<{ n: string }>(
+      `select count(*)::int as n from answer where participation_id = $1`,
+      [p.id]
+    )
+    return Number(rows[0]!.n)
+  })
+
+  const total = QUESTION_COUNT[p.diagnostic_type]
+  return {
+    questionCode,
+    optionCode,
+    answered,
+    total,
+    complete: answered === total,
+    status: p.status === 'abandoned' ? 'in_progress' : p.status,
+    correlation_id: event.context.correlationId,
+  }
 })

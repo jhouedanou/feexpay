@@ -1,12 +1,15 @@
-import { eq } from 'drizzle-orm'
-import { schema, useDb } from '../../../utils/db'
-import { requireParticipation } from '../../../utils/participation'
-import { toPublicResult } from '../../../utils/result'
-
+/**
+ * GET /api/public/results/{token} — résultat public d'un parcours complété (P08/P09).
+ */
 export default defineEventHandler(async (event) => {
-  const p = await requireParticipation(event)
-  if (p.status !== 'completed') throw apiError(event, 'INCOMPLETE_PARTICIPATION')
-  const [snap] = await useDb().select().from(schema.scoreSnapshot).where(eq(schema.scoreSnapshot.participationId, p.id)).limit(1)
-  if (!snap) throw apiError(event, 'NOT_FOUND')
-  return toPublicResult(p.diagnosticType, snap.result)
+  const token = getRouterParam(event, 'token')
+  if (!token) throw apiError(event, 'VALIDATION_ERROR', 'Jeton manquant.')
+
+  const session = await requireSession(event)
+  const p = await participationByToken(event, token, session.id)
+
+  if (p.status !== 'completed') {
+    throw apiError(event, 'INCOMPLETE_PARTICIPATION', 'Parcours non terminé.')
+  }
+  return { token, ...(await readSnapshot(event, p.id)) }
 })
