@@ -1,6 +1,6 @@
 # Radar by FeexPay
 
-Web app mobile-first : profil du dirigeant (14 questions → 8 archétypes) et rayonnement de l'entreprise (7 questions → score 0–100, météo). Plan complet et décisions : [PLAN.md](PLAN.md). Sources normatives : `MarketingBS/`.
+Web app mobile-first : profil du dirigeant (14 questions → 8 archétypes) et rayonnement de l'entreprise (7 questions → score 0–100, météo). Plan complet et décisions : [PLAN.md](PLAN.md). Écarts entre le pack de handoff et le produit à livrer, avec les points à trancher par le client : [docs/MANQUEMENTS.md](docs/MANQUEMENTS.md). Sources normatives : `MarketingBS/`.
 
 ## Stack
 

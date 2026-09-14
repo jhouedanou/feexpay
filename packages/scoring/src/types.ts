@@ -2,6 +2,22 @@ export type Dim = 'VIS' | 'STR' | 'EXE' | 'ORG' | 'INF' | 'AUD' | 'ADA' | 'TRA'
 export type Lettre = 'A' | 'B' | 'C' | 'D'
 export type DiagnosticType = 'dirigeant' | 'rayonnement'
 
+/** Clés des 5 dimensions de rayonnement, dans l'ordre d'affichage. */
+export type RayonnementDim = 'notoriete' | 'lectureConcurrentielle' | 'differenciation' | 'digital' | 'empreinte'
+
+/** Dimension dirigeant : code, nom affichable et définition (onglet « Vue d'ensemble » V2.1). */
+export interface Dimension {
+  code: Dim
+  nom: string
+  definition: string
+}
+
+/** Dimension de rayonnement : la matrice ne porte que les clés de pondération, pas les libellés. */
+export interface RayonnementDimension {
+  code: RayonnementDim
+  nom: string
+}
+
 /** Réponses : code question -> lettre (ex. { Q1: 'B', ... }). */
 export type Answers = Record<string, Lettre>
 

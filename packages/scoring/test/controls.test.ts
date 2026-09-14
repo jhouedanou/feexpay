@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { DIMS, buildInsights, crossReading, fromSequence, options, scoreDirigeant, scoreRayonnement, ScoringError } from '../src'
+import {
+  DIMS,
+  RAYONNEMENT_DIMS,
+  buildInsights,
+  crossReading,
+  dimensions,
+  fromSequence,
+  options,
+  scoreDirigeant,
+  scoreRayonnement,
+  ScoringError,
+} from '../src'
 
 const d = (s: string) => scoreDirigeant(fromSequence('dirigeant', s))
 const r = (s: string) => scoreRayonnement(fromSequence('rayonnement', s))
@@ -114,5 +125,16 @@ describe('insights', () => {
   it('RC04 déclenchée (Q10D + Q11D ? non) / RC08 (Q8D+Q4D) oui', () => {
     expect(ins.hypotheses.map((h) => h.id)).toContain('RC08')
     expect(ins.hypotheses.map((h) => h.id)).not.toContain('RC04')
+  })
+})
+
+describe('vocabulaire des dimensions', () => {
+  it('8 dimensions dirigeant, dans l’ordre de DIMS, nommées et définies', () => {
+    expect(dimensions.map((x) => x.code)).toEqual(DIMS)
+    expect(dimensions.every((x) => x.nom !== '' && x.definition !== '')).toBe(true)
+  })
+  it('5 dimensions de rayonnement, alignées sur les clés du résultat', () => {
+    expect(RAYONNEMENT_DIMS.map((x) => x.code)).toEqual(Object.keys(r('CCCCCCC').dims))
+    expect(RAYONNEMENT_DIMS.every((x) => x.nom !== '')).toBe(true)
   })
 })

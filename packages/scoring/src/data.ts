@@ -1,10 +1,22 @@
 import questionsJson from './versions/v2.1/questions.json'
 import optionsJson from './versions/v2.1/options.json'
 import archetypesJson from './versions/v2.1/archetypes.json'
+import dimensionsJson from './versions/v2.1/dimensions.json'
 import rulesJson from './versions/v2.1/combined-rules.json'
 import constantsJson from './versions/v2.1/constants.json'
 import checksumJson from './versions/v2.1/checksum.json'
-import type { Answers, Archetype, CombinedRule, DiagnosticType, Dim, Option, Question, ScoringError as _SE } from './types'
+import type {
+  Answers,
+  Archetype,
+  CombinedRule,
+  DiagnosticType,
+  Dim,
+  Dimension,
+  Option,
+  Question,
+  RayonnementDimension,
+  ScoringError as _SE,
+} from './types'
 import { ScoringError } from './types'
 
 export const VERSION = constantsJson.version
@@ -15,6 +27,23 @@ export const options = optionsJson as Option[]
 export const archetypes = archetypesJson as Archetype[]
 export const combinedRules = rulesJson as CombinedRule[]
 export const DIMS: Dim[] = ['VIS', 'STR', 'EXE', 'ORG', 'INF', 'AUD', 'ADA', 'TRA']
+
+/** Les 8 dimensions dirigeant avec nom et définition, issues de la matrice V2.1. */
+export const dimensions = dimensionsJson as Dimension[]
+
+/**
+ * Les 5 dimensions de rayonnement, dans l'ordre d'affichage de la maquette P09.
+ * Volontairement en code source et non dans les JSON versionnés : la matrice V2.1
+ * ne porte que les clés de pondération, et régénérer les JSON changerait CHECKSUM,
+ * donc ferait échouer la garde de version au seed sur une base déjà semée.
+ */
+export const RAYONNEMENT_DIMS: RayonnementDimension[] = [
+  { code: 'notoriete', nom: 'Notoriété' },
+  { code: 'lectureConcurrentielle', nom: 'Lecture concurrentielle' },
+  { code: 'differenciation', nom: 'Différenciation' },
+  { code: 'digital', nom: 'Digital' },
+  { code: 'empreinte', nom: 'Empreinte' },
+]
 
 const byCode = new Map(options.map((o) => [o.code, o]))
 export const optionByCode = (code: string): Option => {

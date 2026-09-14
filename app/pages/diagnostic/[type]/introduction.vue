@@ -6,9 +6,19 @@ const type = route.params.type as DiagType
 if (type !== 'dirigeant' && type !== 'rayonnement') throw createError({ statusCode: 404 })
 
 const copy = {
-  dirigeant: { titre: 'Profil du dirigeant', intro: '14 situations concrètes. Choisissez la réponse la plus proche de votre façon de faire. Il n’y a pas de bonne réponse.', n: 14 },
-  rayonnement: { titre: "Rayonnement de l'entreprise", intro: '7 questions sur la manière dont votre entreprise est perçue. Répondez selon la situation actuelle.', n: 7 },
+  dirigeant: {
+    titre: 'Profil du dirigeant',
+    intro: 'Des situations concrètes. Choisissez la réponse la plus proche de votre façon de faire. Il n’y a pas de bonne réponse.',
+  },
+  rayonnement: {
+    titre: "Rayonnement de l'entreprise",
+    intro: 'Quelques questions sur la manière dont votre entreprise est perçue. Répondez selon la situation actuelle.',
+  },
 }[type]
+
+// Le nombre de questions vient de la version publiée du moteur, jamais d'une constante.
+const { data: qs } = await useQuestions(type)
+const total = computed(() => qs.value?.questions.length ?? 0)
 
 const other = useParticipation(type === 'dirigeant' ? 'rayonnement' : 'dirigeant')
 const part = useParticipation(type)
@@ -51,7 +61,7 @@ async function go(resume = false) {
     <h1 class="mt-1 text-2xl font-semibold text-navy-800 md:text-3xl">{{ copy.titre }}</h1>
     <p class="mt-4 text-gray-700">{{ copy.intro }}</p>
     <ul class="mt-4 space-y-1 text-sm text-gray-600">
-      <li>{{ copy.n }} questions, une par écran</li>
+      <li v-if="total">{{ total }} questions, une par écran</li>
       <li>Retour possible sans perdre vos réponses</li>
       <li>Résultat affiché immédiatement, sans formulaire</li>
     </ul>

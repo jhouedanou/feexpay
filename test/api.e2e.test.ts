@@ -68,6 +68,17 @@ describe('parcours public', () => {
     const res = await api(`/api/public/results/${token}`)
     expect(res.data.principal.code).toBe('Stratège')
   })
+  it('dimensions dirigeant servies libellées et ordonnées', async () => {
+    const res = await api(`/api/public/results/${token}`)
+    expect(res.data.dims).toHaveLength(8)
+    // Valeurs du cas de contrôle §5.5 (BCBADBADDBCADA) : une régression de clés
+    // qui remettrait tout à zéro serait invisible avec expect.any(Number).
+    expect(res.data.dims[0]).toEqual({ code: 'VIS', nom: 'Vision', valeur: 33 })
+    expect(res.data.dims[1]).toEqual({ code: 'STR', nom: 'Stratégie', valeur: 87 })
+    expect(res.data.dims.map((d: { valeur: number }) => d.valeur)).toEqual([33, 87, 6, 17, 24, 33, 50, 24])
+    expect(res.data.dims.every((d: { nom: string }) => d.nom !== '')).toBe(true)
+    expect(res.data.norm).toBeUndefined()
+  })
   it('réponse après complétion refusée', async () => {
     const r = await api(`/api/public/participations/${token}/answers/Q1`, { method: 'PUT', body: { optionCode: 'Q1A' } })
     expect(r.status).toBe(409)
@@ -81,6 +92,9 @@ describe('parcours public', () => {
     expect(r.data.result.niveau).toBe('Challenger fort')
     expect(r.data.result.meteo).toBe('Éclaircies')
     expect(r.data.result.differenciation).toBe('Qualité')
+    expect(r.data.result.meteoCode).toBe('eclaircies')
+    expect(r.data.result.dims).toHaveLength(5)
+    expect(r.data.result.dims[1]).toEqual({ code: 'lectureConcurrentielle', nom: 'Lecture concurrentielle', valeur: 67 })
   })
   it('jeton inconnu → 404 ; sans cookie → SESSION_EXPIRED', async () => {
     expect((await api(`/api/public/results/${'x'.repeat(43)}`)).status).toBe(404)

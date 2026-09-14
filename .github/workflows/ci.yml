@@ -21,3 +21,12 @@ jobs:
       - run: pnpm build
       - name: Aucun secret dans le bundle client
         run: '! grep -rE "SUPABASE_SERVICE|service_role|DATABASE_URL=postgres" .output/public'
+
+      # `app/` ne doit jamais importer @radar/scoring : son index de module embarque
+      # options.json, donc les constats commerciaux internes (difficulté, hypothèse,
+      # relance, gravité) destinés à la seule fiche prospect admin.
+      - name: Aucun contenu du moteur dans le bundle client
+        run: |
+          ! grep -rlE "Difficulté précise|Question de relance|Utilisation commerciale" .output/public
+          ! grep -rl "Le prospect se projette" .output/public
+          ! grep -rnE "(from|import\()[[:space:]]*['\"]@radar/scoring" app/

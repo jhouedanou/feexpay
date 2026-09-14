@@ -1,8 +1,29 @@
 <script setup lang="ts">
-const cards = [
-  { type: 'dirigeant', titre: 'Profil du dirigeant', desc: '14 questions · votre archétype parmi 8 figures', duree: '≈ 4 min', img: '/brand/emb-stratege-64.png' },
-  { type: 'rayonnement', titre: "Rayonnement de l'entreprise", desc: '7 questions · score 0–100 et météo', duree: '≈ 2 min', img: '/brand/logo-mark.png' },
-]
+// Compteurs résolus côté serveur pour éviter tout décalage de mise en page.
+const { data: counts } = await useAsyncData('diagnostic-counts', async () => {
+  const [d, r] = await Promise.all([
+    $fetch<{ questions: unknown[] }>('/api/public/questions/dirigeant'),
+    $fetch<{ questions: unknown[] }>('/api/public/questions/rayonnement'),
+  ])
+  return { dirigeant: d.questions.length, rayonnement: r.questions.length }
+})
+
+const cards = computed(() => [
+  {
+    type: 'dirigeant',
+    titre: 'Profil du dirigeant',
+    desc: `${counts.value?.dirigeant ?? '—'} questions · votre archétype parmi 8 figures`,
+    duree: '≈ 4 min',
+    img: '/brand/emb-stratege-64.png',
+  },
+  {
+    type: 'rayonnement',
+    titre: "Rayonnement de l'entreprise",
+    desc: `${counts.value?.rayonnement ?? '—'} questions · score 0–100 et météo`,
+    duree: '≈ 2 min',
+    img: '/brand/logo-mark.png',
+  },
+])
 </script>
 
 <template>
